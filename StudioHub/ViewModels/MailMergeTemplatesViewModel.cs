@@ -159,8 +159,8 @@ public partial class MailMergeTemplatesViewModel() : ObservableObject {
 
         Application wordApp = new() { Visible = true };
         Document doc = existingContent != null
-            ? wordApp.Documents.Open(templateFullName)
-            : wordApp.Documents.Add();
+                     ? wordApp.Documents.Open(templateFullName)
+                     : wordApp.Documents.Add();
 
         doc.Variables.Add("StudioHubSignature", signature);
         if (existingContent == null) {
@@ -210,7 +210,7 @@ public partial class MailMergeTemplatesViewModel() : ObservableObject {
             return null;
         }
 
-        TimeSpan timeout = TimeSpan.FromSeconds(10);
+        TimeSpan timeout = TimeSpan.FromSeconds(15);
         Stopwatch sw = Stopwatch.StartNew();
         byte[]? content = null;
 

@@ -8,18 +8,18 @@ public static class MailMergeTemplateService {
 
     // Recupera i metadati per l'app specifica
     public static async Task<IEnumerable<MailMergeTemplateInfo>> GetMailMergeTemplateInfoAsync(string appName) {
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         return await connection.QueryAsync<MailMergeTemplateInfo>(x => x.App == appName);
     }
 
     // Recupera il contenuto binario e le headers
     public static async Task<MailMergeTemplateData?> GetMailMergeTemplateDataAsync(int id) {
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         return (await connection.QueryAsync<MailMergeTemplateData>(x => x.Id == id)).FirstOrDefault();
     }
 
     public static async Task<byte[]> GetMailMergeTemplateFileContentAsync(int id) {
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         MailMergeTemplateData? data = (await connection.QueryAsync<MailMergeTemplateData>(x => x.Id == id)).FirstOrDefault();
         return data?.FileContent ?? [];
     }
@@ -27,7 +27,7 @@ public static class MailMergeTemplateService {
     // Inserimento atomico di Info + Data
     public static async Task<int> InsertMailMergeTemplateAsync(MailMergeTemplateInfo info, byte[] content, string headers) {
 
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         await connection.OpenAsync();
         using SqlTransaction transaction = connection.BeginTransaction();
 
@@ -53,7 +53,7 @@ public static class MailMergeTemplateService {
     // Aggiornamento dei soli metadati (Nome/Descrizione)
     public static async Task UpdateMailMergeTemplateInfoAsync(int id, string name, string description) {
 
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         await connection.UpdateAsync<MailMergeTemplateInfo>(new() {
             Id = id,
             Name = name,
@@ -65,7 +65,7 @@ public static class MailMergeTemplateService {
     // Aggiornamento del file Word
     public static async Task UpdateMailMergeTemplateDataAsync(int id, byte[] content) {
 
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         await connection.OpenAsync();
         using SqlTransaction transaction = connection.BeginTransaction();
 
@@ -92,7 +92,7 @@ public static class MailMergeTemplateService {
     }
 
     public static async Task UpdateMailMergeTemplateFileContentAsync(int id, byte[] newContent) {
-        using SqlConnection connection = new(ConnectionInfoService.GetPrimaryConnectionString());
+        using SqlConnection connection = new(ConnectionInfoService.PrimaryConnectionString);
         await connection.OpenAsync();
 
         using SqlTransaction transaction = connection.BeginTransaction();

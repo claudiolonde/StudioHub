@@ -8,8 +8,8 @@ using StudioHub.Services;
 namespace StudioHub.ViewModels;
 
 /// <summary>
-/// ViewModel per la modifica delle informazioni di connessione al database.
-/// Gestisce la logica di connessione, disconnessione, salvataggio e caricamento delle configurazioni.
+/// ViewModel per la modifica delle informazioni di connessione al database. Gestisce la logica di connessione,
+/// disconnessione, salvataggio e caricamento delle configurazioni.
 /// </summary>
 public partial class EditConnectionInfoViewModel : ObservableObject {
 
@@ -118,6 +118,9 @@ public partial class EditConnectionInfoViewModel : ObservableObject {
     public EditConnectionInfoViewModel() {
 
         savedCI = ConnectionInfoService.LoadConnectionInfo();
+        if (savedCI is null) {
+            return;
+        }
 
         DataSource = savedCI.DataSource;
         IntegratedSecurity = savedCI.IntegratedSecurity;
@@ -217,6 +220,10 @@ public partial class EditConnectionInfoViewModel : ObservableObject {
     private async Task Save() {
         ConnectionInfoService.SaveConnectionInfo(getConnectionInfo());
         SaveCommand.NotifyCanExecuteChanged();
+        IsSaved = true;
         Saved?.Invoke(this, EventArgs.Empty);
     }
+
+    internal bool IsSaved { get; private set; } = false;
+
 }

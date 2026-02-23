@@ -34,7 +34,7 @@ public enum DialogIcon {
 /// <inheritdoc/>
 public partial class Dialog : Window {
 
-    private static readonly (SolidColorBrush?, string)[] icons = [
+    private static readonly (SolidColorBrush? Color, string Data)[] icons = [
 
         // None
         (null, string.Empty),
@@ -68,16 +68,21 @@ public partial class Dialog : Window {
     /// <param name="message">Testo del messaggio.</param>
     /// <param name="icon">Icona da visualizzare.</param>
     /// <param name="title">Titolo della finestra.</param>
-    /// <param name="buttons">Array di stringhe contenente i testi dei pulsanti, se nullo o vuoto verrà visualizzato un pulsante "Chiudi".<br/>
-    /// Inserire un carattere nullo (<c>\0</c>) all'inizio o alla fine della stringa per definire rispettivamente il pulsante predefinito (Invio) o il pulsante annulla (Esc)<br/>
-    /// Solo le prime occorrenze saranno considerate, tutte le successive verranno ignorate.</param>
+    /// <param name="buttons">
+    /// Array di stringhe contenente i testi dei pulsanti, se nullo o vuoto verrà visualizzato un pulsante
+    /// "Chiudi".<br/> Inserire un carattere nullo (<c>\0</c>) all'inizio o alla fine della stringa per definire
+    /// rispettivamente il pulsante predefinito (Invio) o il pulsante annulla (Esc)<br/> Solo le prime occorrenze
+    /// saranno considerate, tutte le successive verranno ignorate.
+    /// </param>
     /// <returns>L'indice <see cref="int"/> in base zero del pulsante premuto dall'utente.</returns>
     public static int Show(string message, DialogIcon icon = DialogIcon.None, string title = "", params string[] buttons) {
 
         Window? activeWindow = GetActiveWindow();
 
-        if (string.IsNullOrEmpty(title)) {
-            title = activeWindow is not null ? activeWindow.Title : Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(title)) {
+            title = activeWindow is null || string.IsNullOrWhiteSpace(activeWindow.Title)
+                ? Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty
+                : activeWindow.Title;
         }
 
         if (buttons == null || buttons.Length == 0) {
@@ -88,14 +93,18 @@ public partial class Dialog : Window {
             Owner = activeWindow
         };
 
-        dialog.Owner!.Opacity = .5;
+        // Disabilita l'icona della finestra all'inizializzazione della sorgente.
+        dialog.SourceInitialized += (s, e) => DisableWindowIcon(dialog);
+        dialog.Owner?.Opacity = .5;
+
         dialog.ShowDialog();
-        dialog.Owner!.Opacity = 1;
+
+        dialog.Owner?.Opacity = 1;
 
         return dialog.ResultIndex;
     }
 
-    /// <inheritdoc cref="Show(string, DialogIcon, string, string[])"/> 
+    /// <inheritdoc cref="Show(string, DialogIcon, string, string[])"/>
     private Dialog(string title, string message, DialogIcon icon, string[] buttons) {
 
         InitializeComponent();
@@ -108,30 +117,11 @@ public partial class Dialog : Window {
         messageString = message;
     }
 
-    /// <summary>
-    /// Restituisce la finestra attiva dell'applicazione corrente, se presente.
-    /// </summary>
-    /// <returns>
-    /// L'istanza <see cref="Window"/> attualmente attiva, oppure <c>null</c> se nessuna finestra è attiva o se non sono presenti finestre.
-    /// </returns>
-    private static Window? _getActiveWindow() {
-        WindowCollection? windows = Application.Current?.Windows;
-        if (windows is null) {
-            return null;
-        }
-        foreach (Window window in windows) {
-            if (window.IsActive) {
-                return window;
-            }
-        }
-        return null;
-    }
-
     private void dialog_Loaded(object sender, RoutedEventArgs e) {
-        double horizontalMargin = dialogMessage.Margin.Left + dialogMessage.Margin.Right;
-        dialogMessage.MaxWidth = ActualWidth - horizontalMargin;
+        double horizontalMargin = textblockMessage.Margin.Left + textblockMessage.Margin.Right;
+        textblockMessage.MaxWidth = ActualWidth - horizontalMargin;
         SizeToContent = SizeToContent.Height;
-        dialogMessage.Text = messageString;
+        textblockMessage.Text = messageString;
     }
 
     private void button_Click(object sender, RoutedEventArgs e) {
@@ -140,9 +130,9 @@ public partial class Dialog : Window {
     }
 
     private void setIcon(int iconIndex) {
-        dialogIcon.Fill = icons[iconIndex].Item1;
-        dialogIcon.Data = Geometry.Parse(icons[iconIndex].Item2);
-        dialogIcon.Visibility = iconIndex == 0 ? Visibility.Collapsed : Visibility.Visible;
+        pathIcon.Fill = icons[iconIndex].Color;
+        pathIcon.Data = Geometry.Parse(icons[iconIndex].Data);
+        pathIcon.Visibility = iconIndex == 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void setButtons(string[] buttonsText) {
@@ -178,7 +168,7 @@ public partial class Dialog : Window {
             button.Content = text.Trim('\0');
             button.Click += button_Click;
 
-            dialogButtons.Children.Add(button);
+            panelButtons.Children.Add(button);
         }
     }
 }

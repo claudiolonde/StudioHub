@@ -23,7 +23,7 @@ public partial class EditConnectionInfoView : Window {
     /// gestisce la cancellazione del comando di connessione in chiusura,
     /// e chiude la finestra al salvataggio.
     /// </remarks>
-    public static void Open() {
+    public static bool Open() {
 
         EditConnectionInfoViewModel vm = new();
         EditConnectionInfoView v = new() {
@@ -52,6 +52,7 @@ public partial class EditConnectionInfoView : Window {
         // Chiude la finestra quando l'evento Saved viene sollevato dal ViewModel.
         vm.Saved += (s, e) => v.Close();
         v.ShowDialog();
+        return vm.IsSaved;
     }
 
 }

@@ -8,28 +8,29 @@
     Title="Dialog"
     MinHeight="160" MinWidth="320"
     ResizeMode="NoResize" ShowInTaskbar="False"
-    WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow"
-    d:Height="160" d:Width="320">
+    WindowStartupLocation="CenterOwner"
+    d:Background="#202020" d:Height="160"
+    d:Width="320">
 
     <Grid Margin="32 24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Path x:Name="dialogIcon"
+        <Path x:Name="pathIcon"
             Grid.Row="0"
-            Width="48"
+            Height="48" Width="48"
             Stretch="UniformToFill" />
 
-        <TextBlock x:Name="dialogMessage"
+        <TextBlock x:Name="textblockMessage"
             Grid.Row="1"
             Margin="0 24"
             HorizontalAlignment="Center"
             TextWrapping="Wrap" />
 
-        <StackPanel x:Name="dialogButtons"
+        <StackPanel x:Name="panelButtons"
             Grid.Row="2"
             HorizontalAlignment="Center" VerticalAlignment="Bottom"
             Orientation="Horizontal" />

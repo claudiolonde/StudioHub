@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<!--
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	-->
   </PropertyGroup>
 

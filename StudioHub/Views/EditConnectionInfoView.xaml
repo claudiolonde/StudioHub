@@ -9,7 +9,7 @@
     Title="Impostazione sorgente dati"
     FocusManager.FocusedElement="{Binding ElementName=Focused}"
     ResizeMode="NoResize" ShowInTaskbar="False"
-    SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner"
+    SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
     d:Background="#202020" d:Height="540"
     d:Width="436"
     d:DataContext="{d:DesignInstance Type=vm:EditConnectionInfoViewModel}">

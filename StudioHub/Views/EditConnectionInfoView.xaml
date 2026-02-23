@@ -1,0 +1,140 @@
+<Window x:Class="StudioHub.Views.EditConnectionInfoView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d"
+    xmlns:help="clr-namespace:StudioHub.Helpers" xmlns:ui="clr-namespace:StudioHub.Controls"
+    xmlns:vm="clr-namespace:StudioHub.ViewModels"
+    Title="Impostazione sorgente dati"
+    FocusManager.FocusedElement="{Binding ElementName=Focused}"
+    ResizeMode="NoResize" ShowInTaskbar="False"
+    SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner"
+    d:Background="#202020" d:Height="540"
+    d:Width="436"
+    d:DataContext="{d:DesignInstance Type=vm:EditConnectionInfoViewModel}">
+    <Grid Margin="24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="64" />
+        </Grid.RowDefinitions>
+
+        <ui:Label
+            Grid.Column="0" Grid.Row="0"
+            Text="sorgente dati"
+            IsRequired="True" />
+        <TextBox x:Name="Focused"
+            Grid.Column="1" Grid.Row="0"
+            Text="{Binding DataSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Margin="0 8"
+            HorizontalAlignment="Left"
+            Width="240"
+            IsEnabled="{Binding CanEditServerSettings}"
+            ToolTip="Inserisci il nome o l'indirizzo IP dell'istanza di SQL Server" />
+
+        <CheckBox
+            Grid.Column="1" Grid.Row="1"
+            Content="Usa autenticazione di Windows"
+            Margin="0 8"
+            IsChecked="{Binding IntegratedSecurity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding CanEditServerSettings}"
+            ToolTip="Indica se autenticarsi utilizzando le credenziali Windows" />
+
+        <ui:Label
+            Grid.Column="0" Grid.Row="2"
+            Text="nome utente"
+            IsRequired="True" />
+        <TextBox
+            Grid.Column="1" Grid.Row="2"
+            Text="{Binding UserId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Margin="0 8"
+            HorizontalAlignment="Left"
+            Width="240"
+            IsEnabled="{Binding CanEditCredentials}"
+            ToolTip="Inserisci il nome utente per l'autenticazione a SQL Server" />
+
+        <ui:Label
+            Grid.Column="0" Grid.Row="3"
+            Text="password"
+            IsRequired="True" />
+        <TextBox
+            Grid.Column="1" Grid.Row="3"
+            Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Margin="0 8"
+            HorizontalAlignment="Left"
+            Width="240"
+            IsEnabled="{Binding CanEditCredentials}"
+            ToolTip="Inserisci la password dell'utente specificato per l'autenticazione a SQL Server" />
+
+        <ui:LoadingSpinner
+            Grid.Column="0" Grid.Row="4"
+            Margin="0 0 4 0"
+            HorizontalAlignment="Right"
+            Width="13"
+            Visibility="{Binding IsBusy, Converter={help:BoolToHidden}}"
+            d:Visibility="Hidden" />
+        <Button
+            Style="{StaticResource HyperlinkButtonStyle}"
+            Grid.Column="1" Grid.Row="4"
+            Content="Connetti"
+            Margin="0 16"
+            Command="{Binding ConnectCommand}"
+            Visibility="{Binding NotIsConnected, Converter={help:BoolToHidden}}" />
+        <Button
+            Style="{StaticResource HyperlinkButtonStyle}"
+            Grid.Column="1" Grid.Row="4"
+            Content="Disconnetti"
+            Margin="0 16"
+            Command="{Binding DisconnectCommand}"
+            Visibility="{Binding IsConnected, Converter={help:BoolToHidden}}"
+            d:Visibility="Hidden" />
+
+        <ui:Label
+            Grid.Column="0" Grid.Row="5"
+            Text="database StudioHub"
+            IsRequired="True" />
+        <ComboBox
+            Grid.Column="1" Grid.Row="5"
+            Margin="0 8"
+            HorizontalAlignment="Left"
+            Width="240"
+            IsEnabled="{Binding IsConnected, Mode=OneWay}"
+            ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
+            SelectedItem="{Binding StudioHubDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ToolTip="Seleziona il database da utilizzare per StudioHub" />
+
+        <ui:Label
+            Grid.Column="0" Grid.Row="6"
+            Text="database CityUp"
+            IsRequired="True" />
+        <ComboBox
+            Grid.Column="1" Grid.Row="6"
+            Margin="0 8"
+            HorizontalAlignment="Left"
+            Width="240"
+            IsEnabled="{Binding IsConnected, Mode=OneWay}"
+            ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
+            SelectedItem="{Binding CityUpDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ToolTip="Seleziona il database utilizzato da CityUp" />
+
+        <Button
+            Style="{DynamicResource AccentButtonStyle}"
+            Grid.Column="0" Grid.Row="7"
+            Grid.ColumnSpan="2"
+            Content="Salva"
+            VerticalAlignment="Bottom"
+            Width="128"
+            Command="{Binding SaveCommand}" />
+
+    </Grid>
+</Window>

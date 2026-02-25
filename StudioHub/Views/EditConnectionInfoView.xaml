@@ -7,16 +7,17 @@
     xmlns:help="clr-namespace:StudioHub.Helpers" xmlns:ui="clr-namespace:StudioHub.Controls"
     xmlns:vm="clr-namespace:StudioHub.ViewModels"
     Title="Impostazione sorgente dati"
-    Height="430" Width="600"
+    Height="409" Width="600"
     FocusManager.FocusedElement="{Binding ElementName=Focused}"
     ResizeMode="NoResize" ShowInTaskbar="False"
-    SizeToContent="Height" WindowStartupLocation="CenterScreen"
+    WindowStartupLocation="CenterScreen"
     d:Background="#202020"
     d:DataContext="{d:DesignInstance Type=vm:EditConnectionInfoViewModel}">
 
-    <Grid Margin="30">
+    <Grid Margin="25">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
+            <ColumnDefinition Width="20" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -25,42 +26,59 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!--  data source  -->
-        <StackPanel Grid.Column="0" Grid.Row="0" Margin="0 0 10 0">
-            <ui:Label Text="Sorgente Dati" Margin="0 0 0 5" IsRequired="True" />
-            <TextBox x:Name="Focused"
-                Text="{Binding DataSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                IsEnabled="{Binding CanEditServerSettings}"
-                ToolTip="Inserisci il nome o l'indirizzo IP dell'istanza di SQL Server" />
-        </StackPanel>
+        <ui:Label
+            Grid.Column="0" Grid.Row="0"
+            Text="Sorgente Dati"
+            Margin="0 0 0 5"
+            IsRequired="True" />
+        <TextBox x:Name="Focused"
+            Grid.Column="0" Grid.Row="1"
+            Text="{Binding DataSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding CanEditServerSettings}"
+            ToolTip="Inserisci il nome o l'indirizzo IP dell'istanza di SQL Server" />
 
         <!--  integrated security  -->
         <CheckBox
-            Grid.Column="1" Grid.Row="0"
+            Grid.Column="2" Grid.Row="1"
             Content="Usa autenticazione di Windows"
-            Margin="10 0"
             VerticalAlignment="Bottom"
             IsChecked="{Binding IntegratedSecurity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding CanEditServerSettings}"
             ToolTip="Indica se autenticarsi utilizzando le credenziali Windows" />
 
         <!--  user credentials  -->
-        <StackPanel Grid.Column="0" Grid.Row="1" Margin="0 30 10 0">
-            <ui:Label Text="Nome Utente" Margin="0 0 0 5" IsRequired="True" />
-            <TextBox Text="{Binding UserId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEditCredentials}" ToolTip="Inserisci il nome utente per l'autenticazione a SQL Server" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="1" Margin="10 30 0 0">
-            <ui:Label Text="Password" Margin="0 0 0 5" IsRequired="True" />
-            <TextBox Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEditCredentials}" ToolTip="Inserisci la password dell'utente specificato per l'autenticazione a SQL Server" />
-        </StackPanel>
+        <ui:Label
+            Grid.Column="0" Grid.Row="2"
+            Text="Nome Utente"
+            Margin="0 15 0 5"
+            IsRequired="True" />
+
+        <ui:Label
+            Grid.Column="2" Grid.Row="2"
+            Text="Password"
+            Margin="0 15 0 5"
+            IsRequired="True" />
+        <TextBox
+            Grid.Column="0" Grid.Row="3"
+            Text="{Binding UserId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding CanEditCredentials}"
+            ToolTip="Inserisci il nome utente per l'autenticazione a SQL Server" />
+        <TextBox
+            Grid.Column="2" Grid.Row="3"
+            Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding CanEditCredentials}"
+            ToolTip="Inserisci la password dell'utente specificato per l'autenticazione a SQL Server" />
 
         <!--  connection  -->
         <StackPanel
-            Grid.Column="0" Grid.Row="2"
-            Grid.ColumnSpan="2"
-            Margin="0 30"
+            Grid.Column="0" Grid.Row="4"
+            Margin="0 25"
             Orientation="Horizontal">
             <ui:LoadingSpinner
                 Margin="0 0 5 0"
@@ -81,29 +99,33 @@
         </StackPanel>
 
         <!--  databases  -->
-        <StackPanel Grid.Column="0" Grid.Row="3" Margin="0 0 10 0">
-            <ui:Label Text="Database StudioHub" Margin="0 0 0 5" IsRequired="True" />
-            <ComboBox
-                IsEnabled="{Binding IsConnected, Mode=OneWay}"
-                ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
-                SelectedItem="{Binding StudioHubDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ToolTip="Seleziona il database da utilizzare per StudioHub" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="3" Margin="10 0 0 0">
-            <ui:Label Text="Database CityUp" Margin="0 0 0 5" IsRequired="True" />
-            <ComboBox
-                IsEnabled="{Binding IsConnected, Mode=OneWay}"
-                ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
-                SelectedItem="{Binding CityUpDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ToolTip="Seleziona il database utilizzato da CityUp" />
-        </StackPanel>
+        <ui:Label
+            Grid.Column="0" Grid.Row="5"
+            Text="Database StudioHub"
+            Margin="0 0 0 5"
+            IsRequired="True" />
+        <ui:Label
+            Grid.Column="2" Grid.Row="5"
+            Text="Database CityUp"
+            Margin="0 0 0 5"
+            IsRequired="True" />
+        <ComboBox
+            Grid.Column="0" Grid.Row="6"
+            IsEnabled="{Binding IsConnected, Mode=OneWay}"
+            ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
+            SelectedItem="{Binding StudioHubDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ToolTip="Seleziona il database da utilizzare per StudioHub" />
+        <ComboBox
+            Grid.Column="2" Grid.Row="6"
+            IsEnabled="{Binding IsConnected, Mode=OneWay}"
+            ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
+            SelectedItem="{Binding CityUpDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ToolTip="Seleziona il database utilizzato da CityUp" />
 
         <!--  buttons  -->
-        <StackPanel
-            Grid.Column="0" Grid.Row="4"
+        <StackPanel Margin="0 50 0 0"
+            Grid.Column="0" Grid.Row="7"
             Grid.ColumnSpan="2"
-            Margin="0 60 0 0"
-            HorizontalAlignment="Right"
             Orientation="Horizontal">
             <Button Content="Annulla" Width="128" IsCancel="True" />
             <Button

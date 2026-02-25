@@ -9,7 +9,7 @@ namespace StudioHub.Views;
 /// </summary>
 public partial class EditConnectionInfoView : Window {
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public EditConnectionInfoView() {
         InitializeComponent();
     }
@@ -18,10 +18,9 @@ public partial class EditConnectionInfoView : Window {
     /// Apre la finestra di dialogo per modificare le informazioni di connessione.
     /// </summary>
     /// <remarks>
-    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/>, 
-    /// disabilita l'icona della finestra, abilita la chiusura tramite ESC,
-    /// gestisce la cancellazione del comando di connessione in chiusura,
-    /// e chiude la finestra al salvataggio.
+    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/> , disabilita l'icona della finestra,
+    /// abilita la chiusura tramite ESC, gestisce la cancellazione del comando di connessione in chiusura, e chiude la
+    /// finestra al salvataggio.
     /// </remarks>
     public static bool Open() {
 

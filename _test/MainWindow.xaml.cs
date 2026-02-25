@@ -19,10 +19,10 @@ public partial class MainWindow : Window {
 
     private async void Button_Click(object sender, RoutedEventArgs e) {
         //Title = "";
-        Dialog.Show("Questo è un testo di esempio", DialogIcon.Info, "titolo");
+        EditConnectionInfoView.Open();
+        //Dialog.Show("Questo è un testo di esempio", DialogIcon.Info, "titolo");
         //MailMergeTemplatesView.Open("Meeting", ["Nome", "Cognome", "Email"]);
 
-        //EditConnectionInfoView.Open();
     }
 
 }

@@ -8,7 +8,7 @@ namespace StudioHub.Helpers;
 /// <summary>
 /// Converte un valore booleano in <see cref="Visibility"/> per l'uso in binding WPF.
 /// </summary>
-public class BoolToCollapse : MarkupExtension, IValueConverter {
+public class BoolToCollapsed : MarkupExtension, IValueConverter {
 
     /// <summary>
     /// Se impostato a <c>true</c>, inverte il valore booleano prima della conversione.
@@ -19,7 +19,7 @@ public class BoolToCollapse : MarkupExtension, IValueConverter {
     /// Restituisce l'istanza corrente come valore da utilizzare nel markup XAML.
     /// </summary>
     /// <param name="serviceProvider">Provider di servizi per il markup.</param>
-    /// <returns>L'istanza corrente di <see cref="BoolToCollapse"/>.</returns>
+    /// <returns>L'istanza corrente di <see cref="BoolToCollapsed"/>.</returns>
     public override object ProvideValue(IServiceProvider serviceProvider) {
         return this;
     }

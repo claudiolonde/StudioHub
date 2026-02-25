@@ -41,7 +41,7 @@ public class FileSizeConverter : MarkupExtension, IValueConverter {
     /// Restituisce l'istanza corrente come valore da utilizzare nel markup XAML.
     /// </summary>
     /// <param name="serviceProvider">Provider di servizi per il markup.</param>
-    /// <returns>L'istanza corrente di <see cref="BoolToCollapse"/>.</returns>
+    /// <returns>L'istanza corrente di <see cref="BoolToCollapsed"/>.</returns>
     public override object ProvideValue(IServiceProvider serviceProvider) {
         return this;
     }

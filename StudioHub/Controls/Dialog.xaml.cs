@@ -118,10 +118,10 @@ public partial class Dialog : Window {
     }
 
     private void dialog_Loaded(object sender, RoutedEventArgs e) {
-        double horizontalMargin = textblockMessage.Margin.Left + textblockMessage.Margin.Right;
-        textblockMessage.MaxWidth = ActualWidth - horizontalMargin;
+        double horizontalMargin = textBlockMessage.Margin.Left + textBlockMessage.Margin.Right;
+        textBlockMessage.MaxWidth = ActualWidth - horizontalMargin;
         SizeToContent = SizeToContent.Height;
-        textblockMessage.Text = messageString;
+        textBlockMessage.Text = messageString;
     }
 
     private void button_Click(object sender, RoutedEventArgs e) {

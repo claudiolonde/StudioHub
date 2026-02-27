@@ -5,35 +5,39 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
     xmlns:local="clr-namespace:StudioHub.Controls"
+    WindowStartupLocation="CenterOwner"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
     Title="Dialog"
     MinHeight="160" MinWidth="320"
-    ResizeMode="NoResize" ShowInTaskbar="False"
-    WindowStartupLocation="CenterOwner"
-    d:Background="#202020" d:Height="160"
-    d:Width="320">
+    d:Height="160" d:Width="320"
+    >
 
     <Grid Margin="32 24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Path x:Name="pathIcon"
             Grid.Row="0"
             Height="48" Width="48"
-            Stretch="UniformToFill" />
+            Stretch="UniformToFill"
+            />
 
-        <TextBlock x:Name="textblockMessage"
+        <TextBlock x:Name="textBlockMessage"
             Grid.Row="1"
             Margin="0 24"
             HorizontalAlignment="Center"
-            TextWrapping="Wrap" />
+            TextWrapping="Wrap"
+            />
 
         <StackPanel x:Name="panelButtons"
             Grid.Row="2"
             HorizontalAlignment="Center" VerticalAlignment="Bottom"
-            Orientation="Horizontal" />
+            Orientation="Horizontal"
+            />
     </Grid>
 
 </Window>

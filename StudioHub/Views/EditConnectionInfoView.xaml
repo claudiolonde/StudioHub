@@ -4,31 +4,33 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:help="clr-namespace:StudioHub.Helpers" xmlns:ui="clr-namespace:StudioHub.Controls"
+    xmlns:help="clr-namespace:StudioHub.Helpers"
+    xmlns:ui="clr-namespace:StudioHub.Controls"
     xmlns:vm="clr-namespace:StudioHub.ViewModels"
-    Title="Impostazione sorgente dati"
+    WindowStartupLocation="CenterScreen"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
     Height="409" Width="600"
     FocusManager.FocusedElement="{Binding ElementName=Focused}"
-    ResizeMode="NoResize" ShowInTaskbar="False"
-    WindowStartupLocation="CenterScreen"
-    d:Background="#202020"
-    d:DataContext="{d:DesignInstance Type=vm:EditConnectionInfoViewModel}">
+    d:DataContext="{d:DesignInstance Type=vm:EditConnectionInfoViewModel}"
+    >
 
+    <!--  Title="Impostazione sorgente dati"  -->
     <Grid Margin="25">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="20" />
-            <ColumnDefinition />
+            <ColumnDefinition/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!--  data source  -->
@@ -36,66 +38,75 @@
             Grid.Column="0" Grid.Row="0"
             Text="Sorgente Dati"
             Margin="0 0 0 5"
-            IsRequired="True" />
+            IsRequired="True"
+            />
         <TextBox x:Name="Focused"
             Grid.Column="0" Grid.Row="1"
             Text="{Binding DataSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding CanEditServerSettings}"
-            ToolTip="Inserisci il nome o l'indirizzo IP dell'istanza di SQL Server" />
+            ToolTip="Inserisci il nome o l'indirizzo IP dell'istanza di SQL Server"
+            />
 
         <!--  integrated security  -->
         <CheckBox
             Grid.Column="2" Grid.Row="1"
             Content="Usa autenticazione di Windows"
-            VerticalAlignment="Bottom"
-            IsChecked="{Binding IntegratedSecurity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding CanEditServerSettings}"
-            ToolTip="Indica se autenticarsi utilizzando le credenziali Windows" />
+            IsChecked="{Binding IntegratedSecurity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            VerticalAlignment="Bottom"
+            ToolTip="Indica se autenticarsi utilizzando le credenziali Windows"
+            />
 
         <!--  user credentials  -->
         <ui:Label
             Grid.Column="0" Grid.Row="2"
             Text="Nome Utente"
             Margin="0 15 0 5"
-            IsRequired="True" />
+            IsRequired="True"
+            />
 
         <ui:Label
             Grid.Column="2" Grid.Row="2"
             Text="Password"
             Margin="0 15 0 5"
-            IsRequired="True" />
+            IsRequired="True"
+            />
         <TextBox
             Grid.Column="0" Grid.Row="3"
             Text="{Binding UserId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding CanEditCredentials}"
-            ToolTip="Inserisci il nome utente per l'autenticazione a SQL Server" />
+            ToolTip="Inserisci il nome utente per l'autenticazione a SQL Server"
+            />
         <TextBox
             Grid.Column="2" Grid.Row="3"
             Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding CanEditCredentials}"
-            ToolTip="Inserisci la password dell'utente specificato per l'autenticazione a SQL Server" />
+            ToolTip="Inserisci la password dell'utente specificato per l'autenticazione a SQL Server"
+            />
 
         <!--  connection  -->
         <StackPanel
             Grid.Column="0" Grid.Row="4"
             Margin="0 25"
-            Orientation="Horizontal">
+            Orientation="Horizontal"
+            >
             <ui:LoadingSpinner
-                Margin="0 0 5 0"
                 Width="14"
                 Visibility="{Binding IsBusy, Converter={help:BoolToHidden}}"
-                d:Visibility="Hidden" />
-            <Button
-                Style="{StaticResource HyperlinkButtonStyle}"
+                Margin="0 0 5 0"
+                d:Visibility="Hidden"
+                />
+            <Button Style="{StaticResource HyperlinkButtonStyle}"
                 Content="Verifica connessione"
+                Visibility="{Binding NotIsConnected, Converter={help:BoolToCollapsed}}"
                 Command="{Binding ConnectCommand}"
-                Visibility="{Binding NotIsConnected, Converter={help:BoolToCollapsed}}" />
-            <Button
-                Style="{StaticResource HyperlinkButtonStyle}"
+                />
+            <Button Style="{StaticResource HyperlinkButtonStyle}"
                 Content="Disconnetti"
-                Command="{Binding DisconnectCommand}"
                 Visibility="{Binding IsConnected, Converter={help:BoolToCollapsed}}"
-                d:Visibility="Collapsed" />
+                Command="{Binding DisconnectCommand}"
+                d:Visibility="Collapsed"
+                />
         </StackPanel>
 
         <!--  databases  -->
@@ -103,38 +114,48 @@
             Grid.Column="0" Grid.Row="5"
             Text="Database StudioHub"
             Margin="0 0 0 5"
-            IsRequired="True" />
+            IsRequired="True"
+            />
         <ui:Label
             Grid.Column="2" Grid.Row="5"
             Text="Database CityUp"
             Margin="0 0 0 5"
-            IsRequired="True" />
+            IsRequired="True"
+            />
         <ComboBox
             Grid.Column="0" Grid.Row="6"
             IsEnabled="{Binding IsConnected, Mode=OneWay}"
             ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
             SelectedItem="{Binding StudioHubDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            ToolTip="Seleziona il database da utilizzare per StudioHub" />
+            ToolTip="Seleziona il database da utilizzare per StudioHub"
+            />
         <ComboBox
             Grid.Column="2" Grid.Row="6"
             IsEnabled="{Binding IsConnected, Mode=OneWay}"
             ItemsSource="{Binding DatabaseNames, Mode=OneWay}"
             SelectedItem="{Binding CityUpDBSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            ToolTip="Seleziona il database utilizzato da CityUp" />
+            ToolTip="Seleziona il database utilizzato da CityUp"
+            />
 
         <!--  buttons  -->
-        <StackPanel Margin="0 50 0 0"
+        <StackPanel
             Grid.Column="0" Grid.Row="7"
             Grid.ColumnSpan="2"
-            Orientation="Horizontal">
-            <Button Content="Annulla" Width="128" IsCancel="True" />
+            Margin="0 50 0 0"
+            Orientation="Horizontal"
+            >
             <Button
-                Style="{DynamicResource AccentButtonStyle}"
-                Content="Salva"
-                Margin="20 0 0 0"
+                Content="Annulla"
                 Width="128"
+                IsCancel="True"
+                />
+            <Button Style="{DynamicResource AccentButtonStyle}"
+                Content="Salva"
+                Width="128"
+                Margin="20 0 0 0"
                 Command="{Binding SaveCommand}"
-                IsDefault="True" />
+                IsDefault="True"
+                />
         </StackPanel>
 
     </Grid>

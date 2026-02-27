@@ -11,7 +11,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Templates\**" />
+    <EmbeddedResource Remove="Templates\**" />
+    <None Remove="Templates\**" />
+    <Page Remove="Templates\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\Font Awesome 7 Free-Solid-900.otf" />
+    <None Remove="Assets\WordModels.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +44,7 @@
     <Resource Include="Assets\Font Awesome 7 Free-Solid-900.otf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\WordModels.ico" />
   </ItemGroup>
 
 </Project>

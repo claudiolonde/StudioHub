@@ -98,13 +98,7 @@ public static class ConnectionInfoService {
             .Primary(x => x.Id)
             .Identity(x => x.Id);
         */
-        FluentMapper.Entity<MailMergeTemplateData>()
-            .Table("Shared.MailMergeTemplateData")
-            .Primary(x => x.Id);
-        FluentMapper.Entity<MailMergeTemplateInfo>()
-            .Table("Shared.MailMergeTemplateInfo")
-            .Primary(x => x.Id)
-            .Identity(x => x.Id);
+
     }
 
     /// <summary>

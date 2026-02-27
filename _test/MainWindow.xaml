@@ -4,12 +4,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:local="clr-namespace:_test" xmlns:ui="clr-namespace:StudioHub.Controls;assembly=StudioHub"
+    xmlns:local="clr-namespace:_test"
+    xmlns:ui="clr-namespace:StudioHub.Controls;assembly=StudioHub"
+    WindowStartupLocation="CenterScreen"
     Title="MainWindow"
     Height="450" Width="800"
-    WindowStartupLocation="CenterScreen"
-    d:Background="#202020">
+    >
     <StackPanel Margin="24">
-        <Button Content="RUN" Width="100" Click="Button_Click" />
+        <Button
+            Content="RUN"
+            Width="100"
+            Click="Button_Click"
+            />
     </StackPanel>
 </Window>

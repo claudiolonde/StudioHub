@@ -20,7 +20,7 @@ public partial class MainWindow : Window {
     private async void Button_Click(object sender, RoutedEventArgs e) {
         WordModelsView.Open();
         return;
-        EditConnectionInfoView.Open();
+        //EditConnectionInfoView.Open();
     }
 
 }

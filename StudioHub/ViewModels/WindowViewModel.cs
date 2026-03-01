@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace StudioHub.ViewModels;
 
-public partial class WordModelsViewModel : ObservableObject {
+public partial class WindowViewModel : ObservableObject {
 
     /// <summary>
     /// Evento sollevato quando avviene un salvataggio con successo.

@@ -8,13 +8,9 @@ namespace StudioHub.Views;
 /// <summary>
 /// Logica di interazione per xaml
 /// </summary>
-public partial class WordModelsView : Window {
-    public WordModelsView() {
+public partial class WordTemplatesView : Window {
+    public WordTemplatesView() {
         InitializeComponent();
-        //if (!ConnectionInfoService.Initialize()) {
-        //    Application.Current.Shutdown();
-        //    return;
-        //}
     }
 
     /// <summary>
@@ -23,10 +19,12 @@ public partial class WordModelsView : Window {
     /// <remarks>
     /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/> , disabilita l'icona della finestra,
     /// </remarks>
-    public static bool Open() {
+    public static void Open(string appName) {
 
-        WordModelsViewModel vm = new();
-        WordModelsView v = new() {
+        WordTemplatesViewModel vm = new();
+        vm.Path = System.IO.Path.Combine(TEMPLATES_PATH, "Microsoft Word", appName);
+
+        WordTemplatesView v = new() {
             Owner = GetActiveWindow(),
             DataContext = vm
         };
@@ -34,16 +32,11 @@ public partial class WordModelsView : Window {
         // Disabilita l'icona della finestra.
         //v.SourceInitialized += (s, e) => DisableWindowIcon(v);
 
-        // Chiude la finestra quando l'evento Saved viene sollevato dal ViewModel.
-        vm.Saved += (s, e) => v.Close();
-
         for (int n = 1; n <= 100; n++) {
-            v.listbox.Items.Add($"Elemento numero: {n.ToString("0000")}");
+            v.listbox.Items.Add($"Elemento numero: {n:0000}");
         }
 
         v.ShowDialog();
-        return vm.IsSaved;
 
     }
-
 }

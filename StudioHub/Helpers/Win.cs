@@ -7,13 +7,14 @@ namespace StudioHub.Helpers;
 /// <summary>
 /// Classe di utilità che fornisce metodi helper per la gestione delle finestre WPF.
 /// </summary>
-public class Utils {
+public class Win {
 
     /// <summary>
     /// Restituisce la finestra attiva dell'applicazione corrente, se presente.
     /// </summary>
     /// <returns>
-    /// L'istanza <see cref="Window"/> attualmente attiva, oppure <c>null</c> se nessuna finestra è attiva o se non sono presenti finestre.
+    /// L'istanza <see cref="Window"/> attualmente attiva, oppure <c> null</c> se nessuna finestra è attiva o se non
+    /// sono presenti finestre.
     /// </returns>
     public static Window? GetActiveWindow() {
         WindowCollection? windows = Application.Current?.Windows;
@@ -33,13 +34,9 @@ public class Utils {
     /// </summary>
     /// <param name="window">Istanza della finestra WPF di cui disabilitare l'icona.</param>
     /// <remarks>
-    /// Inserire la funzione all'interno del metodo <c>OnSourceInitialized</c> della finestra per assicurarsi che venga eseguita dopo l'inizializzazione.
-    /// <code>
-    /// protected override void OnSourceInitialized(EventArgs e) {
-    ///     base.OnSourceInitialized(e);
-    ///     DisableWindowIcon(this);
-    /// }
-    /// </code>
+    /// Inserire la funzione all'interno del metodo <c> OnSourceInitialized</c> della finestra per assicurarsi che venga
+    /// eseguita dopo l'inizializzazione. <code> protected override void OnSourceInitialized(EventArgs e) {
+    /// base.OnSourceInitialized(e); DisableWindowIcon(this); } </code>
     /// </remarks>
     public static void DisableWindowIcon(Window window) {
         IntPtr hwnd = new WindowInteropHelper(window).Handle;

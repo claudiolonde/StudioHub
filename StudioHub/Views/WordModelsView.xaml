@@ -1,4 +1,4 @@
-<Window x:Class="StudioHub.Views.WordModelsView"
+<Window x:Class="StudioHub.Views.WordTemplatesView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,97 +11,137 @@
     ShowInTaskbar="True"
     ResizeMode="CanResize"
     Title="Gestione modelli Word" Icon="/StudioHub;component/Assets/WordModels.ico"
-    Height="524" Width="800"
+    Height="624" Width="800"
     UseLayoutRounding="True"
-    d:DataContext="{d:DesignInstance Type=vm:WordModelsViewModel}"
+    d:Background="#202020"
+    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel,
+                                     IsDesignTimeCreatable=True}"
     >
     <Grid Margin="25">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40"/>
             <RowDefinition/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel
-            Grid.Column="0" Grid.Row="0"
-            Orientation="Horizontal"
-            >
-            <Button Style="{StaticResource AccentButtonStyle}">
-                <TextBlock>
-                    <Run Text="&#x2b;" FontFamily="{StaticResource FontAwesomeSolid}"/>
-                    <Run Text=" Nuovo Modello"/>
-                </TextBlock>
-            </Button>
-            <Button Margin="16 0 0 0">
-                <TextBlock>
-                    <Run Text="&#xf303;" FontFamily="{StaticResource FontAwesomeSolid}"/>
-                    <Run Text=" Modifica"/>
-                </TextBlock>
-            </Button>
-            <Button Margin="16 0 0 0">
-                <TextBlock>
-                    <Run Text="&#xf0c5;" FontFamily="{StaticResource FontAwesomeSolid}"/>
-                    <Run Text=" Duplica"/>
-                </TextBlock>
-            </Button>
-            <Button Margin="16 0 0 0">
-                <TextBlock>
-                    <Run Text="&#xf246;" FontFamily="{StaticResource FontAwesomeSolid}"/>
-                    <Run Text=" Rinomina"/>
-                </TextBlock>
-            </Button>
-        </StackPanel>
-        <Button Grid.Column="1" Grid.Row="0">
-            <TextBlock>
-                <Run Text="&#xf2ed;" FontFamily="{StaticResource FontAwesomeSolid}"/>
-                <Run Text=" Elimina"/>
+
+
+
+        <Grid VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!--  buttons  -->
+            <StackPanel Orientation="Horizontal">
+
+                <!--  Nuovo modello  -->
+                <Button Style="{StaticResource AccentButtonStyle}">
+                    <TextBlock>
+                        <Run Text="&#x2b;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+                        <Run Text="Nuovo"/>
+                    </TextBlock>
+                </Button>
+
+                <!--  Modifica  -->
+                <Button Margin="30 0 0 0">
+                    <TextBlock>
+                        <Run Text="&#xf303;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+                        <Run Text=" Modifica"/>
+                    </TextBlock>
+                </Button>
+
+                <!--  Duplica  -->
+                <Button Margin="15 0 0 0">
+                    <TextBlock>
+                        <Run Text="&#xf0c5;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+                        <Run Text=" Duplica"/>
+                    </TextBlock>
+                </Button>
+
+                <!--  Rinomina  -->
+                <Button Margin="15 0 0 0">
+                    <TextBlock>
+                        <Run Text="&#xf246;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+                        <Run Text=" Rinomina"/>
+                    </TextBlock>
+                </Button>
+
+                <!--  Elimina  -->
+                <Button Margin="30 0 60 0" Background="IndianRed">
+                    <TextBlock>
+                        <Run Text="&#xf2ed;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+                        <Run Text=" Elimina"/>
+                    </TextBlock>
+                </Button>
+            </StackPanel>
+
+
+
+            <!--  filter/search  -->
+            <TextBox x:Name="textBoxSearch"
+                Grid.Column="1"
+                VerticalAlignment="Top"
+                />
+            <TextBlock
+                Grid.Column="1"
+                Visibility="{Binding Text, ElementName=textBoxSearch, Converter={h:StringToCollapsed}}"
+                Margin="13 6 0 0"
+                VerticalAlignment="Top"
+                Foreground="{StaticResource TextFillColorDisabledBrush}"
+                IsHitTestVisible="False"
+                >
+                <Run Text="&#xf002;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+                <Run Text="Filtra per nome modello..."/>
             </TextBlock>
-        </Button>
-        <ListBox Margin="0 10" x:Name="listbox" BorderThickness="1"
-            Grid.Column="0" Grid.Row="1"
-            Grid.ColumnSpan="2"
+        </Grid>
+
+
+
+        <!--  elenco modelli  -->
+        <ListBox x:Name="listbox"
+            Grid.Row="1"
+            Margin="0 0 0 10"
             >
-            <!--<ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border
-                        Margin="5" Padding="10"
-                        Background="WhiteSmoke"
-                        CornerRadius="5"
-                        >
-                        <StackPanel Orientation="Vertical">
-
-                            <TextBlock
-                                Text="{Binding Titolo}"
-                                Foreground="Black"
-                                FontSize="16" FontWeight="Bold"
-                                />
-
-                            <TextBlock
-                                Text="{Binding Descrizione}"
-                                Margin="0 5 0 0"
-                                Foreground="DarkGray"
-                                FontStyle="Italic"
-                                />
-
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>-->
         </ListBox>
-        <TextBlock Background="{Binding Background, ElementName=listbox}"
-            Grid.Column="0" Grid.Row="2"
-            Grid.ColumnSpan="2" FontSize="12"
-            Height="32"
-            Padding="6"
-            >
-            <Run Text="visualizzati"/>
-            <Run Text="n" FontWeight="Black"/>
-            <Run Text="modelli su"/>
-            <Run Text="n" FontWeight="Black"/>
-            <Run Text="totali"/>
-        </TextBlock>
+
+
+
+        <!--  infobar  -->
+        <Grid Grid.Row="2" Background="{Binding Background, ElementName=listbox}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+
+
+            <!--  percorso  -->
+            <TextBlock
+                Text="{Binding Path, Mode=OneTime}"
+                Margin="10 0 0 0"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                Foreground="{StaticResource TextFillColorDisabledBrush}"
+                FontSize="11"
+                TextTrimming="CharacterEllipsis"
+                ToolTip="{Binding Path, Mode=OneTime}"
+                />
+
+            <!--  filtered/totals  -->
+            <TextBlock
+                Grid.Column="1"
+                Margin="0 0 10 0"
+                HorizontalAlignment="Right" VerticalAlignment="Center"
+                Foreground="{StaticResource TextFillColorDisabledBrush}"
+                FontSize="11"
+                >
+                <Run Text="Modelli:"/>
+                <Run Text="{Binding FilteredTemplates, Mode=OneWay}" FontWeight="Bold"/>
+                <Run Text="di"/>
+                <Run Text="{Binding TotalTemplates, Mode=OneWay}" FontWeight="Bold"/>
+            </TextBlock>
+
+        </Grid>
+
     </Grid>
 </Window>

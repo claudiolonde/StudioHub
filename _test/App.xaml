@@ -5,6 +5,6 @@
     StartupUri="MainWindow.xaml"
     >
     <Application.Resources>
-        <ResourceDictionary Source="/StudioHub;component/Themes/Generic.xaml"/>
+        <ResourceDictionary Source="/StudioHub;component/Themes/StudioHubDictionary.xaml"/>
     </Application.Resources>
 </Application>

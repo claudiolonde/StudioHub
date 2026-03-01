@@ -1,15 +1,15 @@
-<Window x:Class="StudioHub.Controls.Dialog"
+<Window x:Class="StudioHub.Views.Dialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:local="clr-namespace:StudioHub.Controls"
     WindowStartupLocation="CenterOwner"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
-    Title="Dialog"
     MinHeight="160" MinWidth="320"
+    UseLayoutRounding="True"
+    d:Background="#202020"
     d:Height="160" d:Width="320"
     >
 

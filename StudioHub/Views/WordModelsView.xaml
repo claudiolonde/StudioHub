@@ -14,8 +14,7 @@
     Height="624" Width="800"
     UseLayoutRounding="True"
     d:Background="#202020"
-    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel,
-                                     IsDesignTimeCreatable=True}"
+    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel}"
     >
     <Grid Margin="25">
         <Grid.RowDefinitions>
@@ -68,7 +67,7 @@
                 </Button>
 
                 <!--  Elimina  -->
-                <Button Margin="30 0 60 0" Background="IndianRed">
+                <Button Style="{StaticResource AlertButtonStyle}" Margin="30 0 60 0">
                     <TextBlock>
                         <Run Text="&#xf2ed;" FontFamily="{StaticResource FontAwesomeSolid}"/>
                         <Run Text=" Elimina"/>
@@ -79,21 +78,24 @@
 
 
             <!--  filter/search  -->
-            <TextBox x:Name="textBoxSearch"
+            <TextBox Style="{StaticResource PlaceholderTextBoxStyle}"
                 Grid.Column="1"
+                Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Padding="26 5 6 6"
                 VerticalAlignment="Top"
+                Tag="Filtra per nome modello..."
                 />
             <TextBlock
                 Grid.Column="1"
-                Visibility="{Binding Text, ElementName=textBoxSearch, Converter={h:StringToCollapsed}}"
-                Margin="13 6 0 0"
-                VerticalAlignment="Top"
+                Text="&#xf002;"
+                Margin="10 9 0 0"
+                HorizontalAlignment="Left"
+                Background="Transparent"
                 Foreground="{StaticResource TextFillColorDisabledBrush}"
+                FontFamily="{StaticResource FontAwesomeSolid}"
                 IsHitTestVisible="False"
-                >
-                <Run Text="&#xf002;" FontFamily="{StaticResource FontAwesomeSolid}"/>
-                <Run Text="Filtra per nome modello..."/>
-            </TextBlock>
+                />
+
         </Grid>
 
 
@@ -102,6 +104,7 @@
         <ListBox x:Name="listbox"
             Grid.Row="1"
             Margin="0 0 0 10"
+            ItemsSource="{Binding FilteredTemplates, Mode=OneWay}"
             >
         </ListBox>
 
@@ -113,8 +116,6 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-
-
 
             <!--  percorso  -->
             <TextBlock
@@ -136,9 +137,9 @@
                 FontSize="11"
                 >
                 <Run Text="Modelli:"/>
-                <Run Text="{Binding FilteredTemplates, Mode=OneWay}" FontWeight="Bold"/>
+                <Run Text="{Binding FilteredTemplatesCount, Mode=OneWay}" FontWeight="Bold"/>
                 <Run Text="di"/>
-                <Run Text="{Binding TotalTemplates, Mode=OneWay}" FontWeight="Bold"/>
+                <Run Text="{Binding TotalTemplatesCount, Mode=OneWay}" FontWeight="Bold"/>
             </TextBlock>
 
         </Grid>

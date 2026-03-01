@@ -1,5 +1,4 @@
 using System.Windows;
-using static StudioHub.Helpers.Constants;
 using StudioHub.Services;
 using StudioHub.Views;
 
@@ -18,8 +17,7 @@ public partial class MainWindow : Window {
     }
 
     private async void Button_Click(object sender, RoutedEventArgs e) {
-
-        WordTemplatesView.Open(App.Name);
+        WordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
         return;
         //EditConnectionInfoView.Open();
     }

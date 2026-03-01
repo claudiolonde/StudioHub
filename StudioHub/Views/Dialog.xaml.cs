@@ -3,7 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace StudioHub.Controls;
+namespace StudioHub.Views;
+
 /// <summary>
 /// Definisce il simbolo visualizzato dalla finestra di dialogo.
 /// </summary>

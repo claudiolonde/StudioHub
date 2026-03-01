@@ -19,10 +19,9 @@ public partial class WordTemplatesView : Window {
     /// <remarks>
     /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/> , disabilita l'icona della finestra,
     /// </remarks>
-    public static void Open(string appName) {
+    public static void Open(string appName, string[] headers) {
 
-        WordTemplatesViewModel vm = new();
-        vm.Path = System.IO.Path.Combine(TEMPLATES_PATH, "Microsoft Word", appName);
+        WordTemplatesViewModel vm = new(appName, headers) { };
 
         WordTemplatesView v = new() {
             Owner = GetActiveWindow(),
@@ -32,9 +31,6 @@ public partial class WordTemplatesView : Window {
         // Disabilita l'icona della finestra.
         //v.SourceInitialized += (s, e) => DisableWindowIcon(v);
 
-        for (int n = 1; n <= 100; n++) {
-            v.listbox.Items.Add($"Elemento numero: {n:0000}");
-        }
 
         v.ShowDialog();
 

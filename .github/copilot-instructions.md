@@ -35,3 +35,11 @@
     Modificato: [elenco breve]
     Eliminato: [elenco breve]
 - **Nota:** Se una categoria è vuota, omettila pure per mantenere la sintesi.
+
+## 7. Convenzioni XAML
+- **Namespace Prefixes:** Quando suggerisci o generi codice XAML, usa questi prefissi specifici:
+    - 'a:' per il namespace radice del progetto (App/Assembly). NON usare mai 'local'.
+    - 'c:' per le classi nella cartella Controls.
+    - 'h:' per le classi nella cartella Helpers.
+    - 'vm:' per le classi nella cartella ViewModels.
+- **Sintassi:** Mantieni i prefissi brevi e assicurati che le dichiarazioni xmlns siano coerenti con questa mappatura.

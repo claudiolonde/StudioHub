@@ -1,22 +1,26 @@
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Win32;
 
 namespace StudioHub.Helpers;
 
 public class IO {
 
+    /// <summary>
+    /// Mostra una finestra di dialogo per la selezione di una cartella e restituisce il percorso selezionato.
+    /// </summary>
+    /// <param name="title">Titolo opzionale della finestra di dialogo.</param>
+    /// <returns>Il percorso della cartella selezionata, oppure stringa vuota se annullato.</returns>
     public static string GetSelectedFolder(string? title = null) {
-
-        Microsoft.Win32.OpenFolderDialog dialog = new() {
+        OpenFolderDialog openFolderDialog = new OpenFolderDialog {
             Multiselect = false
         };
         if (!string.IsNullOrWhiteSpace(title)) {
-            dialog.Title = title;
+            openFolderDialog.Title = title;
         }
-        bool? result = dialog.ShowDialog();
-        return result == true ? dialog.FolderName : string.Empty;
-
+        bool? dialogResult = openFolderDialog.ShowDialog();
+        return dialogResult == true && !string.IsNullOrWhiteSpace(openFolderDialog.FolderName)
+             ? openFolderDialog.FolderName.TrimEnd(Path.DirectorySeparatorChar)
+             : string.Empty;
     }
 
     /// <summary>

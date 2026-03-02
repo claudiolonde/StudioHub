@@ -43,3 +43,9 @@
     - 'h:' per le classi nella cartella Helpers.
     - 'vm:' per le classi nella cartella ViewModels.
 - **Sintassi:** Mantieni i prefissi brevi e assicurati che le dichiarazioni xmlns siano coerenti con questa mappatura.
+
+## 8. Architettura dei Servizi e Dati
+- **Filosofia:** Considera l'accesso ai dati come parte integrante del servizio. Non creare Repository o DAO separati.
+- **Implementazione:** Usa RepoDb.SqlServer direttamente all'interno delle classi nella cartella 'Services'.
+- **Metodi:** Ogni metodo del servizio deve essere auto-esplicativo, gestendo sia l'interrogazione al database che la logica di business correlata.
+- **Stile:** Mantieni i metodi asincroni, usa nomi espliciti per i tipi e scrivi commenti XML in italiano che spieghino lo scopo del recupero dati.

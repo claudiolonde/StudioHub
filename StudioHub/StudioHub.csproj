@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <None Remove="Assets\Font Awesome 7 Free-Solid-900.otf" />
+    <None Remove="Assets\StudioHub.ico" />
     <None Remove="Assets\WordModels.ico" />
   </ItemGroup>
 
@@ -48,6 +49,7 @@
     <Resource Include="Assets\Font Awesome 7 Free-Solid-900.otf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\StudioHub.ico" />
     <Resource Include="Assets\WordModels.ico" />
     <Resource Include="Themes\StudioHubDictionary.xaml" />
   </ItemGroup>

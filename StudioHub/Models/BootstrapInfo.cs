@@ -1,9 +1,9 @@
+﻿using System.Text.Json.Serialization;
+using StudioHub.Helpers;
+
 namespace StudioHub.Models;
 
-/// <summary>   
-/// Rappresenta le informazioni di connessione a una sorgente dati.
-/// </summary>
-public record ConnectionInfo {
+internal class BootstrapInfo {
 
     /// <summary>
     /// Ottiene o imposta il nome server, nome istanza o l'indirizzo IP della sorgente dati.
@@ -28,11 +28,30 @@ public record ConnectionInfo {
     /// <summary>
     /// Ottiene o imposta il nome del database dell'applicazione.
     /// </summary>
-    public string PrimaryDd { get; set; } = string.Empty;
+    public string PrimaryDb { get; set; } = string.Empty;
 
     /// <summary>
     /// Ottiene o imposta il nome del database del gestionale CityUp.
     /// </summary>
     public string LegacyDb { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Ottiene la stringa di connessione al database principale dell'applicazione.
+    /// La stringa viene generata dinamicamente utilizzando i parametri correnti della configurazione.
+    /// </summary>
+    [JsonIgnore]
+    public string PrimaryConnectionString => Db.BuildConnectionString(this, PrimaryDb);
+
+    /// <summary>
+    /// Ottiene la stringa di connessione al database legacy CityUp.
+    /// La stringa viene generata dinamicamente utilizzando i parametri correnti della configurazione.
+    /// </summary>
+    [JsonIgnore]
+    public string LegacyConnectionString => Db.BuildConnectionString(this, LegacyDb);
+
+    /// <summary>
+    /// Ottiene o imposta il percorso della cartella dati condivisa dell'applicazione
+    /// </summary>
+    public string DataPath { get; set; } = string.Empty;
 
 }

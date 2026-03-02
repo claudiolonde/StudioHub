@@ -7,10 +7,9 @@ namespace StudioHub.Helpers;
 /// <summary>
 /// Classe di utilità che fornisce metodi helper per la gestione delle finestre WPF.
 /// </summary>
-public class Win {
+public class Windows {
 
-
-    /// <summary>
+    /// <summary>   
     /// Restituisce la finestra attiva dell'applicazione corrente, se presente.
     /// </summary>
     /// <returns>

@@ -1,3 +1,3 @@
 ﻿global using StudioHub.Views;
-global using static StudioHub.Helpers.Win;
-global using static StudioHub.Helpers.Constants;
+global using StudioHub.Helpers;
+global using static StudioHub.Helpers.Windows;

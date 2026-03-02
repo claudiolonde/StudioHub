@@ -126,8 +126,8 @@ public partial class EditConnectionInfoViewModel : ObservableObject {
         UserId = savedCI.UserID;
         Password = savedCI.Password;
 
-        StudioHubDBSelection = savedCI.PrimaryDB;
-        CityUpDBSelection = savedCI.LegacyDB;
+        StudioHubDBSelection = savedCI.PrimaryDd;
+        CityUpDBSelection = savedCI.LegacyDb;
         DatabaseNames = [StudioHubDBSelection!, CityUpDBSelection!];
     }
 
@@ -141,8 +141,8 @@ public partial class EditConnectionInfoViewModel : ObservableObject {
             IntegratedSecurity = IntegratedSecurity,
             UserID = UserId ?? string.Empty,
             Password = Password ?? string.Empty,
-            PrimaryDB = StudioHubDBSelection ?? string.Empty,
-            LegacyDB = CityUpDBSelection ?? string.Empty
+            PrimaryDd = StudioHubDBSelection ?? string.Empty,
+            LegacyDb = CityUpDBSelection ?? string.Empty
         };
     }
 
@@ -177,8 +177,8 @@ public partial class EditConnectionInfoViewModel : ObservableObject {
             foreach (string s in names) {
                 DatabaseNames.Add(s);
             }
-            StudioHubDBSelection = DatabaseNames.Contains(ci.PrimaryDB) ? ci.PrimaryDB : null;
-            CityUpDBSelection = DatabaseNames.Contains(ci.LegacyDB) ? ci.LegacyDB : null;
+            StudioHubDBSelection = DatabaseNames.Contains(ci.PrimaryDd) ? ci.PrimaryDd : null;
+            CityUpDBSelection = DatabaseNames.Contains(ci.LegacyDb) ? ci.LegacyDb : null;
 
         }
         catch (OperationCanceledException) { }

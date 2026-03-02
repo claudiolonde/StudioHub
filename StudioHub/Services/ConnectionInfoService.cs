@@ -27,7 +27,6 @@ public static class ConnectionInfoService {
     public static string PrimaryConnectionString => $"{ConnectionString};Initial Catalog=" + PrimaryDB;
     public static string LegacyConnectionString => $"{ConnectionString};Initial Catalog=" + LegacyDB;
 
-
     /// <summary>
     /// Inizializza la configurazione globale per l'accesso a SQL Server. Esegue il setup di RepoDb e la mappatura delle
     /// entità tramite FluentMapper.
@@ -46,8 +45,8 @@ public static class ConnectionInfoService {
         while (true) {
             ConnectionInfo? ci = LoadConnectionInfo();
             if (testConnection(ci)) {
-                PrimaryDB = ci!.PrimaryDB;
-                LegacyDB = ci!.LegacyDB;
+                PrimaryDB = ci!.PrimaryDd;
+                LegacyDB = ci!.LegacyDb;
                 break;
             }
             if (!EditConnectionInfoView.Open()) {
@@ -110,7 +109,7 @@ public static class ConnectionInfoService {
     /// </remarks>
     public static void SaveConnectionInfo(ConnectionInfo ci) {
         string json = JsonSerializer.Serialize(ci);
-        using RegistryKey rk = Registry.CurrentUser.CreateSubKey(REGISTRY_PATH);
+        using RegistryKey rk = Registry.CurrentUser.CreateSubKey(Hub.RegistryPath);
         rk.SetValue("ConnectionInfo", json);
     }
 
@@ -125,7 +124,7 @@ public static class ConnectionInfoService {
     /// <see cref="ConnectionInfo"/> se la chiave o il valore non esistono o la deserializzazione fallisce.
     /// </returns>
     public static ConnectionInfo? LoadConnectionInfo() {
-        using RegistryKey? rk = Registry.CurrentUser.OpenSubKey(REGISTRY_PATH);
+        using RegistryKey? rk = Registry.CurrentUser.OpenSubKey(Hub.RegistryPath);
         if (rk == null) {
             return null;// new ConnectionInfo();
         }

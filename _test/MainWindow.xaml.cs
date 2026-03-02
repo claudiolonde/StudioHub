@@ -1,5 +1,5 @@
 using System.Windows;
-using StudioHub.Services;
+using StudioHub;
 using StudioHub.Views;
 
 namespace _test;
@@ -10,7 +10,7 @@ namespace _test;
 public partial class MainWindow : Window {
     public MainWindow() {
         InitializeComponent();
-        if (!ConnectionInfoService.Initialize()) {
+        if (!Hub.Initialize()) {
             Application.Current.Shutdown();
             return;
         }

@@ -24,34 +24,41 @@ public class IO {
     }
 
     /// <summary>
-    /// Restituisce i nomi dei file visibili nel percorso specificato. Se il percorso non esiste, lo crea
-    /// silenziosamente.
+    /// Restituisce i nomi dei file visibili nel percorso specificato in ordine alfabetico. Se il percorso non esiste,
+    /// lo crea silenziosamente. Permette di specificare più estensioni nel filtro separate da punto e virgola (es.
+    /// "*.txt;*.md").
     /// </summary>
     /// <param name="path">Il percorso della cartella da analizzare.</param>
     /// <param name="filter">
-    /// Opzionale: filtro per i file (es. "*.txt"). Il default è "*.*" (tutti i file).
+    /// Opzionale: filtro per i file (es. "*.txt;*.md"). Il default è "*.*" (tutti i file).
     /// </param>
     /// <param name="option">
     /// Opzionale: specifica se cercare solo nella cartella corrente o anche nelle sottocartelle.
     /// </param>
-    /// <returns>Una lista di nomi di file visibili.</returns>
+    /// <returns>Una lista di nomi di file visibili in ordine alfabetico.</returns>
     public static IEnumerable<string> GetVisibleFileNames(string path,
                                                           string filter = "*.*",
                                                           SearchOption option = SearchOption.TopDirectoryOnly) {
-        if (!Directory.Exists(path)) {
-            try {
-                Directory.CreateDirectory(path);
-            }
-            catch {
-                Dialog.Show($"Impossibile trovare una parte del percorso\n{path}", DialogIcon.Error);
-            }
-            return [];
+        DirectoryInfo directoryInfo = new(path);
+        List<string> fileNames = [];
+
+        string[] filters = filter.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (filters.Length == 0) {
+            filters = ["*.*"];
         }
 
-        DirectoryInfo directoryInfo = new(path);
-        return directoryInfo.EnumerateFiles(filter, option)
-                            .Where(file => !file.Attributes.HasFlag(FileAttributes.Hidden))
-                            .Select(file => file.Name);
+        foreach (string singleFilter in filters) {
+            IEnumerable<FileInfo> files = directoryInfo.EnumerateFiles(singleFilter, option)
+                .Where(file => !file.Attributes.HasFlag(FileAttributes.Hidden));
+            foreach (FileInfo file in files) {
+                if (!fileNames.Contains(file.Name)) {
+                    fileNames.Add(file.Name);
+                }
+            }
+        }
+
+        fileNames.Sort(StringComparer.OrdinalIgnoreCase);
+        return fileNames;
     }
 
 }

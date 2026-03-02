@@ -9,6 +9,7 @@ namespace StudioHub.Views;
 /// Logica di interazione per xaml
 /// </summary>
 public partial class WordTemplatesView : Window {
+
     public WordTemplatesView() {
         InitializeComponent();
     }
@@ -21,18 +22,18 @@ public partial class WordTemplatesView : Window {
     /// </remarks>
     public static void Open(string appName, string[] headers) {
 
-        WordTemplatesViewModel vm = new(appName, headers) { };
+        ArgumentException.ThrowIfNullOrWhiteSpace(appName);
+        ArgumentNullException.ThrowIfNull(headers);
+        if (string.IsNullOrWhiteSpace(Hub.DataPath)) {
+            Dialog.Show("La cartella dati dell'applicazione non è impostata correttamente.", DialogIcon.Error);
+            return;
+        }
 
+        WordTemplatesViewModel vm = new(appName, headers) { };
         WordTemplatesView v = new() {
-            Owner = GetActiveWindow(),
             DataContext = vm
         };
-
-        // Disabilita l'icona della finestra.
-        //v.SourceInitialized += (s, e) => DisableWindowIcon(v);
-
-
-        v.ShowDialog();
+        v.Show();
 
     }
 }

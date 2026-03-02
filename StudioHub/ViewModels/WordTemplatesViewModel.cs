@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -14,7 +14,6 @@ public partial class WordTemplatesViewModel : ObservableObject {
     [ObservableProperty]
     private string? _filterText;
 
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TotalTemplatesCount))]
     private IEnumerable<string>? _totalTemplates = [];
@@ -27,14 +26,14 @@ public partial class WordTemplatesViewModel : ObservableObject {
 
     public int FilteredTemplatesCount => FilteredTemplates?.Count() ?? 0;
 
-
+    //> aggiungere verifica esistenza path dati
     public WordTemplatesViewModel(string appName, string[] headers) {
-        Path = System.IO.Path.Combine(TEMPLATES_PATH, "Microsoft Word", appName);
+        Path = System.IO.Path.Combine(DATA_PATH, "Templates", "Microsoft Word", appName);
         TotalTemplates = Helpers.IO.GetVisibleFileNames(Path);
-        ApplyFilter();
+        applyFilter();
     }
 
-    public void ApplyFilter() {
+    public void applyFilter() {
         if (string.IsNullOrWhiteSpace(FilterText)) {
             FilteredTemplates = TotalTemplates?.ToList() ?? [];
         }
@@ -47,7 +46,7 @@ public partial class WordTemplatesViewModel : ObservableObject {
     }
 
     partial void OnFilterTextChanged(string? value) {
-        ApplyFilter();
+        applyFilter();
     }
 
 }

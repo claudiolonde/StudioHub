@@ -9,6 +9,7 @@ namespace StudioHub.Helpers;
 /// </summary>
 public class Win {
 
+
     /// <summary>
     /// Restituisce la finestra attiva dell'applicazione corrente, se presente.
     /// </summary>
@@ -45,6 +46,7 @@ public class Win {
         SendMessage(hwnd, 0x0080, new IntPtr(1), IntPtr.Zero);
         SendMessage(hwnd, 0x0080, IntPtr.Zero, IntPtr.Zero);
     }
+
 #pragma warning disable SYSLIB1054
     [DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hwnd, int index);

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace StudioHub.Helpers;
 
@@ -20,8 +20,8 @@ public static class Constants {
     public static readonly string TEMP_PATH = Path.Combine(Path.GetTempPath(), "StudioHub");
 
     /// <summary>
-    /// Percorso della cartella dei modelli utilizzati dall'applicazione.
+    /// Percorso della cartella dati dall'applicazione.
     /// </summary>
-    public static readonly string TEMPLATES_PATH = "D:\\FILES\\Documenti\\StudioHub Templates";
+    public static readonly string DATA_PATH; // = "D:\\FILES\\Documenti\\StudioHub Templates";
 
 }

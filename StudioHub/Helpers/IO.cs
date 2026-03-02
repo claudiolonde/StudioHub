@@ -6,7 +6,6 @@ namespace StudioHub.Helpers;
 
 public class IO {
 
-
     public static string GetSelectedFolder(string? title = null) {
 
         Microsoft.Win32.OpenFolderDialog dialog = new() {
@@ -25,30 +24,28 @@ public class IO {
     /// silenziosamente.
     /// </summary>
     /// <param name="path">Il percorso della cartella da analizzare.</param>
-    /// <param name="searchPattern">
+    /// <param name="filter">
     /// Opzionale: filtro per i file (es. "*.txt"). Il default è "*.*" (tutti i file).
     /// </param>
-    /// <param name="searchOption">
+    /// <param name="option">
     /// Opzionale: specifica se cercare solo nella cartella corrente o anche nelle sottocartelle.
     /// </param>
     /// <returns>Una lista di nomi di file visibili.</returns>
-    public static IEnumerable<string> GetVisibleFileNames(
-        string path,
-        string searchPattern = "*.*",
-        SearchOption searchOption = SearchOption.TopDirectoryOnly) {
-        // Se il percorso non esiste, lo crea silenziosamente
+    public static IEnumerable<string> GetVisibleFileNames(string path,
+                                                          string filter = "*.*",
+                                                          SearchOption option = SearchOption.TopDirectoryOnly) {
         if (!Directory.Exists(path)) {
-            Directory.CreateDirectory(path);
-
-            // Dato che la cartella è appena stata creata, sarà sicuramente vuota.
-            // Restituiamo subito una collezione vuota per risparmiare risorse.
+            try {
+                Directory.CreateDirectory(path);
+            }
+            catch {
+                Dialog.Show($"Impossibile trovare una parte del percorso\n{path}", DialogIcon.Error);
+            }
             return [];
         }
 
         DirectoryInfo directoryInfo = new(path);
-
-        // Se la cartella esisteva, procediamo con la normale lettura e filtraggio
-        return directoryInfo.EnumerateFiles(searchPattern, searchOption)
+        return directoryInfo.EnumerateFiles(filter, option)
                             .Where(file => !file.Attributes.HasFlag(FileAttributes.Hidden))
                             .Select(file => file.Name);
     }

@@ -37,22 +37,31 @@ public partial class WordTemplatesViewModel : ObservableObject {
         ApplyFilter();
     }
 
+    /// <summary>
+    /// Filtra la collezione dei modelli in base al testo inserito dall'utente. Aggiorna la proprietà
+    /// <see cref="FilteredTemplates"/> per il data binding con la UI.
+    /// </summary>
     public void ApplyFilter() {
+        // Gestione del caso in cui il filtro sia vuoto o composto da soli spazi bianchi
         if (string.IsNullOrWhiteSpace(FilterText)) {
+            // Se TotalTemplates è null, inizializza una collezione vuota tramite collection expression
             FilteredTemplates = TotalTemplates is null
-                              ? []
-                              : new ObservableCollection<string>(TotalTemplates);
+                                ? []
+                                : new ObservableCollection<string>(TotalTemplates);
         }
         else {
+            // Normalizzazione della stringa di ricerca per un confronto case-insensitive
             string filter = FilterText.Trim().ToLowerInvariant();
+
+            // Filtraggio della collezione tramite LINQ basato sulla presenza della sottostringa
             FilteredTemplates = TotalTemplates is null
-                              ? []
-                              : new ObservableCollection<string>(
-                                  TotalTemplates.Where(t => t != null && t.Contains(filter, StringComparison.InvariantCultureIgnoreCase))
-                                  );
+                                ? []
+                                : new ObservableCollection<string>(
+                                    TotalTemplates.Where(t => t != null && t.Contains(filter, StringComparison.InvariantCultureIgnoreCase))
+                                    );
         }
     }
-
+     
     partial void OnFilterTextChanged(string value) {
         ApplyFilter();
     }

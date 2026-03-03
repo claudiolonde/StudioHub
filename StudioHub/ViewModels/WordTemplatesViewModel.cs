@@ -28,7 +28,7 @@ public partial class WordTemplatesViewModel : ObservableObject {
     public int FilteredTemplatesCount => FilteredTemplates?.Count() ?? 0;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteTemplateCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteTemplateCommand), nameof(CloneTemplateCommand))]
     private string? _selectedTemplate = null;
 
     public WordTemplatesViewModel(string appName, string[] headers) {
@@ -64,11 +64,17 @@ public partial class WordTemplatesViewModel : ObservableObject {
 
     private const string TRASH_FOLDER_NAME = "$Trash";
 
-    private bool CanDeleteTemplate() {
+    private bool CanModifyTemplate() {
         return !string.IsNullOrWhiteSpace(SelectedTemplate);
     }
 
-    [RelayCommand(CanExecute = nameof(CanDeleteTemplate))]
+
+    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    public void CloneTemplate() {
+
+    }
+
+    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
     public void DeleteTemplate(string templateName) {
         string originalFilePath = System.IO.Path.Combine(Path, templateName);
 

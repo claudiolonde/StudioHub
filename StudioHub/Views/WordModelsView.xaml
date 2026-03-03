@@ -51,7 +51,7 @@
                 </Button>
 
                 <!--  Duplica  -->
-                <Button Margin="15 0 0 0">
+                <Button Margin="15 0 0 0" Command="{Binding CloneTemplateCommand}">
                     <TextBlock>
                         <Run Text="&#xf0c5;" FontFamily="{StaticResource FontAwesomeSolid}"/>
                         <Run Text=" Duplica"/>

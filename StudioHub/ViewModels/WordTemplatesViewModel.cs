@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StudioHub.Models;
 
 namespace StudioHub.ViewModels;
 
@@ -25,18 +21,18 @@ public partial class WordTemplatesViewModel : ObservableObject {
 
     public int TotalTemplatesCount => TotalTemplates?.Count() ?? 0;
 
-    public int FilteredTemplatesCount => FilteredTemplates?.Count() ?? 0;
+    public int FilteredTemplatesCount => FilteredTemplates?.Count ?? 0;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteTemplateCommand), nameof(CloneTemplateCommand))]
+    [NotifyCanExecuteChangedFor(
+        nameof(EditTemplateCommand),
+        nameof(CloneTemplateCommand),
+        nameof(RenameTemplateCommand),
+        nameof(DeleteTemplateCommand))]
     private string? _selectedTemplate = null;
 
-    public WordTemplatesViewModel(string appName, string[] headers) {
-
-        Path = System.IO.Path.Combine(Hub.DataPath, "Templates", "Microsoft Word", appName);
-        if (System.IO.Directory.Exists(Path) == false) {
-            System.IO.Directory.CreateDirectory(Path);
-        }
+    public WordTemplatesViewModel(string path, string[] headers) {
+        Path = path;
         TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
         ApplyFilter();
     }
@@ -61,13 +57,18 @@ public partial class WordTemplatesViewModel : ObservableObject {
         ApplyFilter();
     }
 
+    [RelayCommand()]
+    public void NewTemplate() {
 
-    private const string TRASH_FOLDER_NAME = "$Trash";
+    }
 
     private bool CanModifyTemplate() {
         return !string.IsNullOrWhiteSpace(SelectedTemplate);
     }
 
+    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    public void EditTemplate() {
+    }
 
     [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
     public void CloneTemplate() {
@@ -75,37 +76,50 @@ public partial class WordTemplatesViewModel : ObservableObject {
     }
 
     [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
-    public void DeleteTemplate(string templateName) {
-        string originalFilePath = System.IO.Path.Combine(Path, templateName);
+    public void RenameTemplate() {
+    }
 
-        if (!System.IO.File.Exists(originalFilePath)) {
+    /// <summary>
+    /// Comando per l'eliminazione logica del modello selezionato. Sposta il file in una cartella di backup (trash)
+    /// rinominandolo con un timestamp.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    public void DeleteTemplate() {
+
+        // Visualizza dialogo di conferma; se l'utente seleziona "Annulla" (indice 0), interrompe l'esecuzione
+        if (Dialog.Show($"Eliminare il modello selezionato:\n{SelectedTemplate}", DialogIcon.Warning, null, "\0Annulla\0", "Elimina") == 0) {
             return;
         }
 
-        string trashFolderPath = System.IO.Path.Combine(Path, TRASH_FOLDER_NAME);
+        // Verifica esistenza del file sorgente nel path specificato
+        string sourceFilename = System.IO.Path.Combine(Path, SelectedTemplate!);
+        if (!System.IO.File.Exists(sourceFilename)) {
+            return;
+        }
 
-        // Creazione lazy della directory del cestino impostata come nascosta
-        if (!System.IO.Directory.Exists(trashFolderPath)) {
-            System.IO.DirectoryInfo directoryInfo = System.IO.Directory.CreateDirectory(trashFolderPath);
+        // Gestione della cartella cestino: creazione e impostazione attributo Hidden se non esistente
+        string trashPath = System.IO.Path.Combine(Path, Hub.TrashFolderName);
+        if (!System.IO.Directory.Exists(trashPath)) {
+            System.IO.DirectoryInfo directoryInfo = System.IO.Directory.CreateDirectory(trashPath);
             directoryInfo.Attributes |= System.IO.FileAttributes.Hidden;
         }
 
-        string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(templateName);
-        string fileExtension = System.IO.Path.GetExtension(templateName);
-        string timeStamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
-
-        // Anti-collisione: appending del timestamp al nome del file originale
-        string newFileName = $"{fileNameWithoutExtension}_{timeStamp}{fileExtension}";
-        string destinationFilePath = System.IO.Path.Combine(trashFolderPath, newFileName);
+        // Generazione del nuovo nome file con prefisso temporale per evitare collisioni
+        string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_");
+        string newFilename = $"{timeStamp}{SelectedTemplate}";
 
         try {
-            System.IO.File.Move(originalFilePath, destinationFilePath);
+            // Esegue lo spostamento fisico del file verso la cartella trash
+            System.IO.File.Move(sourceFilename, System.IO.Path.Combine(trashPath, newFilename));
 
+            // Aggiorna la collezione dei template visibili e applica i filtri correnti alla UI
             TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
             ApplyFilter();
+
         }
         catch (System.IO.IOException) {
-            Dialog.Show("Impossibile spostare il file nel cestino. Assicurati che non sia aperto in Word.", DialogIcon.Error);
+            // Gestione errore in caso di file lock (es. documento aperto in Microsoft Word)
+            Dialog.Show("Impossibile eliminare il modello, assicurati che non sia aperto in Word.", DialogIcon.Error);
         }
     }
 }

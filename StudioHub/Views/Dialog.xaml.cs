@@ -76,7 +76,9 @@ public partial class Dialog : Window {
     /// saranno considerate, tutte le successive verranno ignorate.
     /// </param>
     /// <returns>L'indice <see cref="int"/> in base zero del pulsante premuto dall'utente.</returns>
-    public static int Show(string message, DialogIcon icon = DialogIcon.None, string title = "", params string[] buttons) {
+    public static int Show(string message, DialogIcon icon = DialogIcon.None, string? title = null, params string[] buttons) {
+
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(message);
 
         Window? activeWindow = GetActiveWindow();
 

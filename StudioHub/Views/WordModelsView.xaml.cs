@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using StudioHub.Services;
+using System.Windows;
 using StudioHub.ViewModels;
 
 namespace StudioHub.Views;
@@ -24,12 +22,26 @@ public partial class WordTemplatesView : Window {
 
         ArgumentException.ThrowIfNullOrWhiteSpace(appName);
         ArgumentNullException.ThrowIfNull(headers);
+
+        string path = string.Empty;
         if (string.IsNullOrWhiteSpace(Hub.DataPath)) {
             Dialog.Show("La cartella dati dell'applicazione non è impostata correttamente.", DialogIcon.Error);
             return;
         }
+        else {
+            path = System.IO.Path.Combine(Hub.DataPath, "Templates", "Microsoft Word", appName);
+            try {
+                if (System.IO.Directory.Exists(path) == false) {
+                    System.IO.Directory.CreateDirectory(path);
+                }
+            }
+            catch {
+                Dialog.Show($"Impossibile creare la cartella dati:\n{path}.", DialogIcon.Error);
+                return;
+            }
+        }
 
-        WordTemplatesViewModel vm = new(appName, headers) { };
+        WordTemplatesViewModel vm = new(path, headers) { };
         WordTemplatesView v = new() {
             DataContext = vm
         };

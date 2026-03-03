@@ -35,7 +35,7 @@
             <StackPanel Orientation="Horizontal">
 
                 <!--  Nuovo modello  -->
-                <Button Style="{DynamicResource AccentButtonStyle}">
+                <Button Style="{DynamicResource AccentButtonStyle}" Command="{Binding NewTemplateCommand}">
                     <TextBlock>
                         <Run Text="&#x2b;" FontFamily="{StaticResource FontAwesomeSolid}"/>
                         <Run Text="Nuovo"/>
@@ -43,7 +43,7 @@
                 </Button>
 
                 <!--  Modifica  -->
-                <Button Margin="30 0 0 0">
+                <Button Margin="30 0 0 0" Command="{Binding EditTemplateCommand}">
                     <TextBlock>
                         <Run Text="&#xf303;" FontFamily="{StaticResource FontAwesomeSolid}"/>
                         <Run Text=" Modifica"/>
@@ -59,7 +59,7 @@
                 </Button>
 
                 <!--  Rinomina  -->
-                <Button Margin="15 0 0 0">
+                <Button Margin="15 0 0 0" Command="{Binding RenameTemplateCommand}">
                     <TextBlock>
                         <Run Text="&#xf246;" FontFamily="{StaticResource FontAwesomeSolid}"/>
                         <Run Text=" Rinomina"/>
@@ -84,14 +84,14 @@
             <TextBox Style="{StaticResource PlaceholderTextBoxStyle}"
                 Grid.Column="1"
                 Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Padding="26 5 6 6"
+                Padding="24 5 6 6"
                 VerticalAlignment="Top"
                 Tag="Filtra per nome modello..."
                 />
             <TextBlock
                 Grid.Column="1"
                 Text="&#xf002;"
-                Margin="10 9 0 0"
+                Margin="8 9 0 0"
                 HorizontalAlignment="Left"
                 Background="Transparent"
                 Foreground="{DynamicResource TextFillColorDisabledBrush}"
@@ -104,7 +104,7 @@
 
 
         <!--  elenco modelli  -->
-        <ListBox x:Name="listbox"
+        <ListBox x:Name="listbox" FontSize="14"
             Grid.Row="1"
             Margin="0 0 0 10"
             SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -118,11 +118,12 @@
         <Grid Grid.Row="2" Background="{DynamicResource ControlFillColorDefaultBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!--  percorso  -->
             <TextBlock
+                Grid.Column="0" Grid.Row="2"
                 Text="{Binding Path, Mode=OneTime}"
                 Margin="10 0 0 0"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -134,8 +135,8 @@
 
             <!--  filtered/totals  -->
             <TextBlock
-                Grid.Column="1"
-                Margin="0 0 10 0"
+                Grid.Column="1" Grid.Row="2"
+                Margin="15 0 10 0"
                 HorizontalAlignment="Right" VerticalAlignment="Center"
                 Foreground="{DynamicResource TextFillColorDisabledBrush}"
                 FontSize="11"

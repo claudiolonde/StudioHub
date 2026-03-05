@@ -59,20 +59,10 @@ public static class Hub {
     public static string TrashFolderName => "$Recycle.Bin";
     
     /// <summary>
-    /// Flag privato per garantire l'esecuzione singola della logica di inizializzazione.
-    /// </summary>
-    private static bool _isInitialized = false;
-
-    /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.
     /// </summary>
     /// <returns>True se l'inizializzazione è completata con successo o se è già stata eseguita.</returns>
     public static bool Initialize() {
-
-        // Verifica lo stato di inizializzazione per prevenire chiamate multiple
-        if (_isInitialized) {
-            return true;
-        }
 
         // Caricamento dei parametri di configurazione dal file di boot
         BootstrapInfo? info = LoadConfig();
@@ -87,12 +77,11 @@ public static class Hub {
         // Configurazione globale del provider per SQL Server
         GlobalConfiguration.Setup().UseSqlServer();
         mapEntities();
-    private static void mapEntities() {
         _isInitialized = true;
         return true;
     }
 
-    private static void MapEntities() {
+    private static void mapEntities() {
         /*
         FluentMapper.Entity<ModelName>()
             .Table("Schema.TableName")

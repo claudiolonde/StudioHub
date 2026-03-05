@@ -146,8 +146,6 @@ public static class ConnectionInfoService {
     /// </remarks>
     public static void SaveConnectionInfo(ConnectionInfo ci) {
         string json = JsonSerializer.Serialize(ci);
-        using RegistryKey rk = Registry.CurrentUser.CreateSubKey(Hub.RegistryPath);
-        rk.SetValue("ConnectionInfo", json);
     }
 
     /// <summary>
@@ -161,7 +159,7 @@ public static class ConnectionInfoService {
     /// <see cref="ConnectionInfo"/> se la chiave o il valore non esistono o la deserializzazione fallisce.
     /// </returns>
     public static ConnectionInfo? LoadConnectionInfo() {
-        using RegistryKey? rk = Registry.CurrentUser.OpenSubKey(Hub.RegistryPath);
+        using RegistryKey? rk = Registry.CurrentUser.OpenSubKey("");
         if (rk == null) {
             return null;// new ConnectionInfo();
         }

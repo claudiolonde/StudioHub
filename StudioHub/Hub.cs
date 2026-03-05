@@ -5,6 +5,24 @@ namespace StudioHub;
 
 public static class Hub {
 
+    #region    Constants  ----------------------------------------------------------------------------------------------------
+
+    // path
+    public const string SETTINGS = "Settings";
+    public const string TEMPLATES = "Templates";
+    public const string WORD_TEMPLATES = @"Templates\Microsoft Word";
+    public const string MEETING_WORD_TEMPLATES = @"Templates\Microsoft Word\Meeting";
+
+    // filename
+    public const string GLOBAL_SETTINGS = "GlobalSettings.json";
+
+    #endregion Constants  ----------------------------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Flag che indica se il servizio è stato inizializzato.
+    /// </summary>
+    private static bool _isInitialized = false;
+
     /// <summary>
     /// Percorso della chiave di registro utilizzata dall'applicazione per memorizzare le impostazioni di connessione.
     /// </summary>
@@ -68,14 +86,12 @@ public static class Hub {
 
         // Configurazione globale del provider per SQL Server
         GlobalConfiguration.Setup().UseSqlServer();
-
+        mapEntities();
+    private static void mapEntities() {
         _isInitialized = true;
         return true;
     }
 
-    /// <summary>
-    /// Definisce i mapping Fluent tra i modelli C# e le tabelle del database SQL Server.
-    /// </summary>
     private static void MapEntities() {
         /*
         FluentMapper.Entity<ModelName>()
@@ -92,10 +108,14 @@ public static class Hub {
             //DataPath = @"\\192.168.123.18\Studio Londe\UFFICIO\MODELLI",
             DataSource = "192.168.123.18",
             UserID = "sa",
-            Password = "gestionale_2008",
+            Password = "UnaPasswordACaso",
             IntegratedSecurity = false,
             PrimaryDb = "StudioHub",
             LegacyDb = "ARCHIVIO"
         };
     }
 }
+
+
+
+//gestionale_2008

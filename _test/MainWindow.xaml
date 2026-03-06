@@ -5,16 +5,29 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
     xmlns:local="clr-namespace:_test"
+    xmlns:c="clr-namespace:StudioHub.Controls;assembly=StudioHub"
+    xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
     xmlns:ui="clr-namespace:StudioHub.Controls;assembly=StudioHub"
     WindowStartupLocation="CenterScreen"
     Title="MainWindow"
     Height="450" Width="800"
+    d:Background="#202020"
     >
     <StackPanel Margin="24">
         <Button
             Content="RUN"
             Width="100"
             Click="Button_Click"
+            />
+        <TextBox
+            Text="Ciao Gemini!"
+            Margin="0 16"
+            h:TextBoxHelper.LeadingIcon=""
+            />
+        <c:PasswordTextBox
+            Width="200"
+            HorizontalAlignment="Left"
+            Tag="digitare la password..."
             />
     </StackPanel>
 </Window>

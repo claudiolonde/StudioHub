@@ -11,7 +11,7 @@ public class IO {
     /// <param name="title">Titolo opzionale della finestra di dialogo.</param>
     /// <returns>Il percorso della cartella selezionata, oppure stringa vuota se annullato.</returns>
     public static string GetSelectedFolder(string? title = null) {
-        OpenFolderDialog openFolderDialog = new OpenFolderDialog {
+        OpenFolderDialog openFolderDialog = new() {
             Multiselect = false
         };
         if (!string.IsNullOrWhiteSpace(title)) {

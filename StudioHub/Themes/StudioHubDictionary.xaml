@@ -5,10 +5,11 @@
 
         <ResourceDictionary Source="/StudioHub;component/Themes/Colors.xaml"/>
         <ResourceDictionary Source="/StudioHub;component/Themes/Fonts.xaml"/>
+        <ResourceDictionary Source="/StudioHub;component/Themes/DefaultTextBoxBaseStyle.xaml"/>
+        <ResourceDictionary Source="/StudioHub;component/Themes/PasswordTextBoxStyle.xaml"/>
 
         <ResourceDictionary Source="/StudioHub;component/Themes/AlertButtonStyle.xaml"/>
         <ResourceDictionary Source="/StudioHub;component/Themes/HyperlinkButtonStyle.xaml"/>
-        <ResourceDictionary Source="/StudioHub;component/Themes/PlaceholderTextBoxStyle.xaml"/>
 
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

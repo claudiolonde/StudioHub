@@ -53,20 +53,24 @@ public static class Hub {
     /// </summary>
     public static string DataPath { get; private set; } = string.Empty;
 
-/// <summary>
+    /// <summary>
     /// Nome costante della cartella utilizzata per il cestino.
     /// </summary>
     public static string TrashFolderName => "$Recycle.Bin";
-    
+
     /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.
     /// </summary>
     /// <returns>True se l'inizializzazione è completata con successo o se è già stata eseguita.</returns>
     public static bool Initialize() {
 
+        if (_isInitialized) {
+            return true;
+        }
+
         // Caricamento dei parametri di configurazione dal file di boot
         BootstrapInfo? info = LoadConfig();
-        
+
         // Mappatura delle stringhe di connessione e dei nomi database estratti
         PrimaryConnection = info.PrimaryConnectionString;
         LegacyConnection = info.LegacyConnectionString;
@@ -93,8 +97,8 @@ public static class Hub {
 
     private static BootstrapInfo LoadConfig() {
         return new BootstrapInfo {
-            DataPath = @"\\SERVER-18\Studio Londe\UFFICIO\MODELLI",
-            //DataPath = @"\\192.168.123.18\Studio Londe\UFFICIO\MODELLI",
+            //DataPath = @"\\SERVER-18\Studio Londe\UFFICIO\MODELLI",
+            DataPath = @"D:\FILES\Documenti\StudioHub",
             DataSource = "192.168.123.18",
             UserID = "sa",
             Password = "UnaPasswordACaso",

@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="StudioHub/StudioHub.csproj" />
   <Project Path="_test/_test.csproj" />
 </Solution>

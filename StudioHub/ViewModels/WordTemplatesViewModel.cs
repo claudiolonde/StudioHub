@@ -34,14 +34,14 @@ public partial class WordTemplatesViewModel : ObservableObject {
     public WordTemplatesViewModel(string path, string[] headers) {
         Path = path;
         TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
-        ApplyFilter();
+        applyFilter();
     }
 
     /// <summary>
     /// Filtra la collezione dei modelli in base al testo inserito dall'utente. Aggiorna la proprietà
     /// <see cref="FilteredTemplates"/> per il data binding con la UI.
     /// </summary>
-    public void ApplyFilter() {
+    private void applyFilter() {
         // Gestione del caso in cui il filtro sia vuoto o composto da soli spazi bianchi
         if (string.IsNullOrWhiteSpace(FilterText)) {
             // Se TotalTemplates è null, inizializza una collezione vuota tramite collection expression
@@ -63,28 +63,27 @@ public partial class WordTemplatesViewModel : ObservableObject {
     }
      
     partial void OnFilterTextChanged(string value) {
-        ApplyFilter();
+        applyFilter();
     }
 
     [RelayCommand()]
     public void NewTemplate() {
-
     }
 
-    private bool CanModifyTemplate() {
+    private bool canModifyTemplate() {
         return !string.IsNullOrWhiteSpace(SelectedTemplate);
     }
 
-    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
     public void EditTemplate() {
     }
 
-    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
     public void CloneTemplate() {
 
     }
 
-    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
     public void RenameTemplate() {
     }
 
@@ -92,7 +91,7 @@ public partial class WordTemplatesViewModel : ObservableObject {
     /// Comando per l'eliminazione logica del modello selezionato. Sposta il file in una cartella di backup (trash)
     /// rinominandolo con un timestamp.
     /// </summary>
-    [RelayCommand(CanExecute = nameof(CanModifyTemplate))]
+    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
     public void DeleteTemplate() {
 
         // Visualizza dialogo di conferma; se l'utente seleziona "Annulla" (indice 0), interrompe l'esecuzione
@@ -123,7 +122,7 @@ public partial class WordTemplatesViewModel : ObservableObject {
 
             // Aggiorna la collezione dei template visibili e applica i filtri correnti alla UI
             TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
-            ApplyFilter();
+            applyFilter();
 
         }
         catch (System.IO.IOException) {

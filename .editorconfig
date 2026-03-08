@@ -1,7 +1,7 @@
-# Rimuovere la riga seguente se si vogliono ereditare le impostazioni del file con estensione editorconfig da directory di livello superiore
+# Interrompe l'ereditarietà dai file .editorconfig superiori
 root = true
 
-# REGOLE GLOBALI (Si applicano a tutti i file: cs, json, xml, ecc.)
+# REGOLE GENERALI
 [*]
 charset = utf-8
 indent_size = 4
@@ -11,25 +11,30 @@ end_of_line = crlf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# File C#
+# FILE C#
 [*.cs]
 
 # Membri tipo
 dotnet_hide_advanced_members = true
-dotnet_member_insertion_location = with_other_members_of_the_same_kind
+dotnet_member_insertion_location = at_the_end
 dotnet_property_generation_behavior = prefer_throwing_properties
 
 # Ricerca simboli
 dotnet_search_reference_assemblies = true
 
-#### Convenzioni di scrittura codice .NET ####
+# Disattiva avviso valore non usato
+dotnet_diagnostic.IDE0058.severity = none
+
+
+
+#### CONVENZIONI DI SCRITTURA CODICE .NET ####
 
 # Organizza using
 dotnet_separate_import_directive_groups = false
 dotnet_sort_system_directives_first = true
 file_header_template = unset
 
-# Preferenze per this. e Me.
+# Preferenze per this.
 dotnet_style_qualification_for_event = false:suggestion
 dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
@@ -42,11 +47,11 @@ dotnet_style_predefined_type_for_member_access = true:suggestion
 # Preferenze per parentesi
 dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity
 dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
-dotnet_style_parentheses_in_other_operators = never_if_unnecessary
-dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_operators = always_for_clarity
+dotnet_style_parentheses_in_relational_binary_operators = never_if_unnecessary
 
 # Preferenze per modificatore
-dotnet_style_require_accessibility_modifiers = for_non_interface_members
+dotnet_style_require_accessibility_modifiers = always
 
 # Preferenze a livello di espressione
 dotnet_prefer_system_hash_code = true
@@ -80,9 +85,11 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 
 # Preferenze per nuova riga
 dotnet_style_allow_multiple_blank_lines_experimental = true
-dotnet_style_allow_statement_immediately_after_block_experimental = true
+dotnet_style_allow_statement_immediately_after_block_experimental = false
 
-#### Convenzioni di scrittura codice C# ####
+
+
+#### CONVENZIONI DI SCRITTURA CODICE C# ####
 
 # Preferenze per var
 csharp_style_var_elsewhere = false:suggestion
@@ -103,7 +110,7 @@ csharp_style_expression_bodied_properties = true:suggestion
 csharp_style_pattern_matching_over_as_with_null_check = true
 csharp_style_pattern_matching_over_is_with_cast_check = true
 csharp_style_prefer_extended_property_pattern = true
-csharp_style_prefer_not_pattern = false
+csharp_style_prefer_not_pattern = true
 csharp_style_prefer_pattern_matching = false:suggestion
 csharp_style_prefer_switch_expression = true
 
@@ -135,14 +142,14 @@ csharp_style_inlined_variable_declaration = true
 csharp_style_prefer_implicitly_typed_lambda_expression = true
 csharp_style_prefer_index_operator = false
 csharp_style_prefer_local_over_anonymous_function = true
-csharp_style_prefer_null_check_over_type_check = false
+csharp_style_prefer_null_check_over_type_check = true
 csharp_style_prefer_range_operator = false
 csharp_style_prefer_tuple_swap = true
-csharp_style_prefer_unbound_generic_type_in_nameof = true
+csharp_style_prefer_unbound_generic_type_in_nameof = false
 csharp_style_prefer_utf8_string_literals = true
 csharp_style_throw_expression = true
 csharp_style_unused_value_assignment_preference = discard_variable:silent
-csharp_style_unused_value_expression_statement_preference = discard_variable
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # Preferenze per direttive 'using'
 csharp_using_directive_placement = outside_namespace:suggestion
@@ -152,9 +159,11 @@ csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimenta
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = false
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false
-csharp_style_allow_embedded_statements_on_same_line_experimental = true
+csharp_style_allow_embedded_statements_on_same_line_experimental = false
 
-#### Regole di formattazione C# ####
+
+
+#### REGOLE DI FORMATTAZIONE C# ####
 
 # Preferenze per nuova riga
 csharp_new_line_before_catch = true
@@ -170,7 +179,7 @@ csharp_indent_block_contents = true
 csharp_indent_braces = false
 csharp_indent_case_contents = true
 csharp_indent_case_contents_when_block = false
-csharp_indent_labels = no_change
+csharp_indent_labels = one_less_than_current
 csharp_indent_switch_labels = true
 
 # Preferenze per spazi
@@ -198,27 +207,44 @@ csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
 # Preferenze per ritorno a capo
-csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_blocks = false
 csharp_preserve_single_line_statements = false
 
-#### Stili di denominazione personalizzati ####
 
-# 1. DEFINIZIONE DEGLI STILI 
 
+#### STILI DI DENOMINAZIONE PERSONALIZZATI ####
+
+# DEFINIZIONE DEGLI STILI 
+
+# Stile per il suffisso Async
+dotnet_naming_style.stile_suffisso_async.required_suffix = Async
+dotnet_naming_style.stile_suffisso_async.capitalization = pascal_case
+
+# Stile PascalCase (Classi, Metodi, Proprietà)
 dotnet_naming_style.stile_pascal_case.capitalization = pascal_case
 
+# Stile Interfacce (IPascalCase)
 dotnet_naming_style.stile_interfacce.capitalization = pascal_case
 dotnet_naming_style.stile_interfacce.required_prefix = I
 
-# Stile puro camelCase (senza underscore)
+# Stile per Campi Privati MVVM (_camelCase)
+dotnet_naming_style.stile_campi_privati.capitalization = camel_case
+dotnet_naming_style.stile_campi_privati.required_prefix = _
+
+# Stile camelCase puro (Parametri e Locali)
 dotnet_naming_style.stile_camel_case.capitalization = camel_case
 
-# Stile UPPER_CASE per le costanti
+# Stile UPPER_CASE (Costanti)
 dotnet_naming_style.stile_costanti.capitalization = all_upper
 dotnet_naming_style.stile_costanti.word_separator = _
 
 
-# 2. DEFINIZIONE DEI SIMBOLI
+
+# DEFINIZIONE DEI SIMBOLI
+
+# Simbolo per i metodi async
+dotnet_naming_symbols.simboli_metodi_async.applicable_kinds = method
+dotnet_naming_symbols.simboli_metodi_async.required_modifiers = async
 
 dotnet_naming_symbols.simboli_interfacce.applicable_kinds = interface
 dotnet_naming_symbols.simboli_interfacce.applicable_accessibilities = *
@@ -229,36 +255,60 @@ dotnet_naming_symbols.simboli_costanti.required_modifiers = const
 dotnet_naming_symbols.simboli_static_readonly.applicable_kinds = field
 dotnet_naming_symbols.simboli_static_readonly.required_modifiers = static, readonly
 
-# Accorpiamo campi privati, parametri e variabili locali
-dotnet_naming_symbols.simboli_entita_private.applicable_kinds = field, local, parameter
-dotnet_naming_symbols.simboli_entita_private.applicable_accessibilities = private, local
+# Metodi privati
+dotnet_naming_symbols.simboli_metodi_privati.applicable_kinds = method
+dotnet_naming_symbols.simboli_metodi_privati.applicable_accessibilities = private
 
-dotnet_naming_symbols.simboli_tutto_il_resto.applicable_kinds = class, struct, enum, property, method, event, delegate, namespace
+# Campi privati (dove userai l'underscore per MVVM)
+dotnet_naming_symbols.simboli_campi_privati.applicable_kinds = field
+dotnet_naming_symbols.simboli_campi_privati.applicable_accessibilities = private
+
+# Parametri e Variabili Locali (camelCase puro)
+dotnet_naming_symbols.simboli_locali_e_parametri.applicable_kinds = parameter, local
+
+# Tutto ciò che è pubblico o strutturale
+dotnet_naming_symbols.simboli_tutto_il_resto.applicable_kinds = class, struct, enum, property, event, delegate, namespace
 dotnet_naming_symbols.simboli_tutto_il_resto.applicable_accessibilities = *
 
 
-# 3. APPLICAZIONE DELLE REGOLE
 
-# Regola: Interfacce -> IPascalCase
-dotnet_naming_rule.regola_interfacce.symbols = simboli_interfacce
-dotnet_naming_rule.regola_interfacce.style = stile_interfacce
-dotnet_naming_rule.regola_interfacce.severity = suggestion
+# APPLICAZIONE DELLE REGOLE
 
-# Regola: Costanti e Static Readonly -> UPPER_CASE
-dotnet_naming_rule.regola_costanti.symbols = simboli_costanti
-dotnet_naming_rule.regola_costanti.style = stile_costanti
-dotnet_naming_rule.regola_costanti.severity = suggestion
+# I metodi async devono finire con 'Async'
+dotnet_naming_rule.async_methods_must_end_with_async.symbols = simboli_metodi_async
+dotnet_naming_rule.async_methods_must_end_with_async.style = stile_suffisso_async
+dotnet_naming_rule.async_methods_must_end_with_async.severity = suggestion
 
-dotnet_naming_rule.regola_static_readonly.symbols = simboli_static_readonly
-dotnet_naming_rule.regola_static_readonly.style = stile_costanti
-dotnet_naming_rule.regola_static_readonly.severity = suggestion
+# Metodi privati -> camelCase
+dotnet_naming_rule.metodi_privati_rule.symbols = simboli_metodi_privati
+dotnet_naming_rule.metodi_privati_rule.style = stile_camel_case
+dotnet_naming_rule.metodi_privati_rule.severity = suggestion
 
-# Regola: Tutte le entità private (campi, locali, parametri) -> camelCase
-dotnet_naming_rule.regola_entita_private.symbols = simboli_entita_private
-dotnet_naming_rule.regola_entita_private.style = stile_camel_case
-dotnet_naming_rule.regola_entita_private.severity = suggestion
+# Interfacce -> IPascalCase
+dotnet_naming_rule.interfacce_rule.symbols = simboli_interfacce
+dotnet_naming_rule.interfacce_rule.style = stile_interfacce
+dotnet_naming_rule.interfacce_rule.severity = suggestion
 
-# Regola: Tutto il resto (Classi, Metodi, Proprietà pubbliche, ecc.) -> PascalCase
-dotnet_naming_rule.regola_tutto_il_resto.symbols = simboli_tutto_il_resto
-dotnet_naming_rule.regola_tutto_il_resto.style = stile_pascal_case
-dotnet_naming_rule.regola_tutto_il_resto.severity = suggestion
+# Costanti e Static Readonly -> UPPER_CASE
+dotnet_naming_rule.costanti_rule.symbols = simboli_costanti
+dotnet_naming_rule.costanti_rule.style = stile_costanti
+dotnet_naming_rule.costanti_rule.severity = suggestion
+
+dotnet_naming_rule.static_readonly_rule.symbols = simboli_static_readonly
+dotnet_naming_rule.static_readonly_rule.style = stile_costanti
+dotnet_naming_rule.static_readonly_rule.severity = suggestion
+
+# Campi Privati -> _camelCase (MVVM)
+dotnet_naming_rule.campi_privati_rule.symbols = simboli_campi_privati
+dotnet_naming_rule.campi_privati_rule.style = stile_campi_privati
+dotnet_naming_rule.campi_privati_rule.severity = suggestion
+
+# Parametri e Locali -> camelCase
+dotnet_naming_rule.locali_rule.symbols = simboli_locali_e_parametri
+dotnet_naming_rule.locali_rule.style = stile_camel_case
+dotnet_naming_rule.locali_rule.severity = suggestion
+
+# Tutto il resto -> PascalCase
+dotnet_naming_rule.tutto_il_resto_rule.symbols = simboli_tutto_il_resto
+dotnet_naming_rule.tutto_il_resto_rule.style = stile_pascal_case
+dotnet_naming_rule.tutto_il_resto_rule.severity = suggestion

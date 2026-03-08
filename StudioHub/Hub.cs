@@ -69,7 +69,7 @@ public static class Hub {
         }
 
         // Caricamento dei parametri di configurazione dal file di boot
-        BootstrapInfo? info = LoadConfig();
+        BootstrapInfo? info = loadConfig();
 
         // Mappatura delle stringhe di connessione e dei nomi database estratti
         PrimaryConnection = info.PrimaryConnectionString;
@@ -95,7 +95,7 @@ public static class Hub {
 
     }
 
-    private static BootstrapInfo LoadConfig() {
+    private static BootstrapInfo loadConfig() {
         return new BootstrapInfo {
             //DataPath = @"\\SERVER-18\Studio Londe\UFFICIO\MODELLI",
             DataPath = @"D:\FILES\Documenti\StudioHub",

@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="Themes\StudioHubDictionary.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <COMReference Include="Microsoft.Office.Interop.Word">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>7</VersionMinor>
@@ -43,6 +39,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
     <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,7 +48,6 @@
     </Resource>
     <Resource Include="Assets\StudioHub.ico" />
     <Resource Include="Assets\WordModels.ico" />
-    <Resource Include="Themes\StudioHubDictionary.xaml" />
   </ItemGroup>
 
 </Project>

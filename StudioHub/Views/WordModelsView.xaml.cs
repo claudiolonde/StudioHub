@@ -6,7 +6,7 @@ namespace StudioHub.Views;
 /// <summary>
 /// Logica di interazione per xaml
 /// </summary>
-public partial class WordTemplatesView : Window {
+public partial class WordTemplatesView  {
 
     public WordTemplatesView() {
         InitializeComponent();

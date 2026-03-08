@@ -1,4 +1,4 @@
-<Window x:Class="_test.MainView"
+<ui:FluentWindow x:Class="_test.MainView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,27 +7,20 @@
     xmlns:local="clr-namespace:_test"
     xmlns:c="clr-namespace:StudioHub.Controls;assembly=StudioHub"
     xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
-    xmlns:ui="clr-namespace:StudioHub.Controls;assembly=StudioHub"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     WindowStartupLocation="CenterScreen"
     Title="MainWindow"
     Height="450" Width="800"
-    d:Background="#202020"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     >
     <StackPanel Margin="24">
         <Button
             Content="RUN"
             Width="100"
-            Click="Button_Click"
+            Click="button_Click"
             />
-        <TextBox
-            Text="Ciao Gemini!"
-            Margin="0 16"
-            h:TextBoxHelper.LeadingIcon=""
-            />
-        <c:PasswordTextBox
-            Width="200"
-            HorizontalAlignment="Left"
-            Tag="digitare la password..."
-            />
+        <TextBox Text="Ciao Gemini!" Margin="0 16"/>
+
     </StackPanel>
-</Window>
+</ui:FluentWindow>

@@ -1,7 +1,0 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <SolidColorBrush x:Key="AlertBrush">#C42B1C</SolidColorBrush>
-    <SolidColorBrush x:Key="AlertIsMouseOverBrush">#B82416</SolidColorBrush>
-    <SolidColorBrush x:Key="AlertIsPressedBrush">#AD1B10</SolidColorBrush>
-
-</ResourceDictionary>

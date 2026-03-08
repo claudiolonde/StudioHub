@@ -91,18 +91,13 @@
             Margin="0 25"
             Orientation="Horizontal"
             >
-            <ui:LoadingSpinner
-                Width="14"
-                Visibility="{Binding IsBusy, Converter={h:BoolToHidden}}"
-                Margin="0 0 5 0"
-                d:Visibility="Hidden"
-                />
-            <Button Style="{StaticResource HyperlinkButtonStyle}"
+
+            <Button 
                 Content="Verifica connessione"
                 Visibility="{Binding NotIsConnected, Converter={h:BoolToCollapsed}}"
                 Command="{Binding ConnectCommand}"
                 />
-            <Button Style="{StaticResource HyperlinkButtonStyle}"
+            <Button 
                 Content="Disconnetti"
                 Visibility="{Binding IsConnected, Converter={h:BoolToCollapsed}}"
                 Command="{Binding DisconnectCommand}"
@@ -150,7 +145,7 @@
                 Width="128"
                 IsCancel="True"
                 />
-            <Button Style="{DynamicResource AccentButtonStyle}"
+            <Button 
                 Content="Salva"
                 Width="128"
                 Margin="20 0 0 0"

@@ -11,17 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Templates\**" />
-    <EmbeddedResource Remove="Templates\**" />
-    <None Remove="Templates\**" />
-    <Page Remove="Templates\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Assets\Font Awesome 7 Free-Solid-900.otf" />
     <None Remove="Assets\StudioHub.ico" />
     <None Remove="Assets\WordModels.ico" />
   </ItemGroup>
+
+  <!--<ItemGroup>
+    <Page Remove="Themes\generic.xaml" />
+  </ItemGroup>-->
 
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Interop.Word">
@@ -43,9 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Font Awesome 7 Free-Solid-900.otf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Assets\Font Awesome 7 Free-Solid-900.otf" />
     <Resource Include="Assets\StudioHub.ico" />
     <Resource Include="Assets\WordModels.ico" />
   </ItemGroup>

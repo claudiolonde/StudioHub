@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,7 +14,7 @@ public partial class WindowViewModel : ObservableObject {
     public event EventHandler? Saved;
 
     /// <summary>
-    /// Indica se il modello è stato salvato con successo.
+    /// Indica se il salvataggio è avvenuto con successo.
     /// </summary>
     public bool IsSaved { get; private set; }
 
@@ -24,15 +24,15 @@ public partial class WindowViewModel : ObservableObject {
     /// <returns>
     /// <c> true</c> if the save is allowed; <c> false</c> otherwise.
     /// </returns>
-    private bool CanSave() {
-        return true;
+    private bool canSave() {
+        return !IsSaved;
     }
 
     /// <summary>
-    /// Salva il modello di stampa unione, previa validazione di unicità del nome.
+    /// Esegue le operazioni di salvataggio.
     /// </summary>
-    [RelayCommand(CanExecute = nameof(CanSave))]
-    private void Save() {
+    [RelayCommand(CanExecute = nameof(canSave))]
+    public void Save() {
         IsSaved = true;
         Saved?.Invoke(this, EventArgs.Empty);
     }

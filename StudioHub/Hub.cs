@@ -97,8 +97,8 @@ public static class Hub {
 
     private static BootstrapInfo loadConfig() {
         return new BootstrapInfo {
-            DataPath = @"\\SERVER-18\Studio Londe\UFFICIO\MODELLI",
-            //DataPath = @"D:\FILES\Documenti\StudioHub",
+            //DataPath = @"\\SERVER-18\Studio Londe\UFFICIO\MODELLI",
+            DataPath = @"D:\FILES\Documenti\StudioHub",
             DataSource = "192.168.123.18",
             UserID = "sa",
             Password = "UnaPasswordACaso",

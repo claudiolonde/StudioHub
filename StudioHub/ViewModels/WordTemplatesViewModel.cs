@@ -6,7 +6,10 @@ namespace StudioHub.ViewModels;
 
 public partial class WordTemplatesViewModel : ObservableObject {
 
-    public string Path { get; set; }
+    public static string Title => "Gestione modelli Word";
+    public string Path {
+        get; set;
+    }
 
     [ObservableProperty]
     private string _filterText = string.Empty;
@@ -61,7 +64,7 @@ public partial class WordTemplatesViewModel : ObservableObject {
                                     );
         }
     }
-     
+
     partial void OnFilterTextChanged(string value) {
         applyFilter();
     }

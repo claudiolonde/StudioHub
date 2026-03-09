@@ -4,14 +4,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:c="clr-namespace:StudioHub.Controls"
-    xmlns:h="clr-namespace:StudioHub.Helpers"
-    xmlns:vm="clr-namespace:StudioHub.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:StudioHub.ViewModels"
+    xmlns:c="clr-namespace:StudioHub.Controls" xmlns:h="clr-namespace:StudioHub.Helpers"
     WindowStartupLocation="CenterScreen"
     ShowInTaskbar="True"
     ResizeMode="CanResize"
-    Title="Gestione modelli Word" Icon="/StudioHub;component/Assets/StudioHub.ico"
     Height="624" Width="800"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -19,28 +17,34 @@
     d:Background="#202020"
     d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel}"
     >
-    <Grid Margin="25">
+    <Grid>
         <Grid.RowDefinitions>
-            <!--<RowDefinition Height="Auto"/>-->
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="40"/>
             <RowDefinition/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <ui:TitleBar Title="Gestione modelli Word" Icon="{ui:SymbolIcon Fluent24}"/>
 
-
-        <Grid VerticalAlignment="Top">
+        <Grid
+            Grid.Row="1"
+            Margin="25 0"
+            VerticalAlignment="Top"
+            >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
+
 
             <!--  buttons  -->
             <StackPanel Orientation="Horizontal">
 
                 <!--  Nuovo modello  -->
                 <ui:Button
-                    Icon="{ui:SymbolIcon Symbol=Add12}"
+                    Icon="{ui:SymbolIcon Symbol=Add20,
+                                         Filled=True}"
                     Content="Nuovo modello"
                     Appearance="Primary"
                     Command="{Binding NewTemplateCommand}"
@@ -50,31 +54,33 @@
                 <!--  Modifica  -->
                 <Button Margin="30 0 0 0" Command="{Binding EditTemplateCommand}">
                     <TextBlock>
-                        <Run Text=" Modifica"/>
+                        <Run Text="Modifica"/>
                     </TextBlock>
                 </Button>
 
                 <!--  Duplica  -->
                 <Button Margin="15 0 0 0" Command="{Binding CloneTemplateCommand}">
                     <TextBlock>
-                        <Run Text=" Duplica"/>
+                        <Run Text="Duplica"/>
                     </TextBlock>
                 </Button>
 
                 <!--  Rinomina  -->
-                <Button Margin="15 0 0 0" Command="{Binding RenameTemplateCommand}">
-                    <TextBlock>
-                        <Run Text=" Rinomina"/>
-                    </TextBlock>
-                </Button>
+                <ui:Button
+                    Icon="{ui:SymbolIcon Symbol=Rename20}"
+                    Content="Rinomina"
+                    Margin="15 0 0 0"
+                    Command="{Binding RenameTemplateCommand}"
+                    >
+                </ui:Button>
 
                 <!--  Elimina  -->
 
                 <ui:Button
-                    Icon="{ui:SymbolIcon Symbol=Delete24}"
+                    Icon="{ui:SymbolIcon Symbol=Delete16}"
                     Content="Elimina"
                     Margin="30 0 60 0"
-                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Foreground="{StaticResource TextFillColorPrimaryBrush}"
                     Command="{Binding DeleteTemplateCommand}"
                     Appearance="Danger"
                     />
@@ -85,20 +91,10 @@
 
 
             <!--  filter/search  -->
-            <TextBox
+            <ui:TextBox
                 Grid.Column="1"
                 Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Padding="24 5 6 6"
-                VerticalAlignment="Top"
-                Tag="Filtra per nome modello..."
-                />
-            <TextBlock
-                Grid.Column="1"
-                Text="&#xf002;"
-                Margin="8 9 0 0"
-                HorizontalAlignment="Left"
-                Background="Transparent"
-                IsHitTestVisible="False"
+                PlaceholderText="Filtra per nome..."
                 />
 
         </Grid>
@@ -107,8 +103,8 @@
 
         <!--  elenco modelli  -->
         <ListBox x:Name="listbox"
-            Grid.Row="1"
-            Margin="0 0 0 10"
+            Grid.Row="2"
+            Margin="25 0 25 10"
             FontSize="14"
             SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             ItemsSource="{Binding FilteredTemplates, Mode=OneWay}"
@@ -118,7 +114,7 @@
 
 
         <!--  infobar  -->
-        <Grid Grid.Row="2" Background="{DynamicResource ControlFillColorDefaultBrush}">
+        <Grid Grid.Row="3" Margin="25 0 25 25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>

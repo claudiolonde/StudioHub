@@ -6,7 +6,7 @@ namespace StudioHub.Views;
 /// <summary>
 /// Logica di interazione per xaml
 /// </summary>
-public partial class WordTemplatesView  {
+public partial class WordTemplatesView {
 
     public WordTemplatesView() {
         InitializeComponent();
@@ -19,33 +19,29 @@ public partial class WordTemplatesView  {
     /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/> , disabilita l'icona della finestra,
     /// </remarks>
     public static void Open(string appName, string[] headers) {
-
         ArgumentException.ThrowIfNullOrWhiteSpace(appName);
         ArgumentNullException.ThrowIfNull(headers);
 
-        string path = string.Empty;
-        if (string.IsNullOrWhiteSpace(Hub.DataPath)) {
+        string dataPath = Hub.DataPath;
+
+        if (string.IsNullOrWhiteSpace(dataPath)) {
             Dialog.Show("La cartella dati dell'applicazione non è impostata correttamente.", DialogIcon.Error);
             return;
         }
-        else {
-            path = System.IO.Path.Combine(Hub.DataPath, "Templates", "Microsoft Word", appName);
-            try {
-                if (System.IO.Directory.Exists(path) == false) {
-                    System.IO.Directory.CreateDirectory(path);
-                }
-            }
-            catch {
-                Dialog.Show($"Impossibile creare la cartella dati:\n{path}.", DialogIcon.Error);
-                return;
-            }
+
+        string path = System.IO.Path.Combine(dataPath, "Templates", "Microsoft Word", appName);
+        try {
+            _ = System.IO.Directory.CreateDirectory(path);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or System.Security.SecurityException) {
+            Dialog.Show($"Impossibile creare la cartella dati:\n{path}.", DialogIcon.Error);
+            return;
         }
 
-        WordTemplatesViewModel vm = new(path, headers) { };
-        WordTemplatesView v = new() {
-            DataContext = vm
+        WordTemplatesViewModel viewModel = new(path, headers);
+        WordTemplatesView window = new() {
+            DataContext = viewModel
         };
-        v.Show();
-
+        window.Show();
     }
 }

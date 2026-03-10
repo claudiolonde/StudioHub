@@ -1,51 +1,65 @@
-# Istruzioni di Coding per Copilot
+# Copilot Custom Instructions
 
-## 1. Tecnologie e Linguaggi
-- **Stack principale:** C#, .NET e SQL.
-- Per SQL, prediligi leggibilità ed efficienza standard.
+## 1. General Principles
 
-## 2. Stile di Codifica (Mandatorio)
-- **Tipi Espliciti:** NON usare mai 'var'. Usa SEMPRE il tipo esplicito (es. `int x = 5;`).
-- **Nessun 'this':** NON qualificare i membri della classe con 'this.', salvo ambiguità tecniche.
-- **Parentesi (1TBS):** Usa lo stile "One True Brace Style" (parentesi sulla stessa riga) SEMPRE, anche per blocchi a singola riga.
-- **Asincronia:** Usa 'Async/Await' SOLO per vantaggi prestazionali reali. Se presente, il suffisso 'Async' è obbligatorio.
-- **Semplificazione:** Evita espressioni eccessivamente contratte o zucchero sintattico estremo se riducono la leggibilità del tipo esplicito.
+* **Core Stack:** C# 14, .NET, WPF-UI, SQL, and **RepoDb.SqlServer**.
+* **High Confidence:** Make only high-confidence suggestions. If unsure, ask for clarification.
+* **Testing:** **DO NOT** generate Unit Tests unless explicitly requested.
+* **Clean Code:** Prioritize maintainability and readability. Avoid extreme syntactic sugar if it reduces clarity.
+* **NativeAOT:** Write NativeAOT-compatible code. Avoid dynamic code generation or heavy reflection. Mark incompatible code with appropriate annotations or exceptions.
+* **System Files:** Never modify `global.json`, `package.json`, `package-lock.json`, or `NuGet.config` unless explicitly asked.
 
-## 3. Naming Convention
-- **Entità Private:** camelCase.
-- **CommunityToolkit.Mvvm:** _camelCase SOLO per i campi generati dal toolkit.
-- **Interfacce:** IPascalCase.
-- **Costanti:** UPPER_CASE (anche per variabili readonly con funzione di costante).
+## 2. Naming & Formatting
 
-## 4. Architettura e Struttura
-- **Approccio:** Separazione delle responsabilità e uso di 'Record' per immutabilità, senza fanatismo.
-- **Errori:** Bilancia try-catch e Result Pattern in base alla complessità.
-- **Logging:** NON includere ILogger se non richiesto esplicitamente.
+* **EditorConfig:** Strictly follow the styles defined in `.editorconfig`.
+* **Braces (1TBS):** Use the **1TBS style** (opening curly brace on the same line as the statement).
+* **Variables:** Prefer **explicit types** over `var` (unless the type is obvious from the assignment, e.g., `new()`).
+* **CommunityToolkit.Mvvm:** Use `_camelCase` **ONLY** for private fields intended for toolkit source generation.
+* **Constants:** Use `UPPER_CASE` for constants and `static readonly` variables acting as constants.
+* **Private Methods:** Use `camelCase` for private methods to distinguish them from public ones.
+* **Modern C#:** Use Primary Constructors, file-scoped namespaces, and single-line using directives.
+* **Language Helpers:** Use `ArgumentNullException.ThrowIfNull` and `ObjectDisposedException.ThrowIf` where applicable.
 
-## 5. Documentazione e Lingua
-- **Lingua:** Usa l'italiano per la prosa dei commenti (descrizioni e spiegazioni).
-- **Lessico Tecnico:** Mantieni in inglese i termini tecnici e le keyword (es. try-catch, task, loop). NON tradurre mai i costrutti del codice.
-- **XML Documentation:** Commenti `///` in italiano per TUTTI i metodi (pubblici e privati), completi ma concisi.
-- **Commenti In-line:** `//` in italiano SOLO per passaggi critici o poco intuitivi.
-- **Test:** NON generare Unit Test.
+## 3. Architecture & Data Access
 
-## 6. Messaggi di Commit Git
-- **Struttura:** Genera messaggi molto sintetici in italiano seguendo rigorosamente questo schema:
-    Aggiunto: [elenco breve]
-    Modificato: [elenco breve]
-    Eliminato: [elenco breve]
-- **Nota:** Se una categoria è vuota, omettila pure per mantenere la sintesi.
+* **Service-Centric Design:** Do not create separate Repository or DAO classes. Data access is an integral part of the Service.
+* **RepoDb:** Implement **RepoDb.SqlServer** directly within classes located in the `Services` folder.
+* **Immutability:** Use `record` types for data transfer and immutability where appropriate, without over-engineering.
+* **Error Handling:** Balance `try-catch` blocks and the Result Pattern based on logic complexity. Avoid catching exceptions without rethrowing them unless logging/handling.
+* **Logging:** Do **NOT** include `ILogger` or logging logic unless explicitly requested.
 
-## 7. Convenzioni XAML
-- **Namespace Prefixes:** Quando suggerisci o generi codice XAML, usa questi prefissi specifici:
-    - 'a:' per il namespace radice del progetto (App/Assembly). NON usare mai 'local'.
-    - 'c:' per le classi nella cartella Controls.
-    - 'h:' per le classi nella cartella Helpers.
-    - 'vm:' per le classi nella cartella ViewModels.
-- **Sintassi:** Mantieni i prefissi brevi e assicurati che le dichiarazioni xmlns siano coerenti con questa mappatura.
+## 4. Asynchronous Programming
 
-## 8. Architettura dei Servizi e Dati
-- **Filosofia:** Considera l'accesso ai dati come parte integrante del servizio. Non creare Repository o DAO separati.
-- **Implementazione:** Usa RepoDb.SqlServer direttamente all'interno delle classi nella cartella 'Services'.
-- **Metodi:** Ogni metodo del servizio deve essere auto-esplicativo, gestendo sia l'interrogazione al database che la logica di business correlata.
-- **Stile:** Mantieni i metodi asincroni, usa nomi espliciti per i tipi e scrivi commenti XML in italiano che spieghino lo scopo del recupero dati.
+* Provide both synchronous and asynchronous versions of methods where appropriate.
+* Always use the `Async` suffix for asynchronous methods.
+* Return `Task` or `ValueTask`. Avoid `async void` (except for event handlers).
+* Use `CancellationToken` parameters to support cancellation.
+* Use `ConfigureAwait(false)` only in library code; it is generally unnecessary in modern desktop/ASP.NET Core apps.
+
+## 5. XAML Conventions (WPF-UI)
+
+When generating XAML, strictly use these namespace prefixes:
+
+* `a:` for the root/assembly namespace (Never use `local:`).
+* `c:` for classes in the `Controls` folder.
+* `h:` for classes in the `Helpers` folder.
+* `vm:` for classes in the `ViewModels` folder.
+* `ui:` for **WPF-UI** components.
+Ensure `xmlns` declarations are consistent with this mapping.
+
+## 6. Documentation & Language
+
+* **Prose Language:** Use **Italian** for all prose in comments, descriptions, and explanations.
+* **Technical Terms:** Keep technical keywords and terms in **English** (e.g., *try-catch*, *task*, *loop*, *hot path*). Never translate code constructs.
+* **XML Documentation:** Provide `///` comments in **Italian** for **ALL methods** (both public and private). Keep them complete but concise. Use `<see langword="*" />` for keywords like `null`, `true`, or `false`.
+* **In-line Comments:** Use `//` in **Italian** only for critical or non-intuitive logic.
+
+## 7. Git & Markdown
+
+* **Commit Messages:** Generate synthetic messages in **Italian** using this exact schema (omit empty categories):
+* `Aggiunto: [brief list]`
+* `Modificato: [brief list]`
+* `Eliminato: [brief list]`
+
+
+* **Markdown Blocks:** Specify the language for code blocks (e.g., `csharp, `json, ```bash).

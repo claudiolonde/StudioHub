@@ -21,7 +21,7 @@
 *.code-workspace
 .history/
 
-## --- .NET / C# (Il cuore del tuo progetto) ---
+## --- .NET / C# ---
 # Output di compilazione
 [Bb]in/
 [Oo]bj/

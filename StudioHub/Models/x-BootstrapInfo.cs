@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using StudioHub.Helpers;
 
 namespace StudioHub.Models;
@@ -40,14 +40,14 @@ internal class BootstrapInfo {
     /// La stringa viene generata dinamicamente utilizzando i parametri correnti della configurazione.
     /// </summary>
     [JsonIgnore]
-    public string PrimaryConnectionString => Db.BuildConnectionString(this, PrimaryDb);
+    public string PrimaryConnectionString => DB.BuildConnectionString(this, PrimaryDb);
 
     /// <summary>
     /// Ottiene la stringa di connessione al database legacy CityUp.
     /// La stringa viene generata dinamicamente utilizzando i parametri correnti della configurazione.
     /// </summary>
     [JsonIgnore]
-    public string LegacyConnectionString => Db.BuildConnectionString(this, LegacyDb);
+    public string LegacyConnectionString => DB.BuildConnectionString(this, LegacyDb);
 
     /// <summary>
     /// Ottiene o imposta il percorso della cartella dati condivisa dell'applicazione

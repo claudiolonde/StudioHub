@@ -1,6 +1,5 @@
-﻿using System.IO;
+using System.IO;
 using System.Text.Json;
-using Microsoft.Win32;
 using static StudioHub.Hub;
 namespace StudioHub.Services;
 
@@ -9,31 +8,6 @@ namespace StudioHub.Services;
 /// Windows.
 /// </summary>
 internal static class BootstrapService {
-
-    /// <summary>
-    /// Percorso della chiave di registro utilizzata per memorizzare le impostazioni dell'applicazione.
-    /// </summary>
-    const string REGISTRY_ROOT = @"Software\Studio Londe\StudioHub";
-
-    /// <summary>
-    /// Recupera il percorso dati precedentemente salvato dal Registro di Windows.
-    /// </summary>
-    /// <returns>
-    /// La stringa contenente il percorso dati se presente; in caso contrario, <see langword="null"/> .
-    /// </returns>
-    public static string? getDataPath() {
-        using RegistryKey? rk = Registry.CurrentUser.OpenSubKey(REGISTRY_ROOT);
-        return rk?.GetValue("DataPath") as string;
-    }
-
-    /// <summary>
-    /// Memorizza il percorso dati specificato nel Registro di Windows.
-    /// </summary>
-    /// <param name="value">Il percorso della directory da salvare come stringa.</param>
-    public static void setDataPath(string value) {
-        using RegistryKey rk = Registry.CurrentUser.CreateSubKey(REGISTRY_ROOT);
-        rk.SetValue("DataPath", value);
-    }
 
     /// <summary>
     /// Garantisce che l'intera struttura delle cartelle di rete sia presente.

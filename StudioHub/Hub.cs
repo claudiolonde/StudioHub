@@ -7,6 +7,7 @@ public static class Hub {
 
     #region    Constants  ----------------------------------------------------------------------------------------------------
 
+
     // path
     public const string SETTINGS = "Settings";
     public const string TEMPLATES = "Templates";
@@ -57,6 +58,29 @@ public static class Hub {
     /// Nome costante della cartella utilizzata per il cestino.
     /// </summary>
     public static string TrashFolderName => "$Recycle.Bin";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.

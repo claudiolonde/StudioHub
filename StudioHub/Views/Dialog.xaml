@@ -4,8 +4,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:v="clr-namespace:StudioHub.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:v="clr-namespace:StudioHub.Views"
     WindowStartupLocation="CenterOwner"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
@@ -23,7 +23,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{Binding Title}"/>
+        <TextBlock Grid.Row="0" Text="{Binding Title, Mode=OneTime}"/>
 
         <StackPanel
             Grid.Row="1"
@@ -32,14 +32,14 @@
             >
             <ui:SymbolIcon
                 Margin="0 0 0 25"
-                Foreground="{Binding SymbolBrush}"
+                Foreground="{Binding SymbolBrush, Mode=OneTime}"
                 FontSize="60"
-                Symbol="{Binding Symbol}"
+                Symbol="{Binding Symbol, Mode=OneTime}"
                 />
 
             <ScrollViewer MaxHeight="350" VerticalScrollBarVisibility="Auto">
                 <TextBlock
-                    Text="{Binding Message}"
+                    Text="{Binding Message, Mode=OneTime}"
                     Margin="25 0"
                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                     TextWrapping="Wrap" TextAlignment="Center"
@@ -50,7 +50,7 @@
         <ItemsControl
             Grid.Row="2"
             Margin="0 25 0 0"
-            ItemsSource="{Binding Buttons}"
+            ItemsSource="{Binding Buttons, Mode=OneTime}"
             >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -59,11 +59,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Button
-                        Appearance="{Binding Appearance}"
-                        IsDefault="{Binding IsDefault}"
-                        IsCancel="{Binding IsCancel}"
-                        />
+                    <ui:Button/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

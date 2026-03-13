@@ -4,8 +4,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:local="clr-namespace:_test"
+    xmlns:a="clr-namespace:_test"
     xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
+    xmlns:vm="clr-namespace:StudioHub.ViewModels;assembly=StudioHub"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     WindowStartupLocation="CenterScreen"
     Title="MainWindow"
@@ -13,10 +14,11 @@
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ExtendsContentIntoTitleBar="True" UseLayoutRounding="True"
+    d:DataContext="{d:DesignInstance Type=vm:ViewModelBase}"
     >
 
     <StackPanel Margin="24">
-        <ui:Button Appearance="Info"
+        <ui:Button
             Content="RUN"
             Width="100"
             Click="button_Click"

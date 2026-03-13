@@ -2,18 +2,13 @@ namespace StudioHub.Models;
 
 public static class DataPath {
 
-    public static string Root => @"\\SERVER\StudioHub";
+    static internal string root = @"\\SERVER-18\Studio Londe\StudioHub";
+    static internal string trashFolderName = "$Recycle";
 
-    public static string RootTemplate => @$"{Root}\Template";
-    public static string RootTemplateWord => @$"{RootTemplate}\Word";
-    public static string RootTemplateWordMeeting => @$"{RootTemplateWord}\Meeting";
+    public static string Template => @$"{root}\Template";
+    public static string TemplateWord => @$"{Template}\Word";
 
-    public static string RootSettings => @$"{Root}\Settings";
-    public static string RootSettingsGlobalJson => @$"{RootSettings}\GlobalSettings.json";
-
-    public static string RootDeploy => @$"{Root}\Deploy";
-    public static string RootDeployScript => @$"{RootDeploy}\Install StudioHub.cmd";
-
-    public static string TrashFolderName => "$Recycle.Bin";
+    public static string Settings => @$"{root}\Settings";
+    public static string SettingsGlobalSettingsJson => @$"{Settings}\GlobalSettings.json";
 
 }

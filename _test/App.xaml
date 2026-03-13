@@ -7,9 +7,6 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!--<ui:ThemesDictionary Theme="Dark"/>-->
-                <!--<ui:ThemesDictionary Theme="Light"/>-->
-                <!--<ui:ThemesDictionary Theme="Unknown"/>-->
                 <ResourceDictionary Source="/StudioHub;component/Themes/Generic.xaml" />
                 <ui:ControlsDictionary/>
             </ResourceDictionary.MergedDictionaries>

@@ -3,7 +3,9 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 
+#pragma warning disable IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
 namespace StudioHub.Helpers;
+#pragma warning restore IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
 
 /// <summary>
 /// Converte un valore booleano in <see cref="Visibility"/> per l'uso in binding WPF.

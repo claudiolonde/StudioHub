@@ -1,4 +1,4 @@
-﻿global using StudioHub.Views;
 global using StudioHub.Helpers;
 global using StudioHub.Models;
-global using static StudioHub.Helpers.Windows;
+global using StudioHub.Services;
+global using StudioHub.Views;

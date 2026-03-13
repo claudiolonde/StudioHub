@@ -1,61 +1,76 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
+#pragma warning disable IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
 namespace StudioHub.Helpers;
+#pragma warning restore IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
 
 /// <summary>
-/// Converte una dimensione di file (in KB) in una stringa formattata per la visualizzazione.
+/// Converte una dimensione di file espressa in byte in una stringa leggibile dall'utente,
+/// utilizzando le unità più appropriate (Byte, KB, MB, GB, TB, PB).
 /// </summary>
 public class FileSizeConverter : MarkupExtension, IValueConverter {
 
     /// <summary>
-    /// Converte una dimensione di file (long) in una stringa formattata con l'unità "KB".
+    /// Array delle unità di misura supportate per la dimensione dei file.
     /// </summary>
-    /// <param name="value">La dimensione del file in KB.</param>
-    /// <param name="targetType">Il tipo di destinazione della conversione.</param>
-    /// <param name="parameter">Parametro opzionale per la conversione (non utilizzato).</param>
-    /// <param name="culture">Informazioni sulla cultura per la formattazione.</param>
+    static readonly string[] SIZES = ["Byte", "KB", "MB", "GB", "TB", "PB"];
+
+    /// <summary>
+    /// Converte una dimensione di file (in byte) in una stringa formattata con l'unità più adatta.
+    /// </summary>
+    /// <param name="value">Valore della dimensione del file da convertire.</param>
+    /// <param name="targetType">Tipo di destinazione della conversione (ignorato).</param>
+    /// <param name="parameter">Parametro aggiuntivo per la conversione (ignorato).</param>
+    /// <param name="culture">Informazioni sulla cultura da utilizzare per la conversione.</param>
     /// <returns>
-    /// Una stringa formattata che rappresenta la dimensione del file in KB, oppure il valore originale se non è un
-    /// long.
+    /// Una stringa rappresentante la dimensione del file in formato leggibile (es. "1.23 MB"),
+    /// oppure una stringa vuota se il valore è <see langword="null" />.
     /// </returns>
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-        if (value == null) { return string.Empty; }
+
+        if (value is null) {
+            return string.Empty;
+        }
 
         double size;
-        try { size = System.Convert.ToDouble(value, culture); }
-        catch { return value; }
-
-        string[] sizes = ["Byte", "KB", "MB", "GB", "TB", "PB"];
-        int index = 0;
-        while (size >= 1024 && index < sizes.Length - 1) {
-            index++;
-            size /= 1024;
+        try {
+            size = System.Convert.ToDouble(value, culture);
         }
-        string format = index == 0 ? "{0:0} {1}" : "{0:0.##} {1}";
-        return string.Format(culture, format, size, sizes[index]);
+        catch {
+            return value;
+        }
+
+        int index = 0;
+        while (size >= 1024 && index < SIZES.Length - 1) {
+            size /= 1024;
+            index++;
+        }
+
+        return index == 0
+            ? $"{size:0} {SIZES[index]}"
+            : $"{size:0.##} {SIZES[index]}";
     }
 
     /// <summary>
-    /// Restituisce l'istanza corrente come valore da utilizzare nel markup XAML.
+    /// Restituisce l'istanza corrente del convertitore per l'utilizzo in XAML.
     /// </summary>
-    /// <param name="serviceProvider">Provider di servizi per il markup.</param>
-    /// <returns>L'istanza corrente di <see cref="BoolToCollapsed"/>.</returns>
+    /// <param name="serviceProvider">Provider di servizi per la risoluzione dei servizi.</param>
+    /// <returns>L'istanza corrente di <see cref="FileSizeConverter"/>.</returns>
     public override object ProvideValue(IServiceProvider serviceProvider) {
         return this;
     }
 
     /// <summary>
-    /// Non implementato. Solleva sempre un'eccezione <see cref="NotImplementedException"/> .
+    /// Metodo non implementato per la conversione inversa; restituisce semplicemente il valore ricevuto.
     /// </summary>
-    /// <param name="value">Valore da convertire.</param>
-    /// <param name="targetType">Tipo di destinazione della conversione.</param>
-    /// <param name="parameter">Parametro opzionale per la conversione.</param>
-    /// <param name="culture">Informazioni sulla cultura per la formattazione.</param>
-    /// <returns>Non restituisce mai un valore.</returns>
-    /// <exception cref="NotImplementedException">Sempre sollevata.</exception>
+    /// <param name="value">Valore da convertire indietro.</param>
+    /// <param name="targetType">Tipo di destinazione della conversione inversa.</param>
+    /// <param name="parameter">Parametro aggiuntivo per la conversione inversa.</param>
+    /// <param name="culture">Informazioni sulla cultura da utilizzare per la conversione inversa.</param>
+    /// <returns>Il valore ricevuto senza modifiche.</returns>
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-        throw new NotImplementedException();
+        return value;
     }
 }

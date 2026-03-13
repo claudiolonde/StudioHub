@@ -4,10 +4,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:c="clr-namespace:StudioHub.Controls"
-    xmlns:h="clr-namespace:StudioHub.Helpers"
-    xmlns:vm="clr-namespace:StudioHub.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:StudioHub.ViewModels"
+    xmlns:h="clr-namespace:StudioHub.Helpers"
     WindowStartupLocation="CenterScreen"
     ShowInTaskbar="True"
     ResizeMode="CanResize"
@@ -16,19 +15,20 @@
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ExtendsContentIntoTitleBar="True" UseLayoutRounding="True"
-    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel,
+                                     IsDesignTimeCreatable=False}"
     >
     <DockPanel>
 
         <!--  titlebar  -->
-        <ui:TitleBar DockPanel.Dock="Top" Title="Gestione modelli Word">
+        <ui:TitleBar Title="Gestione modelli Word" DockPanel.Dock="Top">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="/StudioHub;component/Assets/StudioHub.ico"/>
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
         <!--  toolbar  -->
-        <DockPanel DockPanel.Dock="Top" Margin="25 0">
+        <DockPanel Margin="25 0" DockPanel.Dock="Top">
 
             <!--  Nuovo modello  -->
             <ui:Button
@@ -88,30 +88,28 @@
 
             <!--  filter text  -->
             <ui:TextBox
-                DockPanel.Dock="Right"
                 Icon="{ui:SymbolIcon Symbol=Search16}"
                 Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                PlaceholderText="Filtra per nome..."
+                DockPanel.Dock="Right" PlaceholderText="Filtra per nome..."
                 />
 
         </DockPanel>
 
         <!--  infobar  -->
         <Border
-            DockPanel.Dock="Bottom"
             Height="32"
             Margin="25 0 25 25" Padding="8 0"
             Background="{DynamicResource CardBackground}"
-            CornerRadius="4"
+            DockPanel.Dock="Bottom" CornerRadius="4"
             >
             <DockPanel>
 
                 <!--  filtered/totals  -->
                 <ui:TextBlock
-                    DockPanel.Dock="Right"
                     VerticalAlignment="Center"
                     Foreground="{DynamicResource TextControlForegroundDisabled}"
                     FontSize="11"
+                    DockPanel.Dock="Right"
                     >
                     <Run Text="Modelli:"/>
                     <Run Text="{Binding FilteredTemplatesCount, Mode=OneWay}" FontWeight="Bold"/>
@@ -121,12 +119,11 @@
 
                 <!--  path  -->
                 <ui:TextBlock
-                    DockPanel.Dock="Left"
                     Text="{Binding Path, Mode=OneTime}"
                     VerticalAlignment="Center"
                     Foreground="{DynamicResource TextControlForegroundDisabled}"
                     FontSize="11"
-                    TextTrimming="CharacterEllipsis"
+                    DockPanel.Dock="Left" TextTrimming="CharacterEllipsis"
                     ToolTip="{Binding Path, Mode=OneTime}"
                     />
 

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -98,7 +99,13 @@ public partial class WordTemplatesViewModel : ObservableObject {
     public void DeleteTemplate() {
 
         // Visualizza dialogo di conferma; se l'utente seleziona "Annulla" (indice 0), interrompe l'esecuzione
-        if (Dialog.Show($"Eliminare il modello selezionato:\n{SelectedTemplate}", DialogIcon.Warning, null, "\0Annulla\0", "Elimina") == 0) {
+        MessageBoxResult result = MessageBox.Show(
+            $"Eliminare il modello selezionato:\n{SelectedTemplate}",
+            "Gestione modelli Word",
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Warning
+        );
+        if (result == MessageBoxResult.OK) {
             return;
         }
 
@@ -130,7 +137,12 @@ public partial class WordTemplatesViewModel : ObservableObject {
         }
         catch (System.IO.IOException) {
             // Gestione errore in caso di file lock (es. documento aperto in Microsoft Word)
-            Dialog.Show("Impossibile eliminare il modello, assicurati che non sia aperto in Word.", DialogIcon.Error);
+            MessageBox.Show(
+                "Impossibile eliminare il modello, assicurati che non sia aperto in Word.",
+                "Gestione modelli Word",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
         }
     }
 }

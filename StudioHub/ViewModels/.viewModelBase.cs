@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace StudioHub.ViewModels;
 
-public partial class WindowViewModel : ObservableObject {
+public partial class ViewModelBase : ObservableObject {
 
     /// <summary>
     /// Evento sollevato quando avviene un salvataggio con successo.

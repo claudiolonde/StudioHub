@@ -5,6 +5,14 @@ namespace StudioHub;
 
 public static class Hub {
 
+    /*
+    MessageBox.Show(
+        "Messaggio.",
+        "Titolo",
+        MessageBoxButton.OK,
+        MessageBoxImage.Error
+    );
+    */
     #region    Constants  ----------------------------------------------------------------------------------------------------
 
 
@@ -60,28 +68,6 @@ public static class Hub {
     public static string TrashFolderName => "$Recycle.Bin";
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.
     /// </summary>
@@ -92,19 +78,9 @@ public static class Hub {
             return true;
         }
 
-        // Caricamento dei parametri di configurazione dal file di boot
-        BootstrapInfo? info = loadConfig();
+        //GlobalConfiguration.Setup().UseSqlServer();
+        //mapEntities();
 
-        // Mappatura delle stringhe di connessione e dei nomi database estratti
-        PrimaryConnection = info.PrimaryConnectionString;
-        LegacyConnection = info.LegacyConnectionString;
-        PrimaryDbName = info.PrimaryDb;
-        LegacyDbName = info.LegacyDb;
-        DataPath = info.DataPath;
-
-        // Configurazione globale del provider per SQL Server
-        GlobalConfiguration.Setup().UseSqlServer();
-        mapEntities();
         _isInitialized = true;
         return true;
     }
@@ -116,23 +92,6 @@ public static class Hub {
             .Primary(x => x.Id)
             .Identity(x => x.Id);
         */
-
     }
 
-    private static BootstrapInfo loadConfig() {
-        return new BootstrapInfo {
-            //DataPath = @"\\SERVER-18\Studio Londe\UFFICIO\MODELLI",
-            DataPath = @"D:\FILES\Documenti\StudioHub",
-            DataSource = "192.168.123.18",
-            UserID = "sa",
-            Password = "UnaPasswordACaso",
-            IntegratedSecurity = false,
-            PrimaryDb = "StudioHub",
-            LegacyDb = "ARCHIVIO"
-        };
-    }
 }
-
-
-
-//gestionale_2008

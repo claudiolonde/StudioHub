@@ -6,9 +6,10 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ui:ThemesDictionary Theme="Dark"/>
+        <!--<ui:ThemesDictionary Theme="Light"/>-->
+        <!--<ui:ThemesDictionary Theme="Unknown"/>-->
         <ui:ControlsDictionary/>
     </ResourceDictionary.MergedDictionaries>
-    <FontFamily x:Key="FontAwesomeSolid">pack://application:,,,/StudioHub;component/Assets/#Font Awesome 7 Free Solid</FontFamily>
 
     <!--
         ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"

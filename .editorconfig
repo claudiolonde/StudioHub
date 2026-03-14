@@ -125,7 +125,7 @@ csharp_style_prefer_readonly_struct = true
 csharp_style_prefer_readonly_struct_member = true
 
 # Preferenze per blocchi di codice
-csharp_prefer_braces = true:suggestion
+csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true
 csharp_prefer_system_threading_lock = true
 csharp_style_namespace_declarations = file_scoped:suggestion
@@ -207,8 +207,8 @@ csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
 # Preferenze per ritorno a capo
-csharp_preserve_single_line_blocks = false
-csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = true
 
 
 

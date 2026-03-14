@@ -36,58 +36,53 @@ public enum DialogType {
 /// </summary>
 public partial class Dialog {
 
-    private bool _haveDefault = false;
-    private bool _haveCancel = false;
-    private int _selectedIndex = -1;
+    private static int _defaultIndex;
+    private static int _cancelIndex;
+    private static int _buttonIndex;
 
     /// <summary>
     /// Mostra una finestra di dialogo modale.
     /// </summary>
     /// <param name="message">Messaggio da visualizzare.</param>
     /// <param name="title">Titolo della finestra (opzionale).</param>
-    /// <param name="buttons">Array di pulsanti (opzionale).</param>
+    /// <param name="buttons">
+    /// Array di pulsanti (opzionale).<br/> Anteporre al testo del pulsante il carattere:<br/> - asterisco (<b>*</b>)
+    /// per impostare il pulsante come predefinito e annullamento, visualizzato come pulsante principale, ha priorità
+    /// sugli altri <br/> - punto esclamativo (<b>!</b>) per impostare il pulsante come predefinito, visualizzato come
+    /// pulsante principale<br/> - tilde (<b>~</b>) per impostare il pulsante come annullamento, visualizzato come
+    /// pulsante secondario
+    /// </param>
     /// <param name="type">Tipo di dialog (opzionale).</param>
     /// <returns>Indice del pulsante selezionato.</returns>
     public static int Show(string message,
                            string? title = null,
                            string[]? buttons = null,
-                           DialogType type = DialogType.None) {
+                           DialogType? type = DialogType.None) {
 
-        buttons ??= ["*Chiudi"];
+        if (buttons is null || buttons.Length == 0) {
+            buttons = ["*Chiudi"];
+        }
+
+        if (!type.HasValue) {
+            type = DialogType.None;
+        }
+
+        Window? owner = null;
+        for (int n = 0; n < Application.Current.Windows.Count; n++) {
+            Window window = Application.Current.Windows[n];
+            if (window.IsActive) {
+                owner = window;
+                break;
+            }
+        }
+
         Dialog dialog = new(message, title, buttons, type) {
-            Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive)
+            Owner = owner
         };
 
+        _buttonIndex = -1;
         dialog.ShowDialog();
-        return dialog._selectedIndex;
-    }
-
-    /// <summary>
-    /// Messaggio visualizzato nel dialog.
-    /// </summary>
-    public string Message {
-        get;
-    }
-
-    /// <summary>
-    /// Simbolo associato al tipo di dialog.
-    /// </summary>
-    public SymbolRegular Symbol {
-        get;
-    }
-
-    /// <summary>
-    /// Pennello per il simbolo del dialog.
-    /// </summary>
-    public Brush SymbolBrush {
-        get;
-    }
-
-    /// <summary>
-    /// Pulsanti visualizzati nel dialog.
-    /// </summary>
-    public Button[] Buttons {
-        get;
+        return _buttonIndex;
     }
 
     /// <summary>
@@ -100,38 +95,44 @@ public partial class Dialog {
     private Dialog(string message,
                    string? title,
                    string[] buttons,
-                   DialogType type) {
+                   DialogType? type) {
 
         InitializeComponent();
-        DataContext = this;
 
-        Message = message;
-        Title = title ??
+        DialogMessage.Text = message;
+
+        DialogTitle.Text = title ??
                 (Application.Current.MainWindow?.Title) ??
                 (System.Reflection.Assembly.GetExecutingAssembly().GetName().Name) ??
                 string.Empty;
-        Buttons = [.. buttons.Where(s => !string.IsNullOrWhiteSpace(s)).Select(createButton)];
+
         switch (type) {
             case DialogType.Error:
-                Symbol = SymbolRegular.ErrorCircle24;
-                SymbolBrush = Brushes.Crimson;
+                DialogIcon.Symbol = SymbolRegular.ErrorCircle24;
+                DialogIcon.Foreground = Brushes.Crimson;
                 break;
             case DialogType.Warning:
-                Symbol = SymbolRegular.Warning24;
-                SymbolBrush = Brushes.Orange;
+                DialogIcon.Symbol = SymbolRegular.Warning24;
+                DialogIcon.Foreground = Brushes.Orange;
                 break;
             case DialogType.Question:
-                Symbol = SymbolRegular.QuestionCircle24;
-                SymbolBrush = Brushes.MediumSlateBlue;
+                DialogIcon.Symbol = SymbolRegular.QuestionCircle24;
+                DialogIcon.Foreground = Brushes.MediumSlateBlue;
                 break;
             case DialogType.Info:
-                Symbol = SymbolRegular.Info24;
-                SymbolBrush = Brushes.DeepSkyBlue;
+                DialogIcon.Symbol = SymbolRegular.Info24;
+                DialogIcon.Foreground = Brushes.DeepSkyBlue;
                 break;
             default:
-                Symbol = SymbolRegular.Empty;
-                SymbolBrush = Brushes.Transparent;
+                DialogIcon.Symbol = SymbolRegular.Empty;
+                DialogIcon.Foreground = Brushes.Transparent;
                 break;
+        }
+
+        string[] listButtons = [.. buttons.Where(s => !string.IsNullOrWhiteSpace(s) && (s.Length > 1 || !"*~!".Contains(s[0])))];
+        setCancelDefault(listButtons);
+        for (int i = 0; i < listButtons.Length; i++) {
+            DialogButtons.Children.Add(createButton(listButtons[i], i));
         }
 
         Loaded += (s, e) => SizeToContent = SizeToContent.WidthAndHeight;
@@ -140,6 +141,32 @@ public partial class Dialog {
                 DragMove();
             }
         };
+    }
+
+    /// <summary>
+    /// Restituisce l'indice del pulsante che inizia con '*' (predefinito e annullamento).
+    /// </summary>
+    /// <param name="buttons">Array di pulsanti.</param>
+    /// <returns>Indice del pulsante predefinito, oppure <see langword="-1"/> se non trovato.</returns>
+    private static void setCancelDefault(string[] buttons) {
+        ArgumentNullException.ThrowIfNull(buttons);
+
+        _defaultIndex = _cancelIndex = -1;
+
+        for (int i = 0; i < buttons.Length; i++) {
+            char prefix = buttons[i][0];
+            if (prefix == '*') {
+                _defaultIndex = i;
+                _cancelIndex = i;
+                break;
+            }
+            if (prefix == '!' && _defaultIndex == -1) {
+                _defaultIndex = i;
+            }
+            if (prefix == '~' && _cancelIndex == -1) {
+                _cancelIndex = i;
+            }
+        }
     }
 
     /// <summary>
@@ -159,36 +186,47 @@ public partial class Dialog {
 
         newButton.Click += (s, e) => {
             if (s is Button b && b.Tag is int i) {
-                _selectedIndex = i;
+                _buttonIndex = i;
                 DialogResult = true;
             }
         };
 
-        char prefix = text[0];
-        text = "*!~".Contains(prefix)
-             ? text.Substring(1)
-             : text;
-
-        if (prefix == '*' && !_haveDefault && !_haveCancel) {
-            _haveDefault = _haveCancel = true;
-            newButton.IsDefault = newButton.IsCancel = true;
-            newButton.Appearance = ControlAppearance.Primary;
+        switch (text[0]) {
+            case '*':
+                if (_defaultIndex == index && _cancelIndex == index) {
+                    newButton.IsDefault = newButton.IsCancel = true;
+                    newButton.Appearance = ControlAppearance.Primary;
+                }
+                else {
+                    newButton.Appearance = ControlAppearance.Transparent;
+                }
+                newButton.Content = text.Substring(1);
+                break;
+            case '!':
+                if (_defaultIndex == index) {
+                    newButton.IsDefault = true;
+                    newButton.Appearance = ControlAppearance.Primary;
+                }
+                else {
+                    newButton.Appearance = ControlAppearance.Transparent;
+                }
+                newButton.Content = text.Substring(1);
+                break;
+            case '~':
+                if (_cancelIndex == index) {
+                    newButton.IsCancel = true;
+                    newButton.Appearance = ControlAppearance.Secondary;
+                }
+                else {
+                    newButton.Appearance = ControlAppearance.Transparent;
+                }
+                newButton.Content = text.Substring(1);
+                break;
+            default:
+                newButton.Appearance = ControlAppearance.Transparent;
+                newButton.Content = text;
+                break;
         }
-        else if (prefix == '!' && !_haveDefault) {
-            _haveDefault = true;
-            newButton.IsDefault = true;
-            newButton.Appearance = ControlAppearance.Primary;
-        }
-        else if (prefix == '~' && !_haveCancel) {
-            _haveCancel = true;
-            newButton.IsCancel = true;
-            newButton.Appearance = ControlAppearance.Secondary;
-        }
-        else {
-            newButton.Appearance = ControlAppearance.Transparent;
-        }
-
-        newButton.Content = text;
         return newButton;
     }
 }

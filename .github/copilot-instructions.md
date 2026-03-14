@@ -2,7 +2,7 @@
 
 ## 1. General Principles
 
-* **Core Stack:** C# 14, .NET, WPF-UI, SQL, and **RepoDb.SqlServer**.
+* **Core Stack:** C#, .NET, WPF-UI, SQL, and **RepoDb.SqlServer**.
 * **High Confidence:** Make only high-confidence suggestions. If unsure, ask for clarification.
 * **Testing:** **DO NOT** generate Unit Tests unless explicitly requested.
 * **Clean Code:** Prioritize maintainability and readability. Avoid extreme syntactic sugar if it reduces clarity.
@@ -12,12 +12,13 @@
 ## 2. Naming & Formatting
 
 * **EditorConfig:** Strictly follow the styles defined in `.editorconfig`.
-* **Braces (1TBS):** Use the **1TBS style** (opening curly brace on the same line as the statement).
+* **Braces (Mandatory):** Always use curly braces `{}` for all control flow statements (`if`, `else`, `for`, `foreach`, `while`), even for single-line statements. **NO EXCEPTIONS.**
+* **Braces Style (1TBS):** Use the **1TBS style** (opening curly brace on the same line as the statement).
 * **Variables:** Prefer **explicit types** over `var` (unless the type is obvious from the assignment, e.g., `new()`).
 * **CommunityToolkit.Mvvm:** Use `_camelCase` **ONLY** for private fields intended for toolkit source generation.
 * **Constants:** Use `UPPER_CASE` for constants and `static readonly` variables acting as constants.
 * **Private Methods:** Use `camelCase` for private methods to distinguish them from public ones.
-* **Modern C#:** Use Primary Constructors, file-scoped namespaces, and single-line using directives.
+* **Modern C#:** Use Primary Constructors, file-scoped namespaces, and **single-line using directives** (using declarations).
 * **Language Helpers:** Use `ArgumentNullException.ThrowIfNull` and `ObjectDisposedException.ThrowIf` where applicable.
 
 ## 3. Architecture & Data Access
@@ -60,6 +61,5 @@ Ensure `xmlns` declarations are consistent with this mapping.
 * `Aggiunto: [brief list]`
 * `Modificato: [brief list]`
 * `Eliminato: [brief list]`
-
 
 * **Markdown Blocks:** Specify the language for code blocks (e.g., `csharp, `json, ```bash).

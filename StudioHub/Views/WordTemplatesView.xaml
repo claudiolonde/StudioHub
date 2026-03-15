@@ -5,35 +5,45 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:vm="clr-namespace:StudioHub.ViewModels"
+    xmlns:a="clr-namespace:StudioHub"
     xmlns:h="clr-namespace:StudioHub.Helpers"
-    WindowStartupLocation="CenterScreen"
-    ShowInTaskbar="True"
-    ResizeMode="CanResize"
-    Title="Gestione modelli Word" Icon="/StudioHub;component/Assets/StudioHub.ico"
-    Height="640" Width="960"
+    xmlns:v="clr-namespace:StudioHub.Views"
+    xmlns:vm="clr-namespace:StudioHub.ViewModels"
+    Height="800" Width="1000"
+    FontFamily="Segoe UI Variable Display, Segoe UI"
+    TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
+    TextOptions.TextHintingMode="Fixed"
+    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
+    SnapsToDevicePixels="True" UseLayoutRounding="True"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    ExtendsContentIntoTitleBar="True" UseLayoutRounding="True"
-    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel,
-                                     IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel}"
     >
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
         <!--  titlebar  -->
-        <ui:TitleBar Title="Gestione modelli Word" DockPanel.Dock="Top">
+        <ui:TitleBar Grid.Row="0" Title="Gestione modelli Word">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="/StudioHub;component/Assets/StudioHub.ico"/>
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
         <!--  toolbar  -->
-        <DockPanel Margin="25 0" DockPanel.Dock="Top">
+        <DockPanel
+            Grid.Row="1"
+            Margin="25 0"
+            DockPanel.Dock="Top"
+            >
 
             <!--  Nuovo modello  -->
             <ui:Button
-                Icon="{ui:SymbolIcon Symbol=Add16,
-                                     Filled=True}"
+                Icon="{ui:SymbolIcon Symbol=Add16}"
                 Content="Nuovo Modello"
                 Appearance="Info"
                 Command="{Binding NewTemplateCommand}"
@@ -80,6 +90,7 @@
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Appearance" Value="Danger"/>
+                                <!--<Setter Property="Foreground" Value="White"/>-->
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -95,18 +106,31 @@
 
         </DockPanel>
 
+        <!--  templates list  -->
+        <!--  ItemsSource="{Binding FilteredTemplates, Mode=OneWay}"  -->
+        <ListBox
+            Grid.Row="2"
+            Margin="25 10"
+            SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+            VirtualizingPanel.ScrollUnit="Pixel"
+            >
+            <ListBoxItem Content="Claudio"/>
+            <ListBoxItem Content="Sandro"/>
+            <ListBoxItem Content="Nicholas"/>
+        </ListBox>
+
         <!--  infobar  -->
         <Border
-            Height="32"
-            Margin="25 0 25 25" Padding="8 0"
-            Background="{DynamicResource CardBackground}"
-            DockPanel.Dock="Bottom" CornerRadius="4"
+            Grid.Row="3"
+            Margin="25"
+            Background="{DynamicResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+            CornerRadius="4"
             >
             <DockPanel>
-
                 <!--  filtered/totals  -->
                 <ui:TextBlock
-                    VerticalAlignment="Center"
+                    Margin="15 6 15 4"
                     Foreground="{DynamicResource TextControlForegroundDisabled}"
                     FontSize="11"
                     DockPanel.Dock="Right"
@@ -117,34 +141,19 @@
                     <Run Text="{Binding TotalTemplatesCount, Mode=OneWay}" FontWeight="Bold"/>
                 </ui:TextBlock>
 
-                <!--  path  -->
+                <!--  templates path  -->
                 <ui:TextBlock
                     Text="{Binding Path, Mode=OneTime}"
-                    VerticalAlignment="Center"
+                    Margin="15 6 15 4"
                     Foreground="{DynamicResource TextControlForegroundDisabled}"
                     FontSize="11"
-                    DockPanel.Dock="Left" TextTrimming="CharacterEllipsis"
+                    TextTrimming="CharacterEllipsis"
                     ToolTip="{Binding Path, Mode=OneTime}"
                     />
 
             </DockPanel>
         </Border>
 
-        <!--  templates list  -->
-        <Border
-            Margin="25 10" Padding="4"
-            Background="{DynamicResource CardBackground}"
-            CornerRadius="4"
-            >
-            <ListBox
-                SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding FilteredTemplates, Mode=OneWay}"
-                VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.ScrollUnit="Pixel"
-                >
-            </ListBox>
-        </Border>
-
-    </DockPanel>
+    </Grid>
 
 </ui:FluentWindow>

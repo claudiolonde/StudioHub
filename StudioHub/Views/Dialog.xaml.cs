@@ -34,10 +34,8 @@ public enum DialogType {
 /// <summary>
 /// Finestra di dialogo personalizzata per messaggi e interazione.
 /// </summary>
-public partial class Dialog {
+public partial class Dialog : FluentWindow {
 
-    private static int _defaultIndex;
-    private static int _cancelIndex;
     private static int _buttonIndex;
 
     /// <summary>
@@ -80,7 +78,6 @@ public partial class Dialog {
             Owner = owner
         };
 
-        _buttonIndex = -1;
         dialog.ShowDialog();
         return _buttonIndex;
     }
@@ -129,104 +126,94 @@ public partial class Dialog {
                 break;
         }
 
-        string[] listButtons = [.. buttons.Where(s => !string.IsNullOrWhiteSpace(s) && (s.Length > 1 || !"*~!".Contains(s[0])))];
-        setCancelDefault(listButtons);
-        for (int i = 0; i < listButtons.Length; i++) {
-            DialogButtons.Children.Add(createButton(listButtons[i], i));
-        }
+        string[] validButtons = [.. buttons.Where(s => !string.IsNullOrWhiteSpace(s) && (s.Length > 1 || !"*~!".Contains(s[0])))];
+        injectButtons(validButtons);
 
-        Loaded += (s, e) => SizeToContent = SizeToContent.WidthAndHeight;
+        Loaded += (s, e) => {
+            SizeToContent = SizeToContent.WidthAndHeight;
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+            double windowWidth = Width;
+            double windowHeight = Height;
+            Left = (screenWidth - windowWidth) / 2;
+            Top = (screenHeight - windowHeight) / 2;
+        };
+
         MouseLeftButtonDown += (s, e) => {
-            if (e.ChangedButton == MouseButton.Left) {
+            if (e.ChangedButton == MouseButton.Left && e.GetPosition(this).Y < 48) {
                 DragMove();
             }
         };
+
     }
 
     /// <summary>
-    /// Restituisce l'indice del pulsante che inizia con '*' (predefinito e annullamento).
+    /// Crea i pulsanti per il dialog, impostando proprietà e comportamento in base al prefisso del testo.
     /// </summary>
-    /// <param name="buttons">Array di pulsanti.</param>
-    /// <returns>Indice del pulsante predefinito, oppure <see langword="-1"/> se non trovato.</returns>
-    private static void setCancelDefault(string[] buttons) {
-        ArgumentNullException.ThrowIfNull(buttons);
+    /// <param name="buttonNames">Array di nomi dei pulsanti, ciascuno può includere un prefisso speciale.</param>
+    private void injectButtons(string[] buttonNames) {
 
-        _defaultIndex = _cancelIndex = -1;
+        int defaultIndex = -1;
+        int cancelIndex = -1;
 
-        for (int i = 0; i < buttons.Length; i++) {
-            char prefix = buttons[i][0];
-            if (prefix == '*') {
-                _defaultIndex = i;
-                _cancelIndex = i;
-                break;
-            }
-            if (prefix == '!' && _defaultIndex == -1) {
-                _defaultIndex = i;
-            }
-            if (prefix == '~' && _cancelIndex == -1) {
-                _cancelIndex = i;
-            }
+        // Imposta gli indici dei pulsanti predefinito e di annullamento in base ai prefissi dei testi dei pulsanti
+        for (int n = 0; n < buttonNames.Length; n++) {
+            char prefix = buttonNames[n][0];
+            if (prefix == '*') { defaultIndex = cancelIndex = n; break; }
+            if (prefix == '!' && defaultIndex == -1) { defaultIndex = n; }
+            if (prefix == '~' && cancelIndex == -1) { cancelIndex = n; }
         }
-    }
 
-    /// <summary>
-    /// Crea un pulsante per il dialog in base al testo e all'indice.
-    /// </summary>
-    /// <param name="text">Testo del pulsante (può includere prefisso per default/cancel).</param>
-    /// <param name="index">Indice del pulsante.</param>
-    /// <returns>Istanza di <see cref="Button"/> configurata.</returns>
-    private Button createButton(string text, int index) {
+        // Crea e configura ciascun pulsante
+        for (int n = 0; n < buttonNames.Length; n++) {
 
-        Button newButton = new() {
-            Margin = new Thickness(10, 0, 10, 0),
-            Padding = new Thickness(20, 5, 20, 5),
-            MinWidth = 100,
-            Tag = index
-        };
+            string content = buttonNames[n];
+            char controlChar = content[0];
 
-        newButton.Click += (s, e) => {
-            if (s is Button b && b.Tag is int i) {
-                _buttonIndex = i;
-                DialogResult = true;
+            Button newButton = new() {
+                Appearance = ControlAppearance.Transparent,
+                Content = "*!~".Contains(controlChar) ? content.Substring(1) : content,
+                Margin = new Thickness(10, 0, 10, 0),
+                MinWidth = 100,
+                Padding = new Thickness(20, 5, 20, 5),
+                Tag = n
+            };
+
+            switch (controlChar) {
+                case '*':
+                    if (defaultIndex == n && cancelIndex == n) {
+                        newButton.IsDefault = true;
+                        newButton.IsCancel = true;
+                        newButton.Appearance = ControlAppearance.Primary;
+                        newButton.ToolTip = "Pulsante predefinito e di annullamento";
+                    }
+                    break;
+                case '!':
+                    if (defaultIndex == n) {
+                        newButton.IsDefault = true;
+                        newButton.Appearance = ControlAppearance.Primary;
+                        newButton.ToolTip = "Pulsante predefinito";
+                    }
+                    break;
+                case '~':
+                    if (cancelIndex == n) {
+                        newButton.IsCancel = true;
+                        newButton.Appearance = ControlAppearance.Secondary;
+                        newButton.ToolTip = "Pulsante di annullamento";
+                    }
+                    break;
+                default:
+                    break;
             }
-        };
 
-        switch (text[0]) {
-            case '*':
-                if (_defaultIndex == index && _cancelIndex == index) {
-                    newButton.IsDefault = newButton.IsCancel = true;
-                    newButton.Appearance = ControlAppearance.Primary;
+            newButton.Click += (s, a) => {
+                if (s is Button button && button.Tag is int i) {
+                    _buttonIndex = i;
+                    DialogResult = true;
                 }
-                else {
-                    newButton.Appearance = ControlAppearance.Transparent;
-                }
-                newButton.Content = text.Substring(1);
-                break;
-            case '!':
-                if (_defaultIndex == index) {
-                    newButton.IsDefault = true;
-                    newButton.Appearance = ControlAppearance.Primary;
-                }
-                else {
-                    newButton.Appearance = ControlAppearance.Transparent;
-                }
-                newButton.Content = text.Substring(1);
-                break;
-            case '~':
-                if (_cancelIndex == index) {
-                    newButton.IsCancel = true;
-                    newButton.Appearance = ControlAppearance.Secondary;
-                }
-                else {
-                    newButton.Appearance = ControlAppearance.Transparent;
-                }
-                newButton.Content = text.Substring(1);
-                break;
-            default:
-                newButton.Appearance = ControlAppearance.Transparent;
-                newButton.Content = text;
-                break;
+            };
+
+            DialogButtons.Children.Add(newButton);
         }
-        return newButton;
     }
 }

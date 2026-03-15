@@ -8,19 +8,23 @@
     xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
     xmlns:vm="clr-namespace:StudioHub.ViewModels;assembly=StudioHub"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    WindowStartupLocation="CenterScreen"
     Title="MainWindow"
     Height="450" Width="800"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    ExtendsContentIntoTitleBar="True" UseLayoutRounding="True"
     d:DataContext="{d:DesignInstance Type=vm:ViewModelBase}"
+    WindowStartupLocation="CenterScreen"
+    ExtendsContentIntoTitleBar="True"
+    UseLayoutRounding="True"
     >
 
-    <StackPanel Margin="24">
+    <StackPanel>
+        <ui:TitleBar x:Name="title"/>
+
         <ui:Button
             Content="RUN"
             Width="100"
+            Margin="25"
             Click="button_Click"
             />
 

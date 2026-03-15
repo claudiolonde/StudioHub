@@ -7,7 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/StudioHub;component/Themes/Generic.xaml" />
+                <ui:ThemesDictionary Theme="Unknown"/>
                 <ui:ControlsDictionary/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

@@ -12,8 +12,6 @@ public partial class MainView {
 
     public MainView() {
         InitializeComponent();
-        int x = Dialog.Show("Questo è il messaggio!", "StudioHUB", ["!Salva", "~Annulla", "*", "Ignora"], DialogType.Warning);
-        Debug.Write(x);
         if (!Hub.Initialize()) {
             Application.Current.Shutdown();
             return;

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace StudioHub.ViewModels;
 
-public partial class ViewModelBase : ObservableObject {
+public partial class BaseViewModel : ObservableObject {
 
     /// <summary>
     /// Evento sollevato quando avviene un salvataggio con successo.

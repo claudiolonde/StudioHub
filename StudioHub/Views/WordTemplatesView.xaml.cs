@@ -17,7 +17,7 @@ public partial class WordTemplatesView {
     /// Apre la vista.
     /// </summary>
     /// <remarks>
-    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/> , disabilita l'icona della finestra,
+    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/>, disabilita l'icona della finestra,
     /// </remarks>
     public static void Open(string appName, string[] headers) {
 
@@ -25,11 +25,11 @@ public partial class WordTemplatesView {
         ArgumentNullException.ThrowIfNull(headers);
 
         if (string.IsNullOrWhiteSpace(DataPath.root)) {
-            MessageBox.Show(
+            Dialog.Show(
                 "La cartella dati dell'applicazione non è impostata correttamente.",
                 "Gestione modelli Word",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
+                null,
+                DialogType.Error
             );
             return;
         }
@@ -39,11 +39,11 @@ public partial class WordTemplatesView {
             _ = Directory.CreateDirectory(appPath);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException) {
-            MessageBox.Show(
+            Dialog.Show(
                 $"Impossibile creare la cartella dati:\n{appPath}.",
                 "Gestione modelli Word",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
+                null,
+                DialogType.Error
             );
             return;
         }

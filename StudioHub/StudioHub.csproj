@@ -1,44 +1,46 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <ImplicitUsings>enable</ImplicitUsings>
-	<!--
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	-->
-  </PropertyGroup>
+    <PropertyGroup>
+        <!--
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        -->
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Assets\StudioHub.ico" />
-  </ItemGroup>
+    <ItemGroup>
+        <Page Update="Themes\.wpf-ui.xaml">
+            <ContainsDesignTimeResources>True</ContainsDesignTimeResources>
+        </Page>
+    </ItemGroup>
 
-  <!--<ItemGroup>
-    <Page Remove="Themes\generic.xaml" />
-  </ItemGroup>-->
+    <ItemGroup>
+        <None Remove="Assets\StudioHub.ico" />
+        <Resource Include="Assets\StudioHub.ico">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </Resource>
+    </ItemGroup>
 
-  <ItemGroup>
-    <COMReference Include="Microsoft.Office.Interop.Word">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>7</VersionMinor>
-      <VersionMajor>8</VersionMajor>
-      <Guid>00020905-0000-0000-c000-000000000046</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
+    <ItemGroup>
+        <COMReference Include="Microsoft.Office.Interop.Word">
+            <WrapperTool>tlbimp</WrapperTool>
+            <VersionMinor>7</VersionMinor>
+            <VersionMajor>8</VersionMajor>
+            <Guid>00020905-0000-0000-c000-000000000046</Guid>
+            <Lcid>0</Lcid>
+            <Isolated>false</Isolated>
+            <EmbedInteropTypes>true</EmbedInteropTypes>
+        </COMReference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
-    <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
-    <PackageReference Include="WPF-UI" Version="4.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\StudioHub.ico" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+        <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
+        <PackageReference Include="WPF-UI" Version="4.2.0" />
+    </ItemGroup>
 
 </Project>

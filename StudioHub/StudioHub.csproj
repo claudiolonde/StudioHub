@@ -12,7 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Page Update="Themes\.wpf-ui.xaml">
+        <Page Update="Themes\_wpf-ui.xaml">
             <ContainsDesignTimeResources>True</ContainsDesignTimeResources>
         </Page>
     </ItemGroup>

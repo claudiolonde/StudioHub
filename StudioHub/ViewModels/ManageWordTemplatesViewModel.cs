@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace StudioHub.ViewModels;
 
-public partial class WordTemplatesViewModel : ObservableObject {
+public partial class ManageWordTemplatesViewModel : ObservableObject {
 
     public static string Title => "Gestione modelli Word";
     public string Path {
@@ -35,7 +35,7 @@ public partial class WordTemplatesViewModel : ObservableObject {
         nameof(DeleteTemplateCommand))]
     private string? _selectedTemplate = null;
 
-    public WordTemplatesViewModel(string path, string[] headers) {
+    public ManageWordTemplatesViewModel(string path, string[] headers) {
         Path = path;
         TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
         applyFilter();

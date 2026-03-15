@@ -18,7 +18,8 @@ public partial class MainView {
         }
     }
     private void button_Click(object sender, RoutedEventArgs e) {
-        WordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
+        Dialog.Show(@"In WPF.", DialogType.Warning, ["!Claudio", "Sandro", "~Nicholas"], null);
+        ManageWordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
         return;
     }
 

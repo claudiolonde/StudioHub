@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -53,9 +54,9 @@ public partial class Dialog : FluentWindow {
     /// <param name="type">Tipo di dialog (opzionale).</param>
     /// <returns>Indice del pulsante selezionato.</returns>
     public static int Show(string message,
-                           string? title = null,
+                           DialogType? type = DialogType.None,
                            string[]? buttons = null,
-                           DialogType? type = DialogType.None) {
+                           string? title = null) {
 
         if (buttons is null || buttons.Length == 0) {
             buttons = ["*Chiudi"];
@@ -74,7 +75,7 @@ public partial class Dialog : FluentWindow {
             }
         }
 
-        Dialog dialog = new(message, title, buttons, type) {
+        Dialog dialog = new(message, type, buttons, title) {
             Owner = owner
         };
 
@@ -90,9 +91,10 @@ public partial class Dialog : FluentWindow {
     /// <param name="buttons">Array di pulsanti.</param>
     /// <param name="type">Tipo di dialog.</param>
     private Dialog(string message,
-                   string? title,
+                   DialogType? type,
                    string[] buttons,
-                   DialogType? type) {
+                   string? title
+                   ) {
 
         InitializeComponent();
 
@@ -121,23 +123,13 @@ public partial class Dialog : FluentWindow {
                 DialogIcon.Foreground = Brushes.DeepSkyBlue;
                 break;
             default:
-                DialogIcon.Symbol = SymbolRegular.Empty;
-                DialogIcon.Foreground = Brushes.Transparent;
+                DialogIcon.Visibility = Visibility.Collapsed;
                 break;
         }
 
         string[] validButtons = [.. buttons.Where(s => !string.IsNullOrWhiteSpace(s) && (s.Length > 1 || !"*~!".Contains(s[0])))];
         injectButtons(validButtons);
-
-        Loaded += (s, e) => {
-            SizeToContent = SizeToContent.WidthAndHeight;
-            double screenWidth = SystemParameters.PrimaryScreenWidth;
-            double screenHeight = SystemParameters.PrimaryScreenHeight;
-            double windowWidth = Width;
-            double windowHeight = Height;
-            Left = (screenWidth - windowWidth) / 2;
-            Top = (screenHeight - windowHeight) / 2;
-        };
+        //calculateAndApplyOptimalSize();
 
         MouseLeftButtonDown += (s, e) => {
             if (e.ChangedButton == MouseButton.Left && e.GetPosition(this).Y < 48) {
@@ -185,21 +177,21 @@ public partial class Dialog : FluentWindow {
                         newButton.IsDefault = true;
                         newButton.IsCancel = true;
                         newButton.Appearance = ControlAppearance.Primary;
-                        newButton.ToolTip = "Pulsante predefinito e di annullamento";
+                        newButton.ToolTip = "Invio/Esc";
                     }
                     break;
                 case '!':
                     if (defaultIndex == n) {
                         newButton.IsDefault = true;
                         newButton.Appearance = ControlAppearance.Primary;
-                        newButton.ToolTip = "Pulsante predefinito";
+                        newButton.ToolTip = "Invio";
                     }
                     break;
                 case '~':
                     if (cancelIndex == n) {
                         newButton.IsCancel = true;
                         newButton.Appearance = ControlAppearance.Secondary;
-                        newButton.ToolTip = "Pulsante di annullamento";
+                        newButton.ToolTip = "Esc";
                     }
                     break;
                 default:
@@ -215,5 +207,85 @@ public partial class Dialog : FluentWindow {
 
             DialogButtons.Children.Add(newButton);
         }
+    }
+
+    private void calculateAndApplyOptimalSize() {
+        // 1. Definizioni delle costanti lette dal XAML
+        const double MAX_W = 600;
+        const double MAX_H = 600;
+        const double MIN_W = 400;
+        const double HORIZONTAL_MARGINS_BUTTONS = 50; // 25 sx + 25 dx
+        const double HORIZONTAL_MARGINS_TEXT = 100;   // 50 grid + 50 scrollviewer
+        const double VERTICAL_MARGINS_TOTAL = 115;    // 15+25(Grid) + 25+25(Content) + 25(Buttons)
+
+        // Target Ratio: 3/2 (1.5) o 4/3 (1.33)
+        const double TARGET_RATIO = 1.5;
+
+        // 2. Misuriamo i controlli base (Titolo, Icona, Pulsanti) con spazio infinito
+        DialogTitle.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        DialogButtons.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+        double iconHeight = 0;
+        if (DialogIcon.Visibility == Visibility.Visible) {
+            DialogIcon.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            iconHeight = DialogIcon.DesiredSize.Height + 25; // 25 è il Margin.Bottom
+        }
+
+        double fixedElementsHeight = DialogTitle.DesiredSize.Height + iconHeight + DialogButtons.DesiredSize.Height;
+        double buttonsTotalWidth = DialogButtons.DesiredSize.Width;
+
+        // 3. Misuriamo il testo su una singola riga (senza wrapping)
+        DialogMessage.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        double rawTextWidth = DialogMessage.DesiredSize.Width;
+
+        double finalWidth = 0;
+        double finalHeight = 0;
+
+        // 4. Logica: Testo corto vs Testo lungo
+        if (rawTextWidth <= buttonsTotalWidth) {
+            // Il testo è più corto dei pulsanti, mantieni la larghezza dei pulsanti (rispettando MinWidth)
+            finalWidth = Math.Max(MIN_W, buttonsTotalWidth + HORIZONTAL_MARGINS_BUTTONS);
+
+            // Calcoliamo l'altezza con questa larghezza
+            DialogMessage.Measure(new Size(finalWidth - HORIZONTAL_MARGINS_TEXT, double.PositiveInfinity));
+            finalHeight = VERTICAL_MARGINS_TOTAL + fixedElementsHeight + DialogMessage.DesiredSize.Height;
+        }
+        else {
+            // Testo lungo: Ricerca della larghezza ottimale per mantenere la proporzione
+            double minSearchW = Math.Max(MIN_W, buttonsTotalWidth + HORIZONTAL_MARGINS_BUTTONS);
+            double maxSearchW = MAX_W;
+
+            double bestWidth = minSearchW;
+            double bestRatioDiff = double.MaxValue;
+
+            // Iteriamo a step di 10 pixel per trovare la larghezza ideale
+            for (double w = minSearchW; w <= maxSearchW; w += 10) {
+                // Misuriamo l'altezza del testo se costretto in questa larghezza 'w'
+                double textWrapWidth = Math.Max(0, w - HORIZONTAL_MARGINS_TEXT);
+                DialogMessage.Measure(new Size(textWrapWidth, double.PositiveInfinity));
+
+                double estimatedHeight = VERTICAL_MARGINS_TOTAL + fixedElementsHeight + DialogMessage.DesiredSize.Height;
+
+                // Calcoliamo il ratio attuale
+                double currentRatio = w / estimatedHeight;
+                double ratioDiff = Math.Abs(currentRatio - TARGET_RATIO);
+
+                // Se ci stiamo avvicinando al rapporto 3:2, salviamo questo valore come migliore
+                if (ratioDiff < bestRatioDiff) {
+                    bestRatioDiff = ratioDiff;
+                    bestWidth = w;
+                }
+            }
+
+            finalWidth = bestWidth;
+
+            // Calcoliamo l'altezza reale finale usando la larghezza trovata
+            DialogMessage.Measure(new Size(finalWidth - HORIZONTAL_MARGINS_TEXT, double.PositiveInfinity));
+            finalHeight = VERTICAL_MARGINS_TOTAL + fixedElementsHeight + DialogMessage.DesiredSize.Height;
+        }
+
+        // 5. Applichiamo i limiti di sicurezza massimi (MaxHeight / MaxWidth del XAML)
+        Width = Math.Min(MAX_W, finalWidth);
+        Height = Math.Min(MAX_H, finalHeight);
     }
 }

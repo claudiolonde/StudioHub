@@ -5,12 +5,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    MinHeight="300" MinWidth="400"
+    MinWidth="400" Height="150"
     MaxHeight="600" MaxWidth="600"
     FontFamily="Segoe UI Variable Display, Segoe UI"
     TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
     TextOptions.TextHintingMode="Fixed"
-    WindowStartupLocation="Manual"
+    WindowStartupLocation="CenterOwner"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
     ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
@@ -25,25 +25,30 @@
 
         <TextBlock x:Name="DialogTitle" Grid.Row="0"/>
 
-        <StackPanel
-            Grid.Row="1"
-            Margin="0 25"
-            IsHitTestVisible="False"
-            >
+        <Grid Grid.Row="1" Margin="0 25">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
             <ui:SymbolIcon x:Name="DialogIcon"
                 Margin="0 0 0 25"
                 FontSize="60"
                 />
 
-            <ScrollViewer MaxHeight="350" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer
+                Grid.Row="1"
+                MaxHeight="10350"
+                Margin="25 0"
+                Focusable="False" IsTabStop="False"
+                VerticalScrollBarVisibility="Auto"
+                >
                 <TextBlock x:Name="DialogMessage"
-                    Margin="25 0"
                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                     TextWrapping="Wrap" TextAlignment="Center"
                     />
             </ScrollViewer>
-        </StackPanel>
+        </Grid>
 
         <StackPanel x:Name="DialogButtons"
             Grid.Row="2"

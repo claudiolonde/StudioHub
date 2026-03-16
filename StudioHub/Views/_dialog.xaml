@@ -5,57 +5,57 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    MinWidth="400" Height="150"
-    MaxHeight="600" MaxWidth="600"
+    MinHeight="180" MinWidth="270"
+    MaxHeight="360" MaxWidth="540"
     FontFamily="Segoe UI Variable Display, Segoe UI"
     TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
     TextOptions.TextHintingMode="Fixed"
     WindowStartupLocation="CenterOwner"
-    ShowInTaskbar="False"
     ResizeMode="NoResize"
     ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
     SnapsToDevicePixels="True" UseLayoutRounding="True"
     >
-    <Grid Margin="25 15 25 25">
+    <Grid Margin="25 10 25 25">
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="32"/>
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="DialogTitle" Grid.Row="0"/>
-
-        <Grid Grid.Row="1" Margin="0 25">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <ui:SymbolIcon x:Name="DialogIcon"
-                Margin="0 0 0 25"
-                FontSize="60"
-                />
-
-            <ScrollViewer
-                Grid.Row="1"
-                MaxHeight="10350"
-                Margin="25 0"
-                Focusable="False" IsTabStop="False"
-                VerticalScrollBarVisibility="Auto"
-                >
-                <TextBlock x:Name="DialogMessage"
-                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    TextWrapping="Wrap" TextAlignment="Center"
-                    />
-            </ScrollViewer>
-        </Grid>
-
-        <StackPanel x:Name="DialogButtons"
-            Grid.Row="2"
-            Margin="0 25 0 0"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal"
+        <!--  Titolo della finestra  -->
+        <TextBlock x:Name="Caption"
+            Grid.Row="0"
+            VerticalAlignment="Top"
+            TextTrimming="CharacterEllipsis"
             />
 
+        <!--  Simbolo associato al messaggio  -->
+        <ui:SymbolIcon x:Name="Badge"
+            Grid.Row="1"
+            FontSize="58"
+            />
+
+        <!--  Messaggio  -->
+        <ScrollViewer
+            Grid.Row="2"
+            Margin="0 15 0 35"
+            VerticalAlignment="Center"
+            Focusable="False" IsTabStop="False"
+            VerticalScrollBarVisibility="Auto"
+            >
+            <TextBlock x:Name="Message"
+                TextWrapping="Wrap" TextAlignment="Center"
+                />
+        </ScrollViewer>
+
+        <!--  Pulsanti della finestra  -->
+        <StackPanel x:Name="Buttons"
+            Grid.Row="3"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            >
+        </StackPanel>
     </Grid>
+
 </ui:FluentWindow>

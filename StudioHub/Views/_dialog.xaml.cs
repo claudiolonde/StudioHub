@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -6,286 +5,225 @@ using Wpf.Ui.Controls;
 
 namespace StudioHub.Views;
 
-/// <summary>
-/// Tipi di dialog disponibili.
-/// </summary>
 public enum DialogType {
-    /// <summary>
-    /// Dialog di errore.
-    /// </summary>
-    Error,
-    /// <summary>
-    /// Dialog di avviso.
-    /// </summary>
-    Warning,
-    /// <summary>
-    /// Dialog di domanda.
-    /// </summary>
+    None,
     Question,
-    /// <summary>
-    /// Dialog informativo.
-    /// </summary>
     Info,
-    /// <summary>
-    /// Nessun tipo specificato.
-    /// </summary>
-    None
+    Warning,
+    Error,
 }
 
-/// <summary>
-/// Finestra di dialogo personalizzata per messaggi e interazione.
-/// </summary>
-public partial class Dialog : FluentWindow {
+public partial class Dialog {
 
-    private static int _buttonIndex;
+    private static int _pressedButtonIndex;
+    private static readonly string ASSEMBLY_NAME = typeof(Dialog).Assembly.GetName().Name ?? string.Empty;
 
-    /// <summary>
-    /// Mostra una finestra di dialogo modale.
-    /// </summary>
-    /// <param name="message">Messaggio da visualizzare.</param>
-    /// <param name="title">Titolo della finestra (opzionale).</param>
-    /// <param name="buttons">
-    /// Array di pulsanti (opzionale).<br/> Anteporre al testo del pulsante il carattere:<br/> - asterisco (<b>*</b>)
-    /// per impostare il pulsante come predefinito e annullamento, visualizzato come pulsante principale, ha priorità
-    /// sugli altri <br/> - punto esclamativo (<b>!</b>) per impostare il pulsante come predefinito, visualizzato come
-    /// pulsante principale<br/> - tilde (<b>~</b>) per impostare il pulsante come annullamento, visualizzato come
-    /// pulsante secondario
-    /// </param>
-    /// <param name="type">Tipo di dialog (opzionale).</param>
-    /// <returns>Indice del pulsante selezionato.</returns>
-    public static int Show(string message,
-                           DialogType? type = DialogType.None,
-                           string[]? buttons = null,
-                           string? title = null) {
+    public Dialog(string title, DialogType type, string message, string[] buttons) {
+
+        InitializeComponent();
+        MouseLeftButtonDown += (s, e) => {
+            if (e.ChangedButton == MouseButton.Left && e.GetPosition(this).Y < 40) {
+                DragMove();
+            }
+        };
+
+        Caption.Text = title;
+        switch (type) {
+            case DialogType.Error:
+                Badge.Symbol = SymbolRegular.ErrorCircle24;
+                Badge.Foreground = Brushes.Crimson;
+                break;
+            case DialogType.Warning:
+                Badge.Symbol = SymbolRegular.Warning24;
+                Badge.Foreground = Brushes.Orange;
+                break;
+            case DialogType.Question:
+                Badge.Symbol = SymbolRegular.QuestionCircle24;
+                Badge.Foreground = Brushes.MediumSlateBlue;
+                break;
+            case DialogType.Info:
+                Badge.Symbol = SymbolRegular.Info24;
+                Badge.Foreground = Brushes.DeepSkyBlue;
+                break;
+            default:
+                Badge.Visibility = Visibility.Collapsed;
+                break;
+        }
+        Message.Text = message;
+        injectButtons(buttons);
+        calculateAndSetLayout(type);
+        Loaded += dialog_Loaded;
+    }
+
+    private void dialog_Loaded(object sender, RoutedEventArgs e) {
+        //Caption.Text = $"width={Width} - height={Height}";
+    }
+
+    public static int Show(string message) {
+        return Show(null, DialogType.None, message, null);
+    }
+
+    public static int Show(DialogType type, string message) {
+        return Show(null, type, message, null);
+    }
+
+    public static int Show(string? title, DialogType type, string message, string[]? buttons) {
+
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(message);
+
+        WindowCollection windows = Application.Current.Windows;
+        Window? owner = null;
+        for (int i = 0; i < windows.Count; i++) {
+            if (windows[i].IsActive) {
+                owner = windows[i];
+                break;
+            }
+        }
+
+        string caption = title ?? owner?.Title ?? ASSEMBLY_NAME;
 
         if (buttons is null || buttons.Length == 0) {
             buttons = ["*Chiudi"];
         }
 
-        if (!type.HasValue) {
-            type = DialogType.None;
-        }
-
-        Window? owner = null;
-        for (int n = 0; n < Application.Current.Windows.Count; n++) {
-            Window window = Application.Current.Windows[n];
-            if (window.IsActive) {
-                owner = window;
-                break;
-            }
-        }
-
-        Dialog dialog = new(message, type, buttons, title) {
+        Dialog dialog = new(caption, type, message, buttons) {
             Owner = owner
         };
 
+        _pressedButtonIndex = -1;
         dialog.ShowDialog();
-        return _buttonIndex;
-    }
-
-    /// <summary>
-    /// Costruttore privato. Inizializza il dialog con i parametri specificati.
-    /// </summary>
-    /// <param name="message">Messaggio da visualizzare.</param>
-    /// <param name="title">Titolo della finestra.</param>
-    /// <param name="buttons">Array di pulsanti.</param>
-    /// <param name="type">Tipo di dialog.</param>
-    private Dialog(string message,
-                   DialogType? type,
-                   string[] buttons,
-                   string? title
-                   ) {
-
-        InitializeComponent();
-
-        DialogMessage.Text = message;
-
-        DialogTitle.Text = title ??
-                (Application.Current.MainWindow?.Title) ??
-                (System.Reflection.Assembly.GetExecutingAssembly().GetName().Name) ??
-                string.Empty;
-
-        switch (type) {
-            case DialogType.Error:
-                DialogIcon.Symbol = SymbolRegular.ErrorCircle24;
-                DialogIcon.Foreground = Brushes.Crimson;
-                break;
-            case DialogType.Warning:
-                DialogIcon.Symbol = SymbolRegular.Warning24;
-                DialogIcon.Foreground = Brushes.Orange;
-                break;
-            case DialogType.Question:
-                DialogIcon.Symbol = SymbolRegular.QuestionCircle24;
-                DialogIcon.Foreground = Brushes.MediumSlateBlue;
-                break;
-            case DialogType.Info:
-                DialogIcon.Symbol = SymbolRegular.Info24;
-                DialogIcon.Foreground = Brushes.DeepSkyBlue;
-                break;
-            default:
-                DialogIcon.Visibility = Visibility.Collapsed;
-                break;
-        }
-
-        string[] validButtons = [.. buttons.Where(s => !string.IsNullOrWhiteSpace(s) && (s.Length > 1 || !"*~!".Contains(s[0])))];
-        injectButtons(validButtons);
-        //calculateAndApplyOptimalSize();
-
-        MouseLeftButtonDown += (s, e) => {
-            if (e.ChangedButton == MouseButton.Left && e.GetPosition(this).Y < 48) {
-                DragMove();
-            }
-        };
+        return _pressedButtonIndex;
 
     }
 
-    /// <summary>
-    /// Crea i pulsanti per il dialog, impostando proprietà e comportamento in base al prefisso del testo.
-    /// </summary>
-    /// <param name="buttonNames">Array di nomi dei pulsanti, ciascuno può includere un prefisso speciale.</param>
-    private void injectButtons(string[] buttonNames) {
+    private void injectButtons(string[] items) {
 
         int defaultIndex = -1;
         int cancelIndex = -1;
 
-        // Imposta gli indici dei pulsanti predefinito e di annullamento in base ai prefissi dei testi dei pulsanti
-        for (int n = 0; n < buttonNames.Length; n++) {
-            char prefix = buttonNames[n][0];
-            if (prefix == '*') { defaultIndex = cancelIndex = n; break; }
-            if (prefix == '!' && defaultIndex == -1) { defaultIndex = n; }
-            if (prefix == '~' && cancelIndex == -1) { cancelIndex = n; }
+        // Filtra le stringhe vuote e quelle composte solo da un carattere di controllo
+        List<string> filtered = [.. items.Where(s => !string.IsNullOrEmpty(s) && !(s.Length == 1 && "~!*".Contains(s[0])))];
+
+        // Cerca il prefisso '*'
+        int starIdx = filtered.FindIndex(s => s.StartsWith('*'));
+        if (starIdx != -1) {
+            defaultIndex = cancelIndex = starIdx;
+        }
+        else {
+            // Cerca il prefisso '!'
+            int bangIdx = filtered.FindIndex(s => s.StartsWith('!'));
+            if (bangIdx != -1) {
+                defaultIndex = bangIdx;
+            }
+            // Cerca il prefisso '~'
+            int tildeIdx = filtered.FindIndex(s => s.StartsWith('~'));
+            if (tildeIdx != -1) {
+                cancelIndex = tildeIdx;
+            }
         }
 
-        // Crea e configura ciascun pulsante
-        for (int n = 0; n < buttonNames.Length; n++) {
+        // Crea un Button per ogni stringa filtrata
+        for (int i = 0; i < filtered.Count; i++) {
 
-            string content = buttonNames[n];
-            char controlChar = content[0];
+            string original = filtered[i];
+            string content = original[0] is '~' or '!' or '*'
+                   ? original[1..]
+                   : original;
 
             Button newButton = new() {
-                Appearance = ControlAppearance.Transparent,
-                Content = "*!~".Contains(controlChar) ? content.Substring(1) : content,
                 Margin = new Thickness(10, 0, 10, 0),
                 MinWidth = 100,
-                Padding = new Thickness(20, 5, 20, 5),
-                Tag = n
+                Tag = i,
+                Content = content,
             };
 
-            switch (controlChar) {
-                case '*':
-                    if (defaultIndex == n && cancelIndex == n) {
-                        newButton.IsDefault = true;
-                        newButton.IsCancel = true;
-                        newButton.Appearance = ControlAppearance.Primary;
-                        newButton.ToolTip = "Invio/Esc";
-                    }
-                    break;
-                case '!':
-                    if (defaultIndex == n) {
-                        newButton.IsDefault = true;
-                        newButton.Appearance = ControlAppearance.Primary;
-                        newButton.ToolTip = "Invio";
-                    }
-                    break;
-                case '~':
-                    if (cancelIndex == n) {
-                        newButton.IsCancel = true;
-                        newButton.Appearance = ControlAppearance.Secondary;
-                        newButton.ToolTip = "Esc";
-                    }
-                    break;
-                default:
-                    break;
+            if (i == defaultIndex && i == cancelIndex) {
+                newButton.IsDefault = newButton.IsCancel = true;
+                newButton.Appearance = ControlAppearance.Primary;
+                newButton.ToolTip = "Invio/Esc";
+            }
+            else if (i == defaultIndex) {
+                newButton.IsDefault = true;
+                newButton.Appearance = ControlAppearance.Primary;
+                newButton.ToolTip = "Invio";
+            }
+            else if (i == cancelIndex) {
+                newButton.IsCancel = true;
+                newButton.Appearance = ControlAppearance.Secondary;
+                newButton.ToolTip = "Esc";
+            }
+            else {
+                newButton.Appearance = ControlAppearance.Transparent;
             }
 
             newButton.Click += (s, a) => {
                 if (s is Button button && button.Tag is int i) {
-                    _buttonIndex = i;
+                    _pressedButtonIndex = i;
                     DialogResult = true;
                 }
             };
 
-            DialogButtons.Children.Add(newButton);
+            Buttons.Children.Add(newButton);
         }
     }
 
-    private void calculateAndApplyOptimalSize() {
-        // 1. Definizioni delle costanti lette dal XAML
-        const double MAX_W = 600;
-        const double MAX_H = 600;
-        const double MIN_W = 400;
-        const double HORIZONTAL_MARGINS_BUTTONS = 50; // 25 sx + 25 dx
-        const double HORIZONTAL_MARGINS_TEXT = 100;   // 50 grid + 50 scrollviewer
-        const double VERTICAL_MARGINS_TOTAL = 115;    // 15+25(Grid) + 25+25(Content) + 25(Buttons)
+    private void calculateAndSetLayout(DialogType type) {
 
-        // Target Ratio: 3/2 (1.5) o 4/3 (1.33)
-        const double TARGET_RATIO = 1.5;
+        const double MIN_WIDTH = 270, MAX_WIDTH = 540;
+        const double MIN_HEIGHT = 180, MAX_HEIGHT = 360;
+        const double H_MARGINS = 50;   // 25 + 25
+        const double V_MARGINS = 35;   // 10 top + 25 bottom (Grid margin)
 
-        // 2. Misuriamo i controlli base (Titolo, Icona, Pulsanti) con spazio infinito
-        DialogTitle.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        DialogButtons.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        // Altezze fisse delle righe del Grid
+        const double ROW_CAPTION = 30;  // RowDefinition Height="30"
+        const double ROW_BUTTONS = 32;  // RowDefinition Height="32"
+        const double MSG_MARGIN = 50;  // Margin="0 25" → 25 top + 25 bottom
 
-        double iconHeight = 0;
-        if (DialogIcon.Visibility == Visibility.Visible) {
-            DialogIcon.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            iconHeight = DialogIcon.DesiredSize.Height + 25; // 25 è il Margin.Bottom
-        }
+        // -------------------------------------------------------------------------
+        // 1. MEASURE BUTTONS
+        // -------------------------------------------------------------------------
+        Buttons.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        double absoluteMinimumWidth = Buttons.DesiredSize.Width + H_MARGINS;
 
-        double fixedElementsHeight = DialogTitle.DesiredSize.Height + iconHeight + DialogButtons.DesiredSize.Height;
-        double buttonsTotalWidth = DialogButtons.DesiredSize.Width;
+        // -------------------------------------------------------------------------
+        // 2. MEASURE BADGE (RowDefinition Height="Auto")
+        // -------------------------------------------------------------------------
+        Badge.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        double badgeHeight = type == DialogType.None ? 0 : Badge.DesiredSize.Height;
 
-        // 3. Misuriamo il testo su una singola riga (senza wrapping)
-        DialogMessage.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        double rawTextWidth = DialogMessage.DesiredSize.Width;
+        // -------------------------------------------------------------------------
+        // 3. MEASURE MESSAGE (unconstrained — testo su riga singola)
+        // -------------------------------------------------------------------------
+        Message.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        double textNaturalWidth = Message.DesiredSize.Width;
+        double textSingleLineHeight = Message.DesiredSize.Height;
 
-        double finalWidth = 0;
-        double finalHeight = 0;
+        // -------------------------------------------------------------------------
+        // 4. IDEAL WIDTH via aspect-ratio trick
+        // -------------------------------------------------------------------------
+        double textArea = textNaturalWidth * textSingleLineHeight;
+        double idealWidth = Math.Sqrt(textArea * 1.50) + H_MARGINS;
+        double targetWidth = Math.Clamp(
+            Math.Max(absoluteMinimumWidth, idealWidth),
+            MIN_WIDTH, MAX_WIDTH);
 
-        // 4. Logica: Testo corto vs Testo lungo
-        if (rawTextWidth <= buttonsTotalWidth) {
-            // Il testo è più corto dei pulsanti, mantieni la larghezza dei pulsanti (rispettando MinWidth)
-            finalWidth = Math.Max(MIN_W, buttonsTotalWidth + HORIZONTAL_MARGINS_BUTTONS);
+        Width = targetWidth;
 
-            // Calcoliamo l'altezza con questa larghezza
-            DialogMessage.Measure(new Size(finalWidth - HORIZONTAL_MARGINS_TEXT, double.PositiveInfinity));
-            finalHeight = VERTICAL_MARGINS_TOTAL + fixedElementsHeight + DialogMessage.DesiredSize.Height;
-        }
-        else {
-            // Testo lungo: Ricerca della larghezza ottimale per mantenere la proporzione
-            double minSearchW = Math.Max(MIN_W, buttonsTotalWidth + HORIZONTAL_MARGINS_BUTTONS);
-            double maxSearchW = MAX_W;
+        // -------------------------------------------------------------------------
+        // 5. MEASURE MESSAGE (constrained) — ora WPF calcola i veri a-capo
+        // -------------------------------------------------------------------------
+        double availableTextWidth = targetWidth - H_MARGINS;
+        Message.Measure(new Size(availableTextWidth, double.PositiveInfinity));
+        double textWrappedHeight = Message.DesiredSize.Height;
 
-            double bestWidth = minSearchW;
-            double bestRatioDiff = double.MaxValue;
+        // -------------------------------------------------------------------------
+        // 6. TARGET HEIGHT — somma di tutte le righe reali del layout
+        //    V_MARGINS + ROW_CAPTION + badgeHeight + MSG_MARGIN + textWrapped + ROW_BUTTONS
+        // -------------------------------------------------------------------------
+        double targetHeight = Math.Clamp(
+            V_MARGINS + ROW_CAPTION + badgeHeight + MSG_MARGIN + textWrappedHeight + ROW_BUTTONS,
+            MIN_HEIGHT, MAX_HEIGHT);
 
-            // Iteriamo a step di 10 pixel per trovare la larghezza ideale
-            for (double w = minSearchW; w <= maxSearchW; w += 10) {
-                // Misuriamo l'altezza del testo se costretto in questa larghezza 'w'
-                double textWrapWidth = Math.Max(0, w - HORIZONTAL_MARGINS_TEXT);
-                DialogMessage.Measure(new Size(textWrapWidth, double.PositiveInfinity));
-
-                double estimatedHeight = VERTICAL_MARGINS_TOTAL + fixedElementsHeight + DialogMessage.DesiredSize.Height;
-
-                // Calcoliamo il ratio attuale
-                double currentRatio = w / estimatedHeight;
-                double ratioDiff = Math.Abs(currentRatio - TARGET_RATIO);
-
-                // Se ci stiamo avvicinando al rapporto 3:2, salviamo questo valore come migliore
-                if (ratioDiff < bestRatioDiff) {
-                    bestRatioDiff = ratioDiff;
-                    bestWidth = w;
-                }
-            }
-
-            finalWidth = bestWidth;
-
-            // Calcoliamo l'altezza reale finale usando la larghezza trovata
-            DialogMessage.Measure(new Size(finalWidth - HORIZONTAL_MARGINS_TEXT, double.PositiveInfinity));
-            finalHeight = VERTICAL_MARGINS_TOTAL + fixedElementsHeight + DialogMessage.DesiredSize.Height;
-        }
-
-        // 5. Applichiamo i limiti di sicurezza massimi (MaxHeight / MaxWidth del XAML)
-        Width = Math.Min(MAX_W, finalWidth);
-        Height = Math.Min(MAX_H, finalHeight);
+        Height = targetHeight;
     }
 }

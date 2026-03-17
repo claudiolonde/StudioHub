@@ -25,12 +25,8 @@ public partial class ManageWordTemplatesView {
         ArgumentNullException.ThrowIfNull(headers);
 
         if (string.IsNullOrWhiteSpace(DataPath.root)) {
-            DialogOLD.Show(
-                "La cartella dati dell'applicazione non è impostata correttamente.",
-                DialogType.Error,
-                null,
-                "Gestione modelli Word"
-            );
+            Dialog.Show(DialogType.Error,
+                "La cartella dati dell'applicazione non è impostata correttamente.");
             return;
         }
 
@@ -39,12 +35,8 @@ public partial class ManageWordTemplatesView {
             _ = Directory.CreateDirectory(appPath);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException) {
-            DialogOLD.Show(
-                $"Impossibile creare la cartella dati:\n{appPath}.",
-                DialogType.Error,
-                null,
-                "Gestione modelli Word"
-            );
+            Dialog.Show(DialogType.Error,
+                $"Impossibile creare la cartella dati:\n{appPath}.");
             return;
         }
 

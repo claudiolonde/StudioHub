@@ -33,7 +33,7 @@
         <!--  Simbolo associato al messaggio  -->
         <ui:SymbolIcon x:Name="Badge"
             Grid.Row="1"
-            FontSize="58"
+            FontSize="64"
             />
 
         <!--  Messaggio  -->

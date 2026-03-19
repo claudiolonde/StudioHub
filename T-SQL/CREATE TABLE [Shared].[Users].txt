@@ -1,0 +1,16 @@
+CREATE TABLE [Shared].[Users] (
+        [Id] [int] IDENTITY(1,1) NOT NULL,
+        [Username] [nvarchar](50) NOT NULL,
+        [FirstName] [nvarchar](100) NOT NULL,
+        [LastName] [nvarchar](100) NOT NULL,
+        [PasswordHash] [nvarchar](MAX) NOT NULL,
+        [IsAdmin] [bit] NOT NULL CONSTRAINT [DF_Users_IsAdmin] DEFAULT (0),
+        [AvatarType] [int] NOT NULL CONSTRAINT [DF_Users_AvatarType] DEFAULT (0),  
+        [Emails] [nvarchar](MAX) NULL,
+        [Phones] [nvarchar](MAX) NULL,
+        [ResetCode] [nvarchar](6) NULL,
+        [ResetExpiry] [datetime2](7) NULL,
+
+        CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [UQ_Users_Username] UNIQUE ([Username] ASC)
+    )

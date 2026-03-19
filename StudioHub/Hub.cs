@@ -91,6 +91,8 @@ public static class Hub {
             .Table("Schema.TableName")
             .Primary(x => x.Id)
             .Identity(x => x.Id);
+
+
         */
     }
 

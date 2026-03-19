@@ -19,9 +19,33 @@
 
     <ItemGroup>
         <None Remove="Assets\StudioHub.ico" />
+        <None Remove="Assets\UserAvatars\bear.png" />
+        <None Remove="Assets\UserAvatars\bee.png" />
+        <None Remove="Assets\UserAvatars\cat.png" />
+        <None Remove="Assets\UserAvatars\dolphin.png" />
+        <None Remove="Assets\UserAvatars\eagle.png" />
+        <None Remove="Assets\UserAvatars\fox.png" />
+        <None Remove="Assets\UserAvatars\hummingbird.png" />
+        <None Remove="Assets\UserAvatars\lion.png" />
+        <None Remove="Assets\UserAvatars\octopus.png" />
+        <None Remove="Assets\UserAvatars\owl.png" />
+        <None Remove="Assets\UserAvatars\raccoon.png" />
+        <None Remove="Assets\UserAvatars\salmon.png" />
         <Resource Include="Assets\StudioHub.ico">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </Resource>
+        <Resource Include="Assets\UserAvatars\bear.png" />
+        <Resource Include="Assets\UserAvatars\bee.png" />
+        <Resource Include="Assets\UserAvatars\cat.png" />
+        <Resource Include="Assets\UserAvatars\dolphin.png" />
+        <Resource Include="Assets\UserAvatars\eagle.png" />
+        <Resource Include="Assets\UserAvatars\fox.png" />
+        <Resource Include="Assets\UserAvatars\hummingbird.png" />
+        <Resource Include="Assets\UserAvatars\lion.png" />
+        <Resource Include="Assets\UserAvatars\octopus.png" />
+        <Resource Include="Assets\UserAvatars\owl.png" />
+        <Resource Include="Assets\UserAvatars\raccoon.png" />
+        <Resource Include="Assets\UserAvatars\salmon.png" />
     </ItemGroup>
 
     <ItemGroup>

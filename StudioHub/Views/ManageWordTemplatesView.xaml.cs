@@ -20,7 +20,6 @@ public partial class ManageWordTemplatesView {
     /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/>, disabilita l'icona della finestra,
     /// </remarks>
     public static void Open(string appName, string[] headers) {
-
         ArgumentException.ThrowIfNullOrWhiteSpace(appName);
         ArgumentNullException.ThrowIfNull(headers);
 

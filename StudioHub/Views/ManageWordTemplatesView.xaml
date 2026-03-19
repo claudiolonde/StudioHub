@@ -17,7 +17,7 @@
     SnapsToDevicePixels="True" UseLayoutRounding="True"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    d:DataContext="{d:DesignInstance Type=vm:WordTemplatesViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:ManageWordTemplatesViewModel}"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -45,7 +45,7 @@
             <ui:Button
                 Icon="{ui:SymbolIcon Symbol=Add16}"
                 Content="Nuovo Modello"
-                Appearance="Info"
+                Appearance="Primary"
                 Command="{Binding NewTemplateCommand}"
                 />
 

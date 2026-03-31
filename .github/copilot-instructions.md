@@ -2,64 +2,70 @@
 
 ## 1. General Principles
 
-* **Core Stack:** C#, .NET, WPF-UI, SQL, and **RepoDb.SqlServer**.
-* **High Confidence:** Make only high-confidence suggestions. If unsure, ask for clarification.
-* **Testing:** **DO NOT** generate Unit Tests unless explicitly requested.
-* **Clean Code:** Prioritize maintainability and readability. Avoid extreme syntactic sugar if it reduces clarity.
-* **NativeAOT:** Write NativeAOT-compatible code. Avoid dynamic code generation or heavy reflection. Mark incompatible code with appropriate annotations or exceptions.
-* **System Files:** Never modify `global.json`, `package.json`, `package-lock.json`, or `NuGet.config` unless explicitly asked.
+* **Core Stack:** C#, .NET, WPF-UI, SQL, e **RepoDb.SqlServer**.
+* **High Confidence:** Fornisci solo suggerimenti ad alta confidenza. Se non sei sicuro, chiedi chiarimenti.
+* **Testing:** **EVITA** qualsiasi tipo di test (inclusi unit test, test di integrazione o end-to-end) a meno che non sia esplicitamente richiesto.
+* **Clean Code:** Dai priorità alla manutenibilità e leggibilità. Evita sintassi troppo complessa che riduce la chiarezza.
+* **NativeAOT:** Scrivi codice compatibile con NativeAOT. Evita la generazione dinamica di codice o l'uso intensivo di reflection. Evidenzia le incompatibilità di **RepoDb.SqlServer** con NativeAOT e suggerisci alternative quando necessario.
+* **System Files:** Non modificare `global.json`, `package.json`, `package-lock.json` o `NuGet.config` a meno che non sia esplicitamente richiesto.
+* **POCO WordTemplate:** Implementa i seguenti campi: `Guid Id` (utilizzato per la cartella temporanea e StudioHubKey), `string Name`, `string Description`, `byte[] Content`, `string TargetApp`, `DateTime Created`, `DateTime Modified`. Preferisci usare questo modello per il salvataggio di blob nel DB; considera varianti come `ContentLength`, `ContentHash`, `MimeType`, `RowVersion` e storage separato/FILESTREAM per grandi BLOB.
 
 ## 2. Naming & Formatting
 
-* **EditorConfig:** Strictly follow the styles defined in `.editorconfig`.
-* **Braces (Mandatory):** Always use curly braces `{}` for all control flow statements (`if`, `else`, `for`, `foreach`, `while`), even for single-line statements. **NO EXCEPTIONS.**
-* **Braces Style (1TBS):** Use the **1TBS style** (opening curly brace on the same line as the statement).
-* **Variables:** Prefer **explicit types** over `var` (unless the type is obvious from the assignment, e.g., `new()`).
-* **CommunityToolkit.Mvvm:** Use `_camelCase` **ONLY** for private fields intended for toolkit source generation.
-* **Constants:** Use `UPPER_CASE` for constants and `static readonly` variables acting as constants.
-* **Private Methods:** Use `camelCase` for private methods to distinguish them from public ones.
-* **Modern C#:** Use Primary Constructors, file-scoped namespaces, and **single-line using directives** (using declarations).
-* **Language Helpers:** Use `ArgumentNullException.ThrowIfNull` and `ObjectDisposedException.ThrowIf` where applicable.
+* **EditorConfig:** Segui rigorosamente gli stili definiti in `.editorconfig`.
+* **Braces (Mandatory):** Usa sempre le parentesi graffe `{}` per tutte le istruzioni di controllo (`if`, `else`, `for`, `foreach`, `while`), anche per le istruzioni su una sola riga. **NESSUNA ECCEZIONE.**
+* **Braces Style (1TBS):** Usa lo stile **1TBS** (la parentesi graffa di apertura sulla stessa riga dell'istruzione).
+* **Variables:** Preferisci tipi **espliciti** rispetto a `var` (a meno che il tipo non sia ovvio dall'assegnazione, ad esempio `new()`).
+* **CommunityToolkit.Mvvm:** Usa `_camelCase` **SOLO** per i campi privati destinati alla generazione di codice del toolkit.
+* **Constants:** Usa `UPPER_CASE` per le costanti e le variabili `static readonly` che agiscono come costanti.
+* **Private Methods:** Usa `camelCase` per i metodi privati per distinguerli da quelli pubblici.
+* **Modern C#:** Usa costruttori primari, spazi dei nomi a livello di file e **using directives** su una sola riga.
+* **Language Helpers:** Usa `ArgumentNullException.ThrowIfNull` e `ObjectDisposedException.ThrowIf` dove applicabile.
 
 ## 3. Architecture & Data Access
 
-* **Service-Centric Design:** Do not create separate Repository or DAO classes. Data access is an integral part of the Service.
-* **RepoDb:** Implement **RepoDb.SqlServer** directly within classes located in the `Services` folder.
-* **Immutability:** Use `record` types for data transfer and immutability where appropriate, without over-engineering.
-* **Error Handling:** Balance `try-catch` blocks and the Result Pattern based on logic complexity. Avoid catching exceptions without rethrowing them unless logging/handling.
-* **Logging:** Do **NOT** include `ILogger` or logging logic unless explicitly requested.
+* **Service-Centric Design:** Non creare classi separate per Repository o DAO. L'accesso ai dati è parte integrante del Service.
+* **RepoDb:** Implementa **RepoDb.SqlServer** direttamente nelle classi situate nella cartella `Services`. Evidenzia eventuali incompatibilità con NativeAOT.
+* **Immutability:** Usa tipi `record` per il trasferimento dei dati e l'immutabilità, senza sovra-ingegnerizzare.
+* **Error Handling:** Bilancia i blocchi `try-catch` e il pattern Result in base alla complessità logica. Evita di catturare eccezioni senza rilanciarle, a meno che non vengano gestite o loggate.
+* **Logging:** Non includere `ILogger` o logica di logging a meno che non sia esplicitamente richiesto. Suggerisci approcci per gestire eccezioni critiche senza logging, ma senza essere invasivo.
 
 ## 4. Asynchronous Programming
 
-* Provide both synchronous and asynchronous versions of methods where appropriate.
-* Always use the `Async` suffix for asynchronous methods.
-* Return `Task` or `ValueTask`. Avoid `async void` (except for event handlers).
-* Use `CancellationToken` parameters to support cancellation.
-* Use `ConfigureAwait(false)` only in library code; it is generally unnecessary in modern desktop/ASP.NET Core apps.
+* Fornisci versioni sia sincrone che asincrone dei metodi dove appropriato.
+* Usa sempre il suffisso `Async` per i metodi asincroni.
+* Ritorna `Task` o `ValueTask`. Evita `async void` (eccetto per gli event handler).
+* Usa parametri `CancellationToken` per supportare la cancellazione.
+* Usa `ConfigureAwait(false)` solo nel codice di libreria; generalmente non è necessario nelle app desktop moderne o ASP.NET Core.
 
 ## 5. XAML Conventions (WPF-UI)
 
-When generating XAML, strictly use these namespace prefixes:
+Quando generi XAML, usa rigorosamente questi prefissi di namespace:
 
-* `a:` for the root/assembly namespace (Never use `local:`).
-* `c:` for classes in the `Controls` folder.
-* `h:` for classes in the `Helpers` folder.
-* `vm:` for classes in the `ViewModels` folder.
-* `ui:` for **WPF-UI** components.
-Ensure `xmlns` declarations are consistent with this mapping.
+* `a:` per il namespace radice/assembly (non usare mai `local:`).
+* `c:` per le classi nella cartella `Controls`.
+* `h:` per le classi nella cartella `Helpers`.
+* `vm:` per le classi nella cartella `ViewModels`.
+* `ui:` per i componenti **WPF-UI**.
+Assicurati che le dichiarazioni `xmlns` siano coerenti con questa mappatura.
 
 ## 6. Documentation & Language
 
-* **Prose Language:** Use **Italian** for all prose in comments, descriptions, and explanations.
-* **Technical Terms:** Keep technical keywords and terms in **English** (e.g., *try-catch*, *task*, *loop*, *hot path*). Never translate code constructs.
-* **XML Documentation:** Provide `///` comments in **Italian** for **ALL methods** (both public and private). Keep them complete but concise. Use `<see langword="*" />` for keywords like `null`, `true`, or `false`.
-* **In-line Comments:** Use `//` in **Italian** only for critical or non-intuitive logic.
+* **Prose Language:** Usa **Italiano** per tutti i commenti, descrizioni e spiegazioni.
+* **Technical Terms:** Mantieni in **Inglese** le parole chiave e i termini tecnici (es. *try-catch*, *task*, *loop*, *hot path*). Non tradurre i costrutti di codice.
+* **XML Documentation:** Fornisci commenti `///` in **Italiano** per **TUTTI i metodi** (sia pubblici che privati). Mantienili semplici e descrittivi. Usa `<see langword="*" />` per parole chiave come `null`, `true` o `false`.
+* **In-line Comments:** Usa `//` in **Italiano** solo per logica critica o non intuitiva.
 
 ## 7. Git & Markdown
 
-* **Commit Messages:** Generate synthetic messages in **Italian** using this exact schema (omit empty categories):
-* `Aggiunto: [brief list]`
-* `Modificato: [brief list]`
-* `Eliminato: [brief list]`
+* **Commit Messages:** Genera messaggi sintetici in **Italiano** usando questo schema (omettendo le categorie vuote):
+* `Aggiunto: [elenco sintetico]`
+* `Modificato: [elenco sintetico]`
+* `Eliminato: [elenco sintetico]`
 
-* **Markdown Blocks:** Specify the language for code blocks (e.g., `csharp, `json, ```bash).
+* **Markdown Blocks:** Specifica il linguaggio per i blocchi di codice (es. `csharp`, `json`, `bash`).
+
+## 8. Lingua Preferita
+
+* Usa **Italiano** per la comunicazione, tranne che per i termini tecnici o relativi al linguaggio di programmazione, che devono rimanere in **Inglese**.
+* Non chiudere **MAI** le risposte con domande o proposte di cortesia, a meno che non siano strettamente necessarie a perfezionare la comprensione della domanda dell'utente e la relativa risposta.

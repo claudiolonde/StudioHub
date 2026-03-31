@@ -25,8 +25,6 @@ dotnet_search_reference_assemblies = true
 # Disattiva avviso valore non usato
 dotnet_diagnostic.IDE0058.severity = none
 
-
-
 #### CONVENZIONI DI SCRITTURA CODICE .NET ####
 
 # Organizza using
@@ -87,8 +85,6 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 dotnet_style_allow_multiple_blank_lines_experimental = true
 dotnet_style_allow_statement_immediately_after_block_experimental = false
 
-
-
 #### CONVENZIONI DI SCRITTURA CODICE C# ####
 
 # Preferenze per var
@@ -96,23 +92,26 @@ csharp_style_var_elsewhere = false:suggestion
 csharp_style_var_for_built_in_types = false:suggestion
 csharp_style_var_when_type_is_apparent = false:suggestion
 
-# Membri con corpo di espressione
-csharp_style_expression_bodied_accessors = true:suggestion
+# Membri con corpo di espressione (uniformati)
+csharp_style_expression_bodied_accessors = false:suggestion
 csharp_style_expression_bodied_constructors = false:suggestion
-csharp_style_expression_bodied_indexers = true:suggestion
-csharp_style_expression_bodied_lambdas = true:suggestion
+csharp_style_expression_bodied_indexers = false:suggestion
+csharp_style_expression_bodied_lambdas = false:suggestion
 csharp_style_expression_bodied_local_functions = false:suggestion
 csharp_style_expression_bodied_methods = false:suggestion
 csharp_style_expression_bodied_operators = false:suggestion
-csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_properties = false:suggestion
 
 # Preferenze per criteri di ricerca
 csharp_style_pattern_matching_over_as_with_null_check = true
 csharp_style_pattern_matching_over_is_with_cast_check = true
 csharp_style_prefer_extended_property_pattern = true
 csharp_style_prefer_not_pattern = true
-csharp_style_prefer_pattern_matching = false:suggestion
+csharp_style_prefer_pattern_matching = true:suggestion
 csharp_style_prefer_switch_expression = true
+
+# Preferenze per namespace
+csharp_style_namespace_declarations = file_scoped:suggestion
 
 # Preference per controllo valori Null
 csharp_style_conditional_delegate_call = true
@@ -125,10 +124,9 @@ csharp_style_prefer_readonly_struct = true
 csharp_style_prefer_readonly_struct_member = true
 
 # Preferenze per blocchi di codice
-csharp_prefer_braces = true:warning
+csharp_prefer_braces = true:suggestion
 csharp_prefer_simple_using_statement = true
 csharp_prefer_system_threading_lock = true
-csharp_style_namespace_declarations = file_scoped:suggestion
 csharp_style_prefer_method_group_conversion = true:suggestion
 csharp_style_prefer_primary_constructors = true
 csharp_style_prefer_simple_property_accessors = true
@@ -152,7 +150,7 @@ csharp_style_unused_value_assignment_preference = discard_variable:silent
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # Preferenze per direttive 'using'
-csharp_using_directive_placement = outside_namespace:suggestion
+csharp_using_directive_placement = outside_namespace:warning
 
 # Preferenze per nuova riga
 csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false
@@ -160,8 +158,6 @@ csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimenta
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false
 csharp_style_allow_embedded_statements_on_same_line_experimental = false
-
-
 
 #### REGOLE DI FORMATTAZIONE C# ####
 
@@ -210,8 +206,6 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-
-
 #### STILI DI DENOMINAZIONE PERSONALIZZATI ####
 
 # DEFINIZIONE DEGLI STILI 
@@ -237,8 +231,6 @@ dotnet_naming_style.stile_camel_case.capitalization = camel_case
 # Stile UPPER_CASE (Costanti)
 dotnet_naming_style.stile_costanti.capitalization = all_upper
 dotnet_naming_style.stile_costanti.word_separator = _
-
-
 
 # DEFINIZIONE DEI SIMBOLI
 
@@ -269,8 +261,6 @@ dotnet_naming_symbols.simboli_locali_e_parametri.applicable_kinds = parameter, l
 # Tutto ciò che è pubblico o strutturale
 dotnet_naming_symbols.simboli_tutto_il_resto.applicable_kinds = class, struct, enum, property, event, delegate, namespace
 dotnet_naming_symbols.simboli_tutto_il_resto.applicable_accessibilities = *
-
-
 
 # APPLICAZIONE DELLE REGOLE
 

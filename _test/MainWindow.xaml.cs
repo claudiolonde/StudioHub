@@ -17,11 +17,8 @@ public partial class MainView {
         }
     }
     private void button_Click(object sender, RoutedEventArgs e) {
-        EditUserView w = new();
-        w.ShowDialog();
-        
-        return;
         ManageWordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
+        return;
     }
 
 }

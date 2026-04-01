@@ -45,4 +45,5 @@ public partial class ManageWordTemplatesView {
         };
         w.Show();
     }
+
 }

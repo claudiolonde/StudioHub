@@ -1,148 +1,214 @@
+using System;
 using System.Collections.ObjectModel;
-using System.Windows;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows; // Per MessageBox semplice, sostituibile con dialog custom
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Office.Interop.Word;
+using StudioHub.Models;
+using StudioHub.Services;
 
 namespace StudioHub.ViewModels;
 
 public partial class ManageWordTemplatesViewModel : ObservableObject {
+    private readonly ManageWordTemplatesService _templateService;
+    private CancellationTokenSource? _wordCancellationTokenSource;
 
-    public static string Title => "Gestione modelli Word";
-    public string Path {
-        get; set;
+    // Lista master nascosta per mantenere tutti i dati in memoria
+    private List<WordTemplate> _allTemplates = [];
+
+    // Lista bindata alla ListBox
+    [ObservableProperty]
+    private ObservableCollection<WordTemplate> _filteredTemplates = [];
+
+    // Bindato alla TextBox di ricerca. Quando cambia, innesca il filtro.
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    // Bindato al TextBlock per mostrare "X su Y elementi"
+    [ObservableProperty]
+    private string _itemsCountText = "0 su 0 elementi";
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DuplicateCommand))]
+    [NotifyCanExecuteChangedFor(nameof(EditDetailsCommand))]
+    [NotifyCanExecuteChangedFor(nameof(EditContentCommand))]
+    private WordTemplate? _selectedTemplate;
+
+    [ObservableProperty]
+    private bool _isBusy;
+
+    [ObservableProperty]
+    private string _statusMessage = string.Empty;
+
+    public Action<WordTemplate>? ShowEditDetailsDialog { get; set; }
+    public Action? ShowNewTemplateDialog { get; set; }
+
+    public ManageWordTemplatesViewModel() {
+        _templateService = new ManageWordTemplatesService();
     }
 
-    [ObservableProperty]
-    private string _filterText = string.Empty;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TotalTemplatesCount))]
-    private IEnumerable<string> _totalTemplates = [];
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(FilteredTemplatesCount))]
-    private ObservableCollection<string> _filteredTemplates = [];
-
-    public int TotalTemplatesCount => TotalTemplates?.Count() ?? 0;
-
-    public int FilteredTemplatesCount => FilteredTemplates?.Count ?? 0;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(
-        nameof(EditTemplateCommand),
-        nameof(CloneTemplateCommand),
-        nameof(RenameTemplateCommand),
-        nameof(DeleteTemplateCommand))]
-    private string? _selectedTemplate = null;
-
-    public ManageWordTemplatesViewModel(string path, string[] headers) {
-        Path = path;
-        TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
-        applyFilter();
+    [RelayCommand]
+    private async System.Threading.Tasks.Task LoadTemplatesAsync() {
+        IsBusy = true;
+        StatusMessage = "Caricamento modelli in corso...";
+        try {
+            _allTemplates = await _templateService.GetAllTemplatesAsync();
+            ApplyFilter(); // Popola la UI la prima volta
+        }
+        catch (Exception ex) {
+            MessageBox.Show($"Errore durante il caricamento: {ex.Message}", "Errore");
+        }
+        finally {
+            IsBusy = false;
+        }
+    }
+    // Hook generato da CommunityToolkit per reagire al cambio di SearchText
+    partial void OnSearchTextChanged(string value) {
+        ApplyFilter();
     }
 
-    /// <summary>
-    /// Filtra la collezione dei modelli in base al testo inserito dall'utente. Aggiorna la proprietà
-    /// <see cref="FilteredTemplates"/> per il data binding con la UI.
-    /// </summary>
-    private void applyFilter() {
-        // Gestione del caso in cui il filtro sia vuoto o composto da soli spazi bianchi
-        if (string.IsNullOrWhiteSpace(FilterText)) {
-            // Se TotalTemplates è null, inizializza una collezione vuota tramite collection expression
-            FilteredTemplates = TotalTemplates is null
-                                ? []
-                                : new ObservableCollection<string>(TotalTemplates);
+    private void ApplyFilter() {
+        if (string.IsNullOrWhiteSpace(SearchText)) {
+            FilteredTemplates = new ObservableCollection<WordTemplate>(_allTemplates);
         }
         else {
-            // Normalizzazione della stringa di ricerca per un confronto case-insensitive
-            string filter = FilterText.Trim().ToLowerInvariant();
+            var lowerSearch = SearchText.ToLowerInvariant();
+            var filtered = _allTemplates.Where(t =>
+                t.Name.ToLowerInvariant().Contains(lowerSearch) ||
+                t.Description.ToLowerInvariant().Contains(lowerSearch));
 
-            // Filtraggio della collezione tramite LINQ basato sulla presenza della sottostringa
-            FilteredTemplates = TotalTemplates is null
-                                ? []
-                                : new ObservableCollection<string>(
-                                    TotalTemplates.Where(t => t != null && t.Contains(filter, StringComparison.InvariantCultureIgnoreCase))
-                                    );
-        }
-    }
-
-    partial void OnFilterTextChanged(string value) {
-        applyFilter();
-    }
-
-    [RelayCommand()]
-    public void NewTemplate() {
-    }
-
-    private bool canModifyTemplate() {
-        return !string.IsNullOrWhiteSpace(SelectedTemplate);
-    }
-
-    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
-    public void EditTemplate() {
-    }
-
-    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
-    public void CloneTemplate() {
-
-    }
-
-    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
-    public void RenameTemplate() {
-    }
-
-    /// <summary>
-    /// Comando per l'eliminazione logica del modello selezionato. Sposta il file in una cartella di backup (trash)
-    /// rinominandolo con un timestamp.
-    /// </summary>
-    [RelayCommand(CanExecute = nameof(canModifyTemplate))]
-    public void DeleteTemplate() {
-
-        // Visualizza dialogo di conferma; se l'utente seleziona "Annulla" (indice 0), interrompe l'esecuzione
-        MessageBoxResult result = MessageBox.Show(
-            $"Eliminare il modello selezionato:\n{SelectedTemplate}",
-            "Gestione modelli Word",
-            MessageBoxButton.OKCancel,
-            MessageBoxImage.Warning
-        );
-        if (result == MessageBoxResult.OK) {
-            return;
+            FilteredTemplates = new ObservableCollection<WordTemplate>(filtered);
         }
 
-        // Verifica esistenza del file sorgente nel path specificato
-        string sourceFilename = System.IO.Path.Combine(Path, SelectedTemplate!);
-        if (!System.IO.File.Exists(sourceFilename)) {
-            return;
-        }
+        UpdateCountText();
+    }
 
-        // Gestione della cartella cestino: creazione e impostazione attributo Hidden se non esistente
-        string trashPath = System.IO.Path.Combine(Path, Hub.TrashFolderName);
-        if (!System.IO.Directory.Exists(trashPath)) {
-            System.IO.DirectoryInfo directoryInfo = System.IO.Directory.CreateDirectory(trashPath);
-            directoryInfo.Attributes |= System.IO.FileAttributes.Hidden;
-        }
+    private void UpdateCountText() {
+        ItemsCountText = $"{FilteredTemplates.Count} su {_allTemplates.Count} elementi";
+    }
 
-        // Generazione del nuovo nome file con prefisso temporale per evitare collisioni
-        string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_");
-        string newFilename = $"{timeStamp}{SelectedTemplate}";
+    [RelayCommand]
+    private async System.Threading.Tasks.Task NewTemplateAsync() {
+        // Il flusso "Nuovo" è complesso (Word -> poi Dettagli). 
+        // In base al manifesto, apriamo prima il flusso Word, poi se va a buon fine
+        // chiederemo all'utente nome e descrizione.
+        IsBusy = true;
+        StatusMessage = "Avvio di Word per il nuovo modello...";
+        _wordCancellationTokenSource = new CancellationTokenSource();
 
         try {
-            // Esegue lo spostamento fisico del file verso la cartella trash
-            System.IO.File.Move(sourceFilename, System.IO.Path.Combine(trashPath, newFilename));
+            // Questa chiamata bloccherà (asincronamente) finché Word non viene chiuso
+            var newTemplateData = await _templateService.CreateNewTemplateContentAsync(_wordCancellationTokenSource.Token);
 
-            // Aggiorna la collezione dei template visibili e applica i filtri correnti alla UI
-            TotalTemplates = IO.GetVisibleFileNames(Path, "*.doc;*.docx");
-            applyFilter();
+            // Se arriviamo qui, Word è stato chiuso e salvato correttamente
+            // Mostriamo il dialog per i dettagli finali (Nome/Descrizione)
+            ShowNewTemplateDialog?.Invoke();
 
+            // Dopo il dialog, ricarichiamo la lista
+            await LoadTemplatesAsync();
         }
-        catch (System.IO.IOException) {
-            // Gestione errore in caso di file lock (es. documento aperto in Microsoft Word)
-            MessageBox.Show(
-                "Impossibile eliminare il modello, assicurati che non sia aperto in Word.",
-                "Gestione modelli Word",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
-            );
+        catch (OperationCanceledException) {
+            // Utente ha annullato il flusso Word
+        }
+        catch (Exception ex) {
+            MessageBox.Show($"Errore in Word: {ex.Message}", "Errore");
+        }
+        finally {
+            IsBusy = false;
         }
     }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
+    private async System.Threading.Tasks.Task EditContentAsync() {
+        if (SelectedTemplate == null) return;
+
+        IsBusy = true;
+        StatusMessage = $"Modifica contenuto di '{SelectedTemplate.Name}' in Word...";
+        _wordCancellationTokenSource = new CancellationTokenSource();
+
+        try {
+            var updatedContent = await _templateService.EditTemplateContentAsync(
+                SelectedTemplate.Id,
+                SelectedTemplate.FileContent,
+                _wordCancellationTokenSource.Token);
+
+            // Aggiorniamo il record in memoria
+            SelectedTemplate = SelectedTemplate with { FileContent = updatedContent };
+
+            // Ricarichiamo o notifichiamo l'aggiornamento
+            await LoadTemplatesAsync();
+        }
+        catch (OperationCanceledException) { /* Ignora annullamento */ }
+        catch (Exception ex) {
+            MessageBox.Show($"Errore durante la modifica: {ex.Message}", "Errore");
+        }
+        finally {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
+    private void EditDetails() {
+        if (SelectedTemplate == null) return;
+
+        // Apre il modale per rinominare/cambiare descrizione
+        ShowEditDetailsDialog?.Invoke(SelectedTemplate);
+
+        // Dopo il salvataggio nel modale, potremmo chiamare LoadTemplatesAsync()
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
+    private async System.Threading.Tasks.Task DuplicateAsync() {
+        if (SelectedTemplate == null) return;
+
+        IsBusy = true;
+        StatusMessage = "Duplicazione in corso...";
+
+        try {
+            string newName = $"{SelectedTemplate.Name} - Copia {DateTime.Now:yyyyMMdd_HHmmss}";
+            await _templateService.DuplicateTemplateAsync(SelectedTemplate.Id, newName);
+            await LoadTemplatesAsync();
+        }
+        catch (Exception ex) {
+            MessageBox.Show($"Errore durante la duplicazione: {ex.Message}", "Errore");
+        }
+        finally {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
+    private async System.Threading.Tasks.Task DeleteAsync() {
+        if (SelectedTemplate == null) return;
+
+        var result = MessageBox.Show($"Sei sicuro di voler eliminare il modello '{SelectedTemplate.Name}'?",
+                                     "Conferma", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+        if (result == MessageBoxResult.Yes) {
+            IsBusy = true;
+            StatusMessage = "Eliminazione in corso...";
+            try {
+                await _templateService.DeleteTemplateAsync(SelectedTemplate.Id);
+                await LoadTemplatesAsync();
+            }
+            catch (Exception ex) {
+                MessageBox.Show($"Errore durante l'eliminazione: {ex.Message}", "Errore");
+            }
+            finally {
+                IsBusy = false;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void CancelWordOperation() {
+        // Se l'utente preme il bottone "Annulla" sull'overlay
+        _wordCancellationTokenSource?.Cancel();
+    }
+
+    private bool CanExecuteIfSelected() => SelectedTemplate != null;
 }

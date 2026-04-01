@@ -10,7 +10,7 @@ namespace StudioHub.Services;
 /// 4.2 del manifesto. DIPENDENZE: Microsoft.Office.Interop.Word (COM), .NET 10, C# 14. NOTA: Non usa Dependency
 /// Injection — istanziato direttamente dal ViewModel.
 /// </summary>
-public sealed class ManageWordTemplateService : IDisposable {
+public sealed class ClaudeSonnet : IDisposable {
 
     // -------------------------------------------------------------------------
     // Stato interno

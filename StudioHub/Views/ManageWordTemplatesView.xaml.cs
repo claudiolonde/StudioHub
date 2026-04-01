@@ -39,7 +39,7 @@ public partial class ManageWordTemplatesView {
             return;
         }
 
-        ManageWordTemplatesViewModel vm = new(appPath, headers);
+        ManageWordTemplatesViewModel vm = new();
         ManageWordTemplatesView w = new() {
             DataContext = vm
         };

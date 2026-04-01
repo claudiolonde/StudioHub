@@ -49,13 +49,22 @@
                 Command="{Binding NewTemplateCommand}"
                 />
 
-            <!--  Modifica  -->
+            <!--  Modifica dettagli  -->
             <ui:Button
-                Icon="{ui:SymbolIcon Symbol=Edit16}"
-                Content="Modifica"
+                Icon="{ui:SymbolIcon Symbol=Rename16}"
+                Content="Modifica dettagli"
                 Margin="30 0 0 0"
                 Appearance="Transparent"
-                Command="{Binding EditTemplateCommand}"
+                Command="{Binding EditDetailsCommand}"
+                />
+
+            <!--  Modifica contenuto  -->
+            <ui:Button
+                Icon="{ui:SymbolIcon Symbol=Edit16}"
+                Content="Modifica modello"
+                Margin="15 0 0 0"
+                Appearance="Transparent"
+                Command="{Binding EditContentCommand}"
                 />
 
             <!--  Duplica  -->
@@ -64,16 +73,7 @@
                 Content="Duplica"
                 Margin="15 0 0 0"
                 Appearance="Transparent"
-                Command="{Binding CloneTemplateCommand}"
-                />
-
-            <!--  Rinomina  -->
-            <ui:Button
-                Icon="{ui:SymbolIcon Symbol=Rename16}"
-                Content="Rinomina"
-                Margin="15 0 0 0"
-                Appearance="Transparent"
-                Command="{Binding RenameTemplateCommand}"
+                Command="{Binding DuplicateCommand}"
                 />
 
             <!--  Elimina  -->
@@ -81,7 +81,7 @@
                 Icon="{ui:SymbolIcon Symbol=Delete16}"
                 Content="Elimina"
                 Margin="30 0 30 0"
-                Command="{Binding DeleteTemplateCommand}"
+                Command="{Binding DeleteCommand}"
                 Focusable="False"
                 >
                 <ui:Button.Style>
@@ -115,9 +115,6 @@
             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.ScrollUnit="Pixel"
             >
-            <ListBoxItem Content="Claudio"/>
-            <ListBoxItem Content="Sandro"/>
-            <ListBoxItem Content="Nicholas"/>
         </ListBox>
 
         <!--  infobar  -->

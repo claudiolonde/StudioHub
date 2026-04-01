@@ -3,7 +3,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Wpf.Ui.Controls;
 
-namespace StudioHub.Views;
+namespace StudioHub;
 
 /// <summary>
 /// Definisce il tipo visivo del dialogo, determinando l'icona e il colore del badge.

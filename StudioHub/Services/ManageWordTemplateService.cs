@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Office.Interop.Word;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StudioHub.Services;
 
@@ -26,7 +20,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     private Document? _document;
     private string? _tempFolder;
     private string? _docPath;
-    private string? _operationGuid;
+    private string? _sessionGuid;
     private bool _disposed;
 
     // Completato dal gestore DocumentBeforeClose quando il GUID corrisponde.
@@ -39,7 +33,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     // Costanti
     // -------------------------------------------------------------------------
 
-    private const string AppName = "StudioHub";
+    private const string APP_NAME = "StudioHub";
     private const string HeadersFile = "headers.tsv";
     private const string NewDocName = "newdoc.docx";
     private const string EditDocName = "modello.docx";
@@ -63,10 +57,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// <param name="cancellationToken">
     /// Token collegato al pulsante Annulla nella finestra modale.
     /// </param>
-    public async Task<bool> StartAndWaitAsync(
-        byte[]? existingDocBytes,
-        string[] fieldHeaders,
-        CancellationToken cancellationToken) {
+    public async Task<bool> StartAndWaitAsync(byte[]? existingDocBytes, string[] fieldHeaders, CancellationToken cancellationToken) {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         _cancellationToken = cancellationToken;
@@ -74,22 +65,20 @@ public sealed class ManageWordTemplateService : IDisposable {
         // ------------------------------------------------------------------
         // 4.1 — Genera GUID e crea cartella temporanea
         // ------------------------------------------------------------------
-        _operationGuid = Guid.NewGuid().ToString("D");
-        _tempFolder = Path.Combine(Path.GetTempPath(), _operationGuid);
+        _sessionGuid = Guid.NewGuid().ToString("D");
+        _tempFolder = Path.Combine(Path.GetTempPath(), _sessionGuid);
         Directory.CreateDirectory(_tempFolder);
 
         try {
-            // --------------------------------------------------------------
-            // 4.1 — Prepara il documento nella cartella temp
-            // --------------------------------------------------------------
+            // prepara il documento nella cartella temp
             _docPath = existingDocBytes is null
-                ? await CreateEmptyDocumentAsync(_tempFolder)
-                : await CopyExistingDocumentAsync(existingDocBytes, _tempFolder);
+                ? await createEmptyDocumentAsync(_tempFolder)
+                : await copyExistingDocumentAsync(existingDocBytes, _tempFolder);
 
             // --------------------------------------------------------------
             // 4.2 — Genera headers.tsv
             // --------------------------------------------------------------
-            string headersTsvPath = GenerateHeadersTsv(_tempFolder, fieldHeaders);
+            string headersTsvPath = generateHeadersTSV(_tempFolder, fieldHeaders);
 
             // --------------------------------------------------------------
             // 4.2 — Avvia Word
@@ -102,68 +91,52 @@ public sealed class ManageWordTemplateService : IDisposable {
             // Disabilita AutoSave (OneDrive) per impedire salvataggi fuori cartella.
             // Nota: AutoSaveOn è una proprietà di Document, la impostiamo dopo Open().
 
-            // --------------------------------------------------------------
-            // 4.2 — Apre il documento
-            // --------------------------------------------------------------
+            // apre il documento
             _document = _wordApp.Documents.Open(
                 FileName: _docPath,
                 ConfirmConversions: false,
                 ReadOnly: false,
                 AddToRecentFiles: false);
 
-            // Impedisce il salvataggio automatico su OneDrive / SharePoint.
+            // impedisce il salvataggio automatico su OneDrive / SharePoint.
             _document.AutoSaveOn = false;
 
-            // --------------------------------------------------------------
-            // 4.2 — Inietta variabile con il GUID dell'operazione
-            // --------------------------------------------------------------
-            _document.Variables[AppName].Value = _operationGuid;
+            // inietta variabile con il GUID dell'operazione
+            _document.Variables[APP_NAME].Value = _sessionGuid;
 
-            // --------------------------------------------------------------
-            // 4.2 — Associa headers.tsv come origine dati mail merge
-            // --------------------------------------------------------------
+            // associa headers.tsv come origine dati mail merge
             _document.MailMerge.OpenDataSource(
                 Name: headersTsvPath,
                 ConfirmConversions: false,
                 ReadOnly: true,
                 LinkToSource: false);
 
-            // Salva per rendere persistenti variabile e mail merge.
+            // salva per rendere persistenti variabile e mail merge.
             _document.Save();
 
-            // --------------------------------------------------------------
-            // 4.2 — Iscrive gli eventi globali dell'applicazione Word
-            // --------------------------------------------------------------
-            _wordApp.DocumentBeforeSave += OnDocumentBeforeSave;
-            _wordApp.DocumentBeforeClose += OnDocumentBeforeClose;
+            // iscrive gli eventi globali dell'applicazione Word
+            _wordApp.DocumentBeforeSave += onDocumentBeforeSave;
+            _wordApp.DocumentBeforeClose += onDocumentBeforeClose;
 
-            // --------------------------------------------------------------
-            // 4.2 — Prepara il TCS prima di rendere Word visibile
-            // --------------------------------------------------------------
+            // prepara il TCS prima di rendere Word visibile
             _closeTcs = new TaskCompletionSource<bool>(
                 TaskCreationOptions.RunContinuationsAsynchronously);
 
-            // Registra la cancellazione: se l'utente preme Annulla,
-            // il documento viene chiuso forzatamente (Ramo B).
-            cancellationToken.Register(HandleCancellation, useSynchronizationContext: true);
+            // registra la cancellazione: se l'utente preme Annulla, il documento viene chiuso forzatamente
+            cancellationToken.Register(handleCancellation, useSynchronizationContext: true);
 
-            // --------------------------------------------------------------
-            // 4.2 — Rende Word visibile e in primo piano
-            // --------------------------------------------------------------
+            // rende Word visibile e in primo piano
             _wordApp.Visible = true;
             _wordApp.Activate();
 
-            // --------------------------------------------------------------
-            // Attesa asincrona: si sblocca su BeforeClose (Ramo A)
-            // o su cancellazione (Ramo B).
-            // --------------------------------------------------------------
+            // Attesa asincrona: si sblocca su BeforeClose o su cancellazione
             bool completedNormally = await _closeTcs.Task;
             return completedNormally;
         }
         catch {
             // Qualsiasi eccezione durante la preparazione: pulizia e rethrow.
-            CleanupComObjects();
-            DeleteTempFolder();
+            cleanupComObjects();
+            deleteTempFolder();
             throw;
         }
     }
@@ -175,22 +148,19 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// <summary>
     /// Punto 4.2.12 — DocumentBeforeSave. Impedisce "Salva con nome" verificando che il percorso non cambi.
     /// </summary>
-    private void OnDocumentBeforeSave(
+    private void onDocumentBeforeSave(
         Document doc,
         ref bool saveAsUi,
         ref bool cancel) {
-        // Se l'utente ha aperto il dialogo "Salva con nome", annulliamo.
+        // se l'utente ha aperto il dialogo "Salva con nome", annulliamo.
         if (saveAsUi) {
             cancel = true;
 
-            // Messaggio su thread UI tramite Dispatcher.
-            System.Windows.Application.Current?.Dispatcher.Invoke(() =>
-                System.Windows.MessageBox.Show(
-                    "Usa il pulsante Salva nell'applicazione al termine della modifica.\n" +
-                    "Il salvataggio con nome non è consentito.",
-                    AppName,
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Information));
+            // messaggio su thread UI tramite Dispatcher.
+            System.Windows.Application.Current?.Dispatcher.Invoke(() => {
+                Dialog.Show(DialogType.Info, APP_NAME,
+                "Usa il pulsante Salva nell'applicazione al termine della modifica.\nIl salvataggio con nome non è consentito.");
+            });
             return;
         }
 
@@ -204,18 +174,14 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// Punto 4.2.12 — DocumentBeforeClose. Completa il TCS solo se la variabile GUID corrisponde all'operazione
     /// corrente.
     /// </summary>
-    private void OnDocumentBeforeClose(Document doc, ref bool cancel) {
-        // Verifica GUID: ignora chiusure di altri documenti aperti in Word.
+    private void onDocumentBeforeClose(Document doc, ref bool cancel) {
+        // verifica GUID: ignora chiusure di altri documenti aperti in Word.
         string? docGuid = null;
-        try {
-            docGuid = doc.Variables[AppName]?.Value;
-        }
-        catch {
-            // La variabile potrebbe non esistere (documento diverso): ignora.
-        }
+        try { docGuid = doc.Variables[APP_NAME]?.Value; } catch { }
 
-        if (!string.Equals(docGuid, _operationGuid, StringComparison.Ordinal))
+        if (!string.Equals(docGuid, _sessionGuid, StringComparison.Ordinal)) {
             return;
+        }
 
         // Completa il TCS sul thread di sincronizzazione UI.
         // I cleanup COM avvengono DOPO (punto 4.4), non qui.
@@ -229,7 +195,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// <summary>
     /// Invocato quando il CancellationToken viene cancellato (pulsante Annulla).
     /// </summary>
-    private void HandleCancellation() {
+    private void handleCancellation() {
         if (_document is null || _wordApp is null) {
             _closeTcs?.TrySetResult(false);
             return;
@@ -237,18 +203,16 @@ public sealed class ManageWordTemplateService : IDisposable {
 
         try {
             // Rimuove gli handler prima di chiudere per evitare rientri.
-            _wordApp.DocumentBeforeSave -= OnDocumentBeforeSave;
-            _wordApp.DocumentBeforeClose -= OnDocumentBeforeClose;
+            _wordApp.DocumentBeforeSave -= onDocumentBeforeSave;
+            _wordApp.DocumentBeforeClose -= onDocumentBeforeClose;
 
             _document.Close(SaveChanges: WdSaveOptions.wdDoNotSaveChanges);
             _wordApp.Quit(SaveChanges: WdSaveOptions.wdDoNotSaveChanges);
         }
-        catch {
-            // Word potrebbe già essere chiuso o in stato inconsistente.
-        }
+        catch { }
         finally {
-            CleanupComObjects();
-            DeleteTempFolder();
+            cleanupComObjects();
+            deleteTempFolder();
             _closeTcs?.TrySetResult(false);
         }
     }
@@ -261,18 +225,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// Crea un documento Word vuoto nella cartella temp senza aprire Word. Usa una copia del Normal.dotm come base
     /// minima.
     /// </summary>
-    private static Task<string> CreateEmptyDocumentAsync(string folder) {
-        // Per creare un .docx vuoto senza avviare Word anticipatamente,
-        // usiamo un template OOXML minimale embedded come risorsa,
-        // oppure – più semplice – lasciamo che sia Word stesso a crearlo
-        // tramite Documents.Add() durante la fase di apertura.
-        //
-        // Qui restituiamo il percorso atteso; la creazione effettiva
-        // avverrà tramite Documents.Add() in StartAndWaitAsync se il file
-        // non esiste ancora (Documents.Open solleva se il file manca).
-        //
-        // ALTERNATIVA consigliata: incorporare un template OOXML minimo
-        // come risorsa embedded e scriverlo con File.WriteAllBytes.
+    private static Task<string> createEmptyDocumentAsync(string folder) {
         string path = Path.Combine(folder, NewDocName);
         return System.Threading.Tasks.Task.FromResult(path);
     }
@@ -280,9 +233,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// <summary>
     /// Scrive i byte del documento esistente nella cartella temp.
     /// </summary>
-    private static async Task<string> CopyExistingDocumentAsync(
-        byte[] docBytes,
-        string folder) {
+    private static async Task<string> copyExistingDocumentAsync(byte[] docBytes, string folder) {
         string path = Path.Combine(folder, EditDocName);
         await File.WriteAllBytesAsync(path, docBytes);
         return path;
@@ -291,25 +242,20 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// <summary>
     /// Genera il file headers.tsv con le sole intestazioni dei campi, separate da tabulazione, su una singola riga.
     /// </summary>
-    private static string GenerateHeadersTsv(string folder, string[] headers)
-    {
-        string tsvPath    = Path.Combine(folder, HeadersFile);
+    private static string generateHeadersTSV(string folder, string[] headers) {
+        string tsvPath = Path.Combine(folder, HeadersFile);
         string schemaPath = Path.Combine(folder, "schema.ini");
- 
+
         File.WriteAllText(tsvPath, string.Join('\t', headers), System.Text.Encoding.UTF8);
- 
-        // schema.ini istruisce il driver Jet/ODBC a leggere il TSV in UTF-8,
-        // necessario per nomi di campo con caratteri accentati (italiano).
-        // Il file schema.ini stesso deve essere scritto in ASCII puro.
         File.WriteAllText(schemaPath,
-            $"""
+           $"""
             [{HeadersFile}]
             Format=TabDelimited
             CharacterSet=65001
             ColNameHeader=True
             """,
-            System.Text.Encoding.ASCII);
- 
+           System.Text.Encoding.ASCII);
+
         return tsvPath;
     }
 
@@ -321,7 +267,7 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// Rilascia tutti i riferimenti COM in modo esplicito. Deve essere chiamato dopo aver già invocato Document.Close()
     /// e Application.Quit().
     /// </summary>
-    private void CleanupComObjects() {
+    private void cleanupComObjects() {
         if (_document is not null) {
             Marshal.ReleaseComObject(_document);
             _document = null;
@@ -342,9 +288,10 @@ public sealed class ManageWordTemplateService : IDisposable {
     /// Elimina la cartella temporanea con tutti i file creati durante l'operazione. In caso di lock residui, fa un
     /// singolo tentativo silenzioso. La logica di retry completa con dialog è nel ViewModel (punto 4.5).
     /// </summary>
-    private void DeleteTempFolder() {
-        if (_tempFolder is null || !Directory.Exists(_tempFolder))
+    private void deleteTempFolder() {
+        if (_tempFolder is null || !Directory.Exists(_tempFolder)) {
             return;
+        }
 
         try {
             Directory.Delete(_tempFolder, recursive: true);
@@ -368,20 +315,14 @@ public sealed class ManageWordTemplateService : IDisposable {
         }
 
         // Rimuove handler prima di chiudere.
-        try { _wordApp.DocumentBeforeSave -= OnDocumentBeforeSave; } catch { }
-        try { _wordApp.DocumentBeforeClose -= OnDocumentBeforeClose; } catch { }
+        try { _wordApp.DocumentBeforeSave -= onDocumentBeforeSave; } catch { }
+        try { _wordApp.DocumentBeforeClose -= onDocumentBeforeClose; } catch { }
 
-        try {
-            // Punto 4.4.15 — rimuove variabile dell'operazione.
-            _document.Variables[AppName].Delete();
-        }
-        catch { /* Già rimossa o documento in stato inconsistente. */ }
+        // rimuove variabile dell'operazione.
+        try { _document.Variables[APP_NAME].Delete(); } catch { }
 
-        try {
-            // Punto 4.4.15 — rimuove associazione mail merge.
-            _document.MailMerge.MainDocumentType = WdMailMergeMainDocType.wdNotAMergeDocument;
-        }
-        catch { }
+        // rimuove associazione mail merge.
+        try { _document.MailMerge.MainDocumentType = WdMailMergeMainDocType.wdNotAMergeDocument; } catch { }
 
         try {
             _document.Close(SaveChanges: WdSaveOptions.wdDoNotSaveChanges);
@@ -389,7 +330,7 @@ public sealed class ManageWordTemplateService : IDisposable {
         }
         catch { }
         finally {
-            CleanupComObjects();
+            cleanupComObjects();
         }
     }
 
@@ -398,21 +339,28 @@ public sealed class ManageWordTemplateService : IDisposable {
     // -------------------------------------------------------------------------
 
     /// <summary>Percorso del file .docx nella cartella temp.</summary>
-    public string? DocumentPath => _docPath;
+    public string? DocumentPath {
+        get { return _docPath; }
+    }
 
     /// <summary>Percorso della cartella temporanea corrente.</summary>
-    public string? TempFolder => _tempFolder;
+    public string? TempFolder {
+        get { return _tempFolder; }
+    }
 
     // -------------------------------------------------------------------------
     // IDisposable
     // -------------------------------------------------------------------------
 
     public void Dispose() {
-        if (_disposed) return;
+        if (_disposed) {
+            return;
+        }
+
         _disposed = true;
 
         // Tenta un cleanup difensivo se il ViewModel non ha chiamato FinalizeWordSession.
         try { FinalizeWordSession(); } catch { }
-        DeleteTempFolder();
+        deleteTempFolder();
     }
 }

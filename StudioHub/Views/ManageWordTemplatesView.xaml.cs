@@ -1,4 +1,3 @@
-using System.IO;
 using System.Windows;
 using StudioHub.ViewModels;
 
@@ -24,6 +23,7 @@ public partial class ManageWordTemplatesView {
         ArgumentNullException.ThrowIfNull(headers);
 
         ManageWordTemplatesViewModel vm = new();
+        vm.Initialize(appName, headers);
         ManageWordTemplatesView w = new() {
             DataContext = vm
         };

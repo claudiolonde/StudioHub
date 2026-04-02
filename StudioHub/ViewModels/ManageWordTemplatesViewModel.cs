@@ -1,33 +1,26 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows; // Per MessageBox semplice, sostituibile con dialog custom
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Office.Interop.Word;
-using StudioHub.Models;
-using StudioHub.Services;
 
 namespace StudioHub.ViewModels;
 
 public partial class ManageWordTemplatesViewModel : ObservableObject {
+
     private readonly ManageWordTemplatesService _templateService;
     private CancellationTokenSource? _wordCancellationTokenSource;
 
-    // Lista master nascosta per mantenere tutti i dati in memoria
+    private string _targetApp;
+    private string[] _appHeaders;
+
     private List<WordTemplate> _allTemplates = [];
 
-    // Lista bindata alla ListBox
     [ObservableProperty]
     private ObservableCollection<WordTemplate> _filteredTemplates = [];
 
-    // Bindato alla TextBox di ricerca. Quando cambia, innesca il filtro.
     [ObservableProperty]
     private string _searchText = string.Empty;
 
-    // Bindato al TextBlock per mostrare "X su Y elementi"
     [ObservableProperty]
     private string _itemsCountText = "0 su 0 elementi";
 
@@ -44,20 +37,35 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    // Modificato Action per passare anche il contenuto binario appena generato (in caso di Nuovo)
     public Action<WordTemplate>? ShowEditDetailsDialog { get; set; }
-    public Action? ShowNewTemplateDialog { get; set; }
+    public Action<byte[]>? ShowNewTemplateDialog { get; set; }
 
+    // [FIX 2] Aggiunti i parametri al costruttore per ricevere il contesto dall'App chiamante
     public ManageWordTemplatesViewModel() {
         _templateService = new ManageWordTemplatesService();
+        _targetApp = string.Empty;
+        _appHeaders = [];
+        // In design time, le liste possono essere pre-popolate per vedere come appare la UI
     }
 
+    public void Initialize(string targetApp, string[] appHeaders) {
+        ArgumentException.ThrowIfNullOrEmpty(targetApp);
+        ArgumentNullException.ThrowIfNull(appHeaders);
+        _targetApp = targetApp;
+        _appHeaders = appHeaders;
+    }
+
+    // 3. Metodo separato per il caricamento dati (chiamato ad esempio nell'evento Loaded della View)
     [RelayCommand]
-    private async System.Threading.Tasks.Task LoadTemplatesAsync() {
+    private async Task LoadTemplatesAsync() {
+        if (_targetApp == null) return; // Sicurezza: se non è stato fatto il Setup, non carica
+
         IsBusy = true;
         StatusMessage = "Caricamento modelli in corso...";
         try {
             _allTemplates = await _templateService.GetAllTemplatesAsync();
-            ApplyFilter(); // Popola la UI la prima volta
+            ApplyFilter();
         }
         catch (Exception ex) {
             MessageBox.Show($"Errore durante il caricamento: {ex.Message}", "Errore");
@@ -66,7 +74,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
             IsBusy = false;
         }
     }
-    // Hook generato da CommunityToolkit per reagire al cambio di SearchText
+
     partial void OnSearchTextChanged(string value) {
         ApplyFilter();
     }
@@ -92,28 +100,24 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     [RelayCommand]
-    private async System.Threading.Tasks.Task NewTemplateAsync() {
-        // Il flusso "Nuovo" è complesso (Word -> poi Dettagli). 
-        // In base al manifesto, apriamo prima il flusso Word, poi se va a buon fine
-        // chiederemo all'utente nome e descrizione.
+    private async Task NewTemplateAsync() {
         IsBusy = true;
         StatusMessage = "Avvio di Word per il nuovo modello...";
         _wordCancellationTokenSource = new CancellationTokenSource();
 
         try {
-            // Questa chiamata bloccherà (asincronamente) finché Word non viene chiuso
-            var newTemplateData = await _templateService.CreateNewTemplateContentAsync(_wordCancellationTokenSource.Token);
+            // [FIX 1] Passiamo le intestazioni dell'app e 'null' come contenuto esistente
+            var newTemplateContent = await _templateService.EditTemplateContentAsync(
+                _appHeaders,
+                null,
+                _wordCancellationTokenSource.Token);
 
-            // Se arriviamo qui, Word è stato chiuso e salvato correttamente
-            // Mostriamo il dialog per i dettagli finali (Nome/Descrizione)
-            ShowNewTemplateDialog?.Invoke();
+            // Passiamo il file generato alla UI per completare il salvataggio con Nome/Descrizione
+            ShowNewTemplateDialog?.Invoke(newTemplateContent);
 
-            // Dopo il dialog, ricarichiamo la lista
             await LoadTemplatesAsync();
         }
-        catch (OperationCanceledException) {
-            // Utente ha annullato il flusso Word
-        }
+        catch (OperationCanceledException) { /* Ignora annullamento utente */ }
         catch (Exception ex) {
             MessageBox.Show($"Errore in Word: {ex.Message}", "Errore");
         }
@@ -123,26 +127,36 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
-    private async System.Threading.Tasks.Task EditContentAsync() {
+    private async Task EditContentAsync() {
         if (SelectedTemplate == null) return;
+
+        // [FIX 3] Controllo Concorrenza
+        if (SelectedTemplate.Locked) {
+            MessageBox.Show("Il modello è attualmente in uso da un altro utente.", "File Bloccato", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
         IsBusy = true;
         StatusMessage = $"Modifica contenuto di '{SelectedTemplate.Name}' in Word...";
         _wordCancellationTokenSource = new CancellationTokenSource();
 
         try {
+            // [FIX 1] Aggiornata la firma per passare Headers e Content
             var updatedContent = await _templateService.EditTemplateContentAsync(
-                SelectedTemplate.Id,
+                _appHeaders,
                 SelectedTemplate.Content,
                 _wordCancellationTokenSource.Token);
 
-            // Aggiorniamo il record in memoria
-            SelectedTemplate = SelectedTemplate with { Content = updatedContent };
+            SelectedTemplate = SelectedTemplate with {
+                Content = updatedContent,
+                Modified = DateTime.UtcNow
+            };
 
-            // Ricarichiamo o notifichiamo l'aggiornamento
+            // TODO: Qui andrebbe chiamato un ipotetico _templateService.UpdateTemplateAsync(SelectedTemplate)
+
             await LoadTemplatesAsync();
         }
-        catch (OperationCanceledException) { /* Ignora annullamento */ }
+        catch (OperationCanceledException) { }
         catch (Exception ex) {
             MessageBox.Show($"Errore durante la modifica: {ex.Message}", "Errore");
         }
@@ -155,14 +169,17 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     private void EditDetails() {
         if (SelectedTemplate == null) return;
 
-        // Apre il modale per rinominare/cambiare descrizione
-        ShowEditDetailsDialog?.Invoke(SelectedTemplate);
+        // [FIX 3] Controllo Concorrenza
+        if (SelectedTemplate.Locked) {
+            MessageBox.Show("Il modello è attualmente in uso da un altro utente.", "File Bloccato", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
-        // Dopo il salvataggio nel modale, potremmo chiamare LoadTemplatesAsync()
+        ShowEditDetailsDialog?.Invoke(SelectedTemplate);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
-    private async System.Threading.Tasks.Task DuplicateAsync() {
+    private async Task DuplicateAsync() {
         if (SelectedTemplate == null) return;
 
         IsBusy = true;
@@ -182,8 +199,14 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteIfSelected))]
-    private async System.Threading.Tasks.Task DeleteAsync() {
+    private async Task DeleteAsync() {
         if (SelectedTemplate == null) return;
+
+        // [FIX 3] Controllo Concorrenza
+        if (SelectedTemplate.Locked) {
+            MessageBox.Show("Impossibile eliminare: il modello è attualmente in uso.", "File Bloccato", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
         var result = MessageBox.Show($"Sei sicuro di voler eliminare il modello '{SelectedTemplate.Name}'?",
                                      "Conferma", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -206,7 +229,6 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
 
     [RelayCommand]
     private void CancelWordOperation() {
-        // Se l'utente preme il bottone "Annulla" sull'overlay
         _wordCancellationTokenSource?.Cancel();
     }
 

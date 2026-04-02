@@ -46,7 +46,7 @@ public class ManageWordTemplatesService {
     /// (dinamico) e schema.ini.
     /// </summary>
     private async Task<(string TempFolder, string DocPath, string HeadersPath)> PrepareTempEnvironmentAsync(
-        List<string> headers,
+        string[] headers,
         byte[]? existingContent = null) {
 
         var sessionGuid = Guid.NewGuid().ToString();
@@ -68,13 +68,13 @@ public class ManageWordTemplatesService {
         }
 
         // 2. Creazione dinamica di headers.tsv (Regola: Intestazioni + Ritorno a capo + (N-1) TAB)
-        if (headers == null || headers.Count == 0) {
+        if (headers == null || headers.Length == 0) {
             // Fallback base se non vengono fornite intestazioni
             headers = ["Campo1"];
         }
 
         var headerLine = string.Join("\t", headers);
-        var emptyLineTabs = new string('\t', headers.Count - 1);
+        var emptyLineTabs = new string('\t', headers.Length - 1);
         var tsvContent = $"{headerLine}\r\n{emptyLineTabs}";
 
         await File.WriteAllTextAsync(headersPath, tsvContent);
@@ -94,11 +94,11 @@ public class ManageWordTemplatesService {
 
 
     // --- SEZIONE 3: Automazione Word ---
-    /// <summary>
-    /// Avvia Word, attende la chiusura da parte dell'utente e ritorna il file modificato in byte.
-    /// </summary>
+/// <summary>
+/// Avvia Word, attende la chiusura da parte dell'utente e ritorna il file modificato in byte.
+/// </summary>
     public async Task<byte[]> EditTemplateContentAsync(
-        List<string> headers,
+        string[] headers,
         byte[]? existingContent,
         CancellationToken ct) {
         // 1. Salva il contesto di sincronizzazione corrente (thread UI)
@@ -124,18 +124,25 @@ public class ManageWordTemplatesService {
             // Il _tcs verrà completato nell'evento DocumentBeforeClose o tramite l'annullamento
             await _tcs.Task;
 
-            // 6. Pulizia di Word (se non annullato)
+            // 6. Pulizia di Word e Polling (se non annullato)
             if (!_isCanceledByUser) {
                 CleanAndCloseDocument();
 
-                // Opzionale: Se il sistema operativo trattiene ancora il file, 
-                // qui andrebbe il Polling (Step 4) che avevamo messo in pausa.
-                // Per ora assumiamo che sia sbloccato.
+                // --- STEP 4: Polling di Sblocco ---
+                bool isUnlocked = await WaitForFileUnlockAsync(docPath);
+                
+                if (!isUnlocked) {
+                    throw new IOException("Impossibile accedere al file salvato. Il file risulta ancora in uso dal sistema dopo il timeout.");
+                }
+
+                // 7. Leggi il risultato finale (ora è sicuro al 100%)
+                var resultBytes = await File.ReadAllBytesAsync(docPath);
+                return resultBytes;
             }
 
-            // 7. Leggi il risultato finale
-            var resultBytes = await File.ReadAllBytesAsync(docPath);
-            return resultBytes;
+            // Se arriviamo qui, significa che l'utente ha premuto "Annulla"
+            // Restituiamo il contenuto originale (o array vuoto se era un nuovo modello)
+            return existingContent ?? [];
         }
         finally {
             // 8. Rilascia sempre i riferimenti COM ed elimina i file
@@ -144,12 +151,32 @@ public class ManageWordTemplatesService {
         }
     }
 
+    /// <summary>
+    /// Attende che il file venga rilasciato dal sistema operativo o da processi esterni (es. antivirus).
+    /// </summary>
+    private async Task<bool> WaitForFileUnlockAsync(string filePath, int timeoutMs = 5000) {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        while (sw.ElapsedMilliseconds < timeoutMs) {
+            try {
+                // Tenta l'accesso esclusivo. Se non lancia eccezione, il file è libero.
+                using var fs = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                return true; 
+            }
+            catch (IOException) {
+                // Ancora bloccato. Aspetta mezzo secondo.
+                await Task.Delay(500);
+            }
+        }
+        return false; // Timeout raggiunto
+    }
+
     private void CleanAndCloseDocument() {
         if (_wordDoc == null) return;
         try {
             // Disconnette l'origine dati e pulisce la variabile
             _wordDoc.MailMerge.MainDocumentType = Word.WdMailMergeMainDocType.wdNotAMergeDocument;
-            _wordDoc.Variables["MiaApp"].Delete();
+            _wordDoc.Variables["StudioHub"].Delete();
 
             // Salva e chiude
             _wordDoc.Save();
@@ -176,7 +203,7 @@ public class ManageWordTemplatesService {
         _wordDoc = _wordApp.Documents.Open(docPath);
 
         // Inietta la variabile per riconoscere il nostro documento alla chiusura
-        _wordDoc.Variables.Add("MiaApp", _currentSessionGuid);
+        _wordDoc.Variables.Add("StudioHub", _currentSessionGuid);
 
         // Collega il file TSV creato prima per la stampa unione
         _wordDoc.MailMerge.OpenDataSource(headersPath);
@@ -203,7 +230,7 @@ public class ManageWordTemplatesService {
 
         bool isOurDoc = false;
         try {
-            var variable = Doc.Variables["MiaApp"];
+            var variable = Doc.Variables["StudioHub"];
             if (variable != null && variable.Value == _currentSessionGuid) isOurDoc = true;
         }
         catch { /* Variabile mancante, ignoriamo */ }
@@ -257,15 +284,15 @@ public class ManageWordTemplatesService {
         return [];
     }
 
-    public async Task DeleteTemplateAsync(Guid id) {
+    public async Task DeleteTemplateAsync(int id) {
         // Da implementare con RepoDb
     }
 
-    public async Task DuplicateTemplateAsync(Guid id, string newName) {
+    public async Task DuplicateTemplateAsync(int id, string newName) {
         // Da implementare con RepoDb: legge, cambia Id e Nome, salva
     }
 
-    public async Task UpdateTemplateDetailsAsync(Guid id, string newName, string newDescription) {
+    public async Task UpdateTemplateDetailsAsync(int id, string newName, string newDescription) {
         // Da implementare con RepoDb: aggiorna solo Nome e Descrizione
     }
 
@@ -275,7 +302,7 @@ public class ManageWordTemplatesService {
         return null!;
     }
 
-    public async Task<byte[]> EditTemplateContentAsync(Guid templateId, byte[] currentContent, CancellationToken ct) {
+    public async Task<byte[]> EditTemplateContentAsync(int templateId, byte[] currentContent, CancellationToken ct) {
         // Da implementare: ripristina file, avvia Word, attende chiusura, ritorna nuovo binario
         return [];
     }

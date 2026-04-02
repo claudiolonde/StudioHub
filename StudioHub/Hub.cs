@@ -18,9 +18,6 @@ public static class Hub {
 
     // path
     public const string SETTINGS = "Settings";
-    public const string TEMPLATES = "Templates";
-    public const string WORD_TEMPLATES = @"Templates\Microsoft Word";
-    public const string MEETING_WORD_TEMPLATES = @"Templates\Microsoft Word\Meeting";
 
     // filename
     public const string GLOBAL_SETTINGS = "GlobalSettings.json";

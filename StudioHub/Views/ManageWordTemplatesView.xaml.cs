@@ -17,27 +17,11 @@ public partial class ManageWordTemplatesView {
     /// Apre la vista.
     /// </summary>
     /// <remarks>
-    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/>, disabilita l'icona della finestra,
+    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/>.
     /// </remarks>
     public static void Open(string appName, string[] headers) {
         ArgumentException.ThrowIfNullOrWhiteSpace(appName);
         ArgumentNullException.ThrowIfNull(headers);
-
-        if (string.IsNullOrWhiteSpace(DataPath.root)) {
-            Dialog.Show(DialogType.Error,
-                "La cartella dati dell'applicazione non è impostata correttamente.");
-            return;
-        }
-
-        string appPath = Path.Combine(DataPath.TemplateWord, appName);
-        try {
-            _ = Directory.CreateDirectory(appPath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.SecurityException) {
-            Dialog.Show(DialogType.Error,
-                $"Impossibile creare la cartella dati:\n{appPath}.");
-            return;
-        }
 
         ManageWordTemplatesViewModel vm = new();
         ManageWordTemplatesView w = new() {

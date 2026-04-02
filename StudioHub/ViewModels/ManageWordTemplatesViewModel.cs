@@ -133,11 +133,11 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         try {
             var updatedContent = await _templateService.EditTemplateContentAsync(
                 SelectedTemplate.Id,
-                SelectedTemplate.FileContent,
+                SelectedTemplate.Content,
                 _wordCancellationTokenSource.Token);
 
             // Aggiorniamo il record in memoria
-            SelectedTemplate = SelectedTemplate with { FileContent = updatedContent };
+            SelectedTemplate = SelectedTemplate with { Content = updatedContent };
 
             // Ricarichiamo o notifichiamo l'aggiornamento
             await LoadTemplatesAsync();

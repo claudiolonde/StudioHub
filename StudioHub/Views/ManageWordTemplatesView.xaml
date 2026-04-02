@@ -61,7 +61,7 @@
             <!--  Modifica contenuto  -->
             <ui:Button
                 Icon="{ui:SymbolIcon Symbol=Edit16}"
-                Content="Modifica modello"
+                Content="Modifica documento"
                 Margin="15 0 0 0"
                 Appearance="Transparent"
                 Command="{Binding EditContentCommand}"

@@ -4,6 +4,7 @@ namespace StudioHub.Models;
 /// Rappresenta una sorgente dati SQL Server, inclusi parametri di connessione e autenticazione.
 /// </summary>
 internal class DataSource {
+
     /// <summary>
     /// Nome o indirizzo del server SQL.
     /// </summary>
@@ -15,7 +16,7 @@ internal class DataSource {
     public string Instance { get; set; } = string.Empty;
 
     /// <summary>
-    /// Porta TCP del server SQL. Se <see langword="null" /> o 0, viene usata l'istanza.
+    /// Porta TCP del server SQL. Se <c>null</c> o 0, viene usata l'istanza.
     /// </summary>
     public ushort? Port { get; set; } = null;
 
@@ -37,26 +38,26 @@ internal class DataSource {
     /// <summary>
     /// Nome del database principale da utilizzare nella connessione.
     /// </summary>
-    public string PrimaryDb { get; set; } = string.Empty;
+    public string StudioHubDB { get; set; } = string.Empty;
 
     /// <summary>
     /// Nome del database legacy da utilizzare nella connessione.
     /// </summary>
-    public string LegacyDb { get; set; } = string.Empty;
+    public string CityUpDB { get; set; } = string.Empty;
 
     /// <summary>
     /// Genera la stringa di connessione SQL Server in base ai parametri specificati.
     /// </summary>
     /// <param name="ds">Oggetto <see cref="DataSource"/> con i parametri di connessione.</param>
     /// <param name="legacy">
-    /// Se <see langword="true" /> , utilizza <see cref="LegacyDb"/> come database iniziale; altrimenti utilizza
-    /// <see cref="PrimaryDb"/> .
+    /// Se <see langword="true" /> , utilizza <see cref="CityUpDB"/> come database iniziale; altrimenti utilizza
+    /// <see cref="StudioHubDB"/> .
     /// </param>
     /// <returns>Stringa di connessione SQL Server formattata.</returns>
     /// <exception cref="ArgumentNullException">
     /// Se uno dei parametri obbligatori (Server, Instance, UserID, Password) non è valorizzato.
     /// </exception>
-    public static string getConnectionString(DataSource ds, bool legacy = false) {
+    public static string GetConnectionString(DataSource ds, bool legacy = false) {
 
         ArgumentNullException.ThrowIfNullOrWhiteSpace(ds.Server);
 
@@ -81,12 +82,12 @@ internal class DataSource {
         }
 
         if (legacy) {
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(ds.LegacyDb);
-            cs += $"Initial Catalog={ds.LegacyDb};";
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(ds.CityUpDB);
+            cs += $"Initial Catalog={ds.CityUpDB};";
         }
         else {
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(ds.PrimaryDb);
-            cs += $"Initial Catalog={ds.PrimaryDb};";
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(ds.StudioHubDB);
+            cs += $"Initial Catalog={ds.StudioHubDB};";
         }
 
         return cs;

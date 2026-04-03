@@ -5,24 +5,20 @@ namespace StudioHub;
 
 public static class Hub {
 
-    /*
-    MessageBox.Show(
-        "Messaggio.",
-        "Titolo",
-        MessageBoxButton.OK,
-        MessageBoxImage.Error
-    );
-    */
-    #region    Constants  ----------------------------------------------------------------------------------------------------
+    #region    Paths  ----------------------------------------------------------------------------------------------------
 
+    //internal static string root = @"\\SERVER-18\Studio Londe\StudioHub";
+    private static string root = @"D:\FILES\StudioHub";
+    public static string Settings => @$"{root}\settings";
 
-    // path
-    public const string SETTINGS = "Settings";
+    /// <summary>
+    /// Nome completo del file .json che contiene le informazioni di connessione alla sorgente dati e i nomi dei
+    /// database
+    /// </summary>
+    public static string GlobalSettingsJson => @$"{Settings}\GlobalSettings.json";
 
-    // filename
-    public const string GLOBAL_SETTINGS = "GlobalSettings.json";
+    #endregion Paths  ----------------------------------------------------------------------------------------------------
 
-    #endregion Constants  ----------------------------------------------------------------------------------------------------
 
     /// <summary>
     /// Flag che indica se il servizio è stato inizializzato.
@@ -75,22 +71,24 @@ public static class Hub {
             return true;
         }
 
-        //GlobalConfiguration.Setup().UseSqlServer();
-        //mapEntities();
+        GlobalConfiguration.Setup().UseSqlServer();
+        mapEntities();
 
         _isInitialized = true;
         return true;
     }
 
+    /*
+       FluentMapper.Entity<ModelName>()
+           .Table("Schema.TableName")
+           .Primary(x => x.Id)
+           .Identity(x => x.Id);
+   */
     private static void mapEntities() {
-        /*
-        FluentMapper.Entity<ModelName>()
-            .Table("Schema.TableName")
+        FluentMapper.Entity<WordTemplate>()
+            .Table("Hub.WordTemplates")
             .Primary(x => x.Id)
             .Identity(x => x.Id);
-
-
-        */
     }
 
 }

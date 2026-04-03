@@ -100,7 +100,7 @@ csharp_style_expression_bodied_lambdas = false:suggestion
 csharp_style_expression_bodied_local_functions = false:suggestion
 csharp_style_expression_bodied_methods = false:suggestion
 csharp_style_expression_bodied_operators = false:suggestion
-csharp_style_expression_bodied_properties = false:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
 
 # Preferenze per criteri di ricerca
 csharp_style_pattern_matching_over_as_with_null_check = true
@@ -150,7 +150,7 @@ csharp_style_unused_value_assignment_preference = discard_variable:silent
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # Preferenze per direttive 'using'
-csharp_using_directive_placement = outside_namespace:warning
+csharp_using_directive_placement = outside_namespace:suggestion
 
 # Preferenze per nuova riga
 csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false
@@ -210,76 +210,84 @@ csharp_preserve_single_line_statements = true
 
 # DEFINIZIONE DEGLI STILI 
 
-# Stile per il suffisso Async
-dotnet_naming_style.stile_suffisso_async.required_suffix = Async
-dotnet_naming_style.stile_suffisso_async.capitalization = pascal_case
-
-# Stile PascalCase (Classi, Metodi, Proprietà)
+# Stile PascalCase (Classi, Metodi Pubblici, Proprietà)
 dotnet_naming_style.stile_pascal_case.capitalization = pascal_case
 
 # Stile Interfacce (IPascalCase)
 dotnet_naming_style.stile_interfacce.capitalization = pascal_case
 dotnet_naming_style.stile_interfacce.required_prefix = I
 
+# Stili per Suffissi Async (Pubblico vs Privato)
+dotnet_naming_style.stile_suffisso_async_pubblico.required_suffix = Async
+dotnet_naming_style.stile_suffisso_async_pubblico.capitalization = pascal_case
+
+dotnet_naming_style.stile_suffisso_async_privato.required_suffix = Async
+dotnet_naming_style.stile_suffisso_async_privato.capitalization = camel_case
+
 # Stile per Campi Privati MVVM (_camelCase)
 dotnet_naming_style.stile_campi_privati.capitalization = camel_case
 dotnet_naming_style.stile_campi_privati.required_prefix = _
 
-# Stile camelCase puro (Parametri e Locali)
+# Stile camelCase puro (Parametri, Locali, Metodi Privati)
 dotnet_naming_style.stile_camel_case.capitalization = camel_case
 
 # Stile UPPER_CASE (Costanti)
 dotnet_naming_style.stile_costanti.capitalization = all_upper
 dotnet_naming_style.stile_costanti.word_separator = _
 
+
 # DEFINIZIONE DEI SIMBOLI
 
-# Simbolo per i metodi async
-dotnet_naming_symbols.simboli_metodi_async.applicable_kinds = method
-dotnet_naming_symbols.simboli_metodi_async.required_modifiers = async
+# Metodi Async Visibili (public, protected, internal)
+dotnet_naming_symbols.simboli_metodi_async_visibili.applicable_kinds = method
+dotnet_naming_symbols.simboli_metodi_async_visibili.applicable_accessibilities = public, internal, protected, protected_internal, private_protected
+dotnet_naming_symbols.simboli_metodi_async_visibili.required_modifiers = async
 
-dotnet_naming_symbols.simboli_interfacce.applicable_kinds = interface
-dotnet_naming_symbols.simboli_interfacce.applicable_accessibilities = *
+# Metodi Async Privati
+dotnet_naming_symbols.simboli_metodi_async_privati.applicable_kinds = method
+dotnet_naming_symbols.simboli_metodi_async_privati.applicable_accessibilities = private
+dotnet_naming_symbols.simboli_metodi_async_privati.required_modifiers = async
 
+# Costanti e Static Readonly
 dotnet_naming_symbols.simboli_costanti.applicable_kinds = field, local
 dotnet_naming_symbols.simboli_costanti.required_modifiers = const
 
 dotnet_naming_symbols.simboli_static_readonly.applicable_kinds = field
 dotnet_naming_symbols.simboli_static_readonly.required_modifiers = static, readonly
 
-# Metodi privati
-dotnet_naming_symbols.simboli_metodi_privati.applicable_kinds = method
-dotnet_naming_symbols.simboli_metodi_privati.applicable_accessibilities = private
+# Interfacce
+dotnet_naming_symbols.simboli_interfacce.applicable_kinds = interface
+dotnet_naming_symbols.simboli_interfacce.applicable_accessibilities = *
 
-# Campi privati (dove userai l'underscore per MVVM)
+# Campi Privati
 dotnet_naming_symbols.simboli_campi_privati.applicable_kinds = field
 dotnet_naming_symbols.simboli_campi_privati.applicable_accessibilities = private
 
-# Parametri e Variabili Locali (camelCase puro)
+# Metodi Privati (sincroni)
+dotnet_naming_symbols.simboli_metodi_privati.applicable_kinds = method
+dotnet_naming_symbols.simboli_metodi_privati.applicable_accessibilities = private
+
+# Parametri e Locali
 dotnet_naming_symbols.simboli_locali_e_parametri.applicable_kinds = parameter, local
 
-# Tutto ciò che è pubblico o strutturale
-dotnet_naming_symbols.simboli_tutto_il_resto.applicable_kinds = class, struct, enum, property, event, delegate, namespace
-dotnet_naming_symbols.simboli_tutto_il_resto.applicable_accessibilities = *
+# Tutto ciò che è visibile fuori e tipi strutturali
+dotnet_naming_symbols.simboli_pubblici_e_strutture.applicable_kinds = class, struct, enum, property, event, delegate, namespace, method
+dotnet_naming_symbols.simboli_pubblici_e_strutture.applicable_accessibilities = public, internal, protected, protected_internal, private_protected
 
-# APPLICAZIONE DELLE REGOLE
 
-# I metodi async devono finire con 'Async'
-dotnet_naming_rule.async_methods_must_end_with_async.symbols = simboli_metodi_async
-dotnet_naming_rule.async_methods_must_end_with_async.style = stile_suffisso_async
-dotnet_naming_rule.async_methods_must_end_with_async.severity = suggestion
+# APPLICAZIONE DELLE REGOLE (Ordine di priorità top-down)
 
-# Metodi privati -> camelCase
-dotnet_naming_rule.metodi_privati_rule.symbols = simboli_metodi_privati
-dotnet_naming_rule.metodi_privati_rule.style = stile_camel_case
-dotnet_naming_rule.metodi_privati_rule.severity = suggestion
+# 1. Metodi Async Privati -> camelCaseAsync
+dotnet_naming_rule.async_privati_rule.symbols = simboli_metodi_async_privati
+dotnet_naming_rule.async_privati_rule.style = stile_suffisso_async_privato
+dotnet_naming_rule.async_privati_rule.severity = suggestion
 
-# Interfacce -> IPascalCase
-dotnet_naming_rule.interfacce_rule.symbols = simboli_interfacce
-dotnet_naming_rule.interfacce_rule.style = stile_interfacce
-dotnet_naming_rule.interfacce_rule.severity = suggestion
+# 2. Metodi Async Visibili -> PascalCaseAsync
+dotnet_naming_rule.async_visibili_rule.symbols = simboli_metodi_async_visibili
+dotnet_naming_rule.async_visibili_rule.style = stile_suffisso_async_pubblico
+dotnet_naming_rule.async_visibili_rule.severity = suggestion
 
-# Costanti e Static Readonly -> UPPER_CASE
+# 3. Costanti e Static Readonly -> UPPER_CASE
 dotnet_naming_rule.costanti_rule.symbols = simboli_costanti
 dotnet_naming_rule.costanti_rule.style = stile_costanti
 dotnet_naming_rule.costanti_rule.severity = suggestion
@@ -288,17 +296,27 @@ dotnet_naming_rule.static_readonly_rule.symbols = simboli_static_readonly
 dotnet_naming_rule.static_readonly_rule.style = stile_costanti
 dotnet_naming_rule.static_readonly_rule.severity = suggestion
 
-# Campi Privati -> _camelCase (MVVM)
+# 4. Interfacce -> IPascalCase
+dotnet_naming_rule.interfacce_rule.symbols = simboli_interfacce
+dotnet_naming_rule.interfacce_rule.style = stile_interfacce
+dotnet_naming_rule.interfacce_rule.severity = suggestion
+
+# 5. Campi Privati -> _camelCase
 dotnet_naming_rule.campi_privati_rule.symbols = simboli_campi_privati
 dotnet_naming_rule.campi_privati_rule.style = stile_campi_privati
 dotnet_naming_rule.campi_privati_rule.severity = suggestion
 
-# Parametri e Locali -> camelCase
+# 6. Metodi Privati -> camelCase
+dotnet_naming_rule.metodi_privati_rule.symbols = simboli_metodi_privati
+dotnet_naming_rule.metodi_privati_rule.style = stile_camel_case
+dotnet_naming_rule.metodi_privati_rule.severity = suggestion
+
+# 7. Parametri e Locali -> camelCase
 dotnet_naming_rule.locali_rule.symbols = simboli_locali_e_parametri
 dotnet_naming_rule.locali_rule.style = stile_camel_case
 dotnet_naming_rule.locali_rule.severity = suggestion
 
-# Tutto il resto -> PascalCase
-dotnet_naming_rule.tutto_il_resto_rule.symbols = simboli_tutto_il_resto
-dotnet_naming_rule.tutto_il_resto_rule.style = stile_pascal_case
-dotnet_naming_rule.tutto_il_resto_rule.severity = suggestion
+# 8. Elementi Pubblici, Proprietà, Classi, Metodi non privati -> PascalCase
+dotnet_naming_rule.pubblici_e_strutture_rule.symbols = simboli_pubblici_e_strutture
+dotnet_naming_rule.pubblici_e_strutture_rule.style = stile_pascal_case
+dotnet_naming_rule.pubblici_e_strutture_rule.severity = suggestion

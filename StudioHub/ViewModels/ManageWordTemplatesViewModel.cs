@@ -34,9 +34,6 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     [ObservableProperty]
     private bool _isBusy;
 
-    [ObservableProperty]
-    private string _statusMessage = string.Empty;
-
     // Modificato Action per passare anche il contenuto binario appena generato (in caso di Nuovo)
     public Action<WordTemplate>? ShowEditDetailsDialog { get; set; }
     public Action<byte[]>? ShowNewTemplateDialog { get; set; }
@@ -62,7 +59,6 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         if (_targetApp == null) return; // Sicurezza: se non è stato fatto il Setup, non carica
 
         IsBusy = true;
-        StatusMessage = "Caricamento modelli in corso...";
         try {
             _allTemplates = await _templateService.GetAllTemplatesAsync();
             ApplyFilter();
@@ -102,14 +98,12 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     [RelayCommand]
     private async Task NewTemplateAsync() {
         IsBusy = true;
-        StatusMessage = "Avvio di Word per il nuovo modello...";
         _wordCancellationTokenSource = new CancellationTokenSource();
 
         try {
             // [FIX 1] Passiamo le intestazioni dell'app e 'null' come contenuto esistente
-            var newTemplateContent = await _templateService.EditTemplateContentAsync(
+            var newTemplateContent = await _templateService.EditTemplateContentAsync(-1,
                 _appHeaders,
-                null,
                 _wordCancellationTokenSource.Token);
 
             // Passiamo il file generato alla UI per completare il salvataggio con Nome/Descrizione
@@ -137,14 +131,12 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         }
 
         IsBusy = true;
-        StatusMessage = $"Modifica contenuto di '{SelectedTemplate.Name}' in Word...";
         _wordCancellationTokenSource = new CancellationTokenSource();
 
         try {
             // [FIX 1] Aggiornata la firma per passare Headers e Content
-            var updatedContent = await _templateService.EditTemplateContentAsync(
+            var updatedContent = await _templateService.EditTemplateContentAsync(-1,
                 _appHeaders,
-                SelectedTemplate.Content,
                 _wordCancellationTokenSource.Token);
 
             SelectedTemplate = SelectedTemplate with {
@@ -183,7 +175,6 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         if (SelectedTemplate == null) return;
 
         IsBusy = true;
-        StatusMessage = "Duplicazione in corso...";
 
         try {
             string newName = $"{SelectedTemplate.Name} - Copia {DateTime.Now:yyyyMMdd_HHmmss}";
@@ -213,7 +204,6 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
 
         if (result == MessageBoxResult.Yes) {
             IsBusy = true;
-            StatusMessage = "Eliminazione in corso...";
             try {
                 await _templateService.DeleteTemplateAsync(SelectedTemplate.Id);
                 await LoadTemplatesAsync();

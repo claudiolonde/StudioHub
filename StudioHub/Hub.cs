@@ -19,47 +19,12 @@ public static class Hub {
 
     #endregion Paths  ----------------------------------------------------------------------------------------------------
 
-
     /// <summary>
     /// Flag che indica se il servizio è stato inizializzato.
     /// </summary>
     private static bool _isInitialized = false;
 
-    /// <summary>
-    /// Percorso della chiave di registro utilizzata dall'applicazione per memorizzare le impostazioni di connessione.
-    /// </summary>
-    public static string RegistryPath => @"Software\Studio Londe\StudioHub";
-
-    /// <summary>
-    /// Stringa di connessione principale utilizzata per accedere al database primario.
-    /// </summary>
-    public static string PrimaryConnection { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Stringa di connessione utilizzata per accedere al database legacy.
-    /// </summary>
-    public static string LegacyConnection { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Nome del database primario a cui si connette l'applicazione.
-    /// </summary>
-    public static string PrimaryDbName { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Nome del database legacy del gestionale CityUp.
-    /// </summary>
-    public static string LegacyDbName { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Percorso della cartella dati condivisa utilizzata dall'applicazione.
-    /// </summary>
-    public static string DataPath { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Nome costante della cartella utilizzata per il cestino.
-    /// </summary>
-    public static string TrashFolderName => "$Recycle.Bin";
-
+    public static DataSource? DataSource;
 
     /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.
@@ -67,9 +32,14 @@ public static class Hub {
     /// <returns>True se l'inizializzazione è completata con successo o se è già stata eseguita.</returns>
     public static bool Initialize() {
 
-        if (_isInitialized) {
-            return true;
-        }
+        if (_isInitialized) { return true; }
+
+        DataSource = new() {
+            Server = "192.168.123.18",
+            UserID = "sa",
+            Password = "gestionale_2008",
+            Database = ("StudioHub", "ARCHIVIO")
+        };
 
         GlobalConfiguration.Setup().UseSqlServer();
         mapEntities();

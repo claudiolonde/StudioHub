@@ -1,6 +1,8 @@
+using System.Data.Common;
 using System.Windows;
 using StudioHub;
 using StudioHub.Views;
+using StudioHub.Models;
 
 namespace _test;
 

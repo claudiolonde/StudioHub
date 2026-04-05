@@ -46,7 +46,7 @@
                 Icon="{ui:SymbolIcon Symbol=Add16}"
                 Content="Nuovo Modello"
                 Appearance="Primary"
-                Command="{Binding NewTemplateCommand}"
+                Command="{Binding newTemplateCommand}"
                 />
 
             <!--  Modifica dettagli  -->
@@ -55,7 +55,7 @@
                 Content="Modifica dettagli"
                 Margin="30 0 0 0"
                 Appearance="Transparent"
-                Command="{Binding EditDetailsCommand}"
+                Command="{Binding editDetailsCommand}"
                 />
 
             <!--  Modifica contenuto  -->
@@ -64,7 +64,7 @@
                 Content="Modifica documento"
                 Margin="15 0 0 0"
                 Appearance="Transparent"
-                Command="{Binding EditContentCommand}"
+                Command="{Binding editContentCommand}"
                 />
 
             <!--  Duplica  -->
@@ -73,7 +73,7 @@
                 Content="Duplica"
                 Margin="15 0 0 0"
                 Appearance="Transparent"
-                Command="{Binding DuplicateCommand}"
+                Command="{Binding duplicateCommand}"
                 />
 
             <!--  Elimina  -->
@@ -81,7 +81,7 @@
                 Icon="{ui:SymbolIcon Symbol=Delete16}"
                 Content="Elimina"
                 Margin="30 0 30 0"
-                Command="{Binding DeleteCommand}"
+                Command="{Binding deleteCommand}"
                 Focusable="False"
                 >
                 <ui:Button.Style>
@@ -100,57 +100,32 @@
             <!--  filter text  -->
             <ui:TextBox
                 Icon="{ui:SymbolIcon Symbol=Search16}"
-                Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                 DockPanel.Dock="Right" PlaceholderText="Filtra per nome..."
                 />
 
         </DockPanel>
 
         <!--  templates list  -->
-        <!--  ItemsSource="{Binding FilteredTemplates, Mode=OneWay}"  -->
         <ListBox
             Grid.Row="2"
             Margin="25 10"
+            ItemsSource="{Binding DisplayedTemplates, Mode=OneWay}"
             SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.ScrollUnit="Pixel"
             >
         </ListBox>
 
-        <!--  infobar  -->
+        <!--  items count  -->
         <Border
             Grid.Row="3"
             Margin="25"
             Background="{DynamicResource LayerOnMicaBaseAltFillColorDefaultBrush}"
             CornerRadius="4"
             >
-            <DockPanel>
-                <!--  filtered/totals  -->
-                <ui:TextBlock
-                    Margin="15 6 15 4"
-                    Foreground="{DynamicResource TextControlForegroundDisabled}"
-                    FontSize="11"
-                    DockPanel.Dock="Right"
-                    >
-                    <Run Text="Modelli:"/>
-                    <Run Text="{Binding FilteredTemplatesCount, Mode=OneWay}" FontWeight="Bold"/>
-                    <Run Text="di"/>
-                    <Run Text="{Binding TotalTemplatesCount, Mode=OneWay}" FontWeight="Bold"/>
-                </ui:TextBlock>
-
-                <!--  templates path  -->
-                <ui:TextBlock
-                    Text="{Binding Path, Mode=OneTime}"
-                    Margin="15 6 15 4"
-                    Foreground="{DynamicResource TextControlForegroundDisabled}"
-                    FontSize="11"
-                    TextTrimming="CharacterEllipsis"
-                    ToolTip="{Binding Path, Mode=OneTime}"
-                    />
-
-            </DockPanel>
+            <ui:TextBlock Text="{Binding ItemsCountText}" Margin="8"/>
         </Border>
-
     </Grid>
 
 </ui:FluentWindow>

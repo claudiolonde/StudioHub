@@ -24,7 +24,7 @@ public static class Hub {
     /// </summary>
     private static bool _isInitialized = false;
 
-    public static DataSource? DataSource;
+    public static DataSourceInfo DataSource = new();
 
     /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.

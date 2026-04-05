@@ -1,5 +1,4 @@
-using System.Windows;
-using StudioHub.ViewModels;
+using System.Runtime.CompilerServices;
 
 namespace StudioHub.Views;
 
@@ -13,21 +12,30 @@ public partial class ManageWordTemplatesView {
     }
 
     /// <summary>
-    /// Apre la vista.
+    /// Apre la vista, inizializza il ViewModel e assegna i callback per i dialoghi di dettaglio.
     /// </summary>
-    /// <remarks>
-    /// Inizializza il ViewModel, imposta la proprietà <see cref="Window.Owner"/>.
-    /// </remarks>
+    /// <param name="appName">Nome dell'applicazione chiamante.</param>
+    /// <param name="headers">Intestazioni di colonna per il datasource di Word.</param>
     public static void Open(string appName, string[] headers) {
         ArgumentException.ThrowIfNullOrWhiteSpace(appName);
         ArgumentNullException.ThrowIfNull(headers);
 
         ManageWordTemplatesViewModel vm = new();
-        vm.Initialize(appName, headers);
-        ManageWordTemplatesView w = new() {
-            DataContext = vm
+        ManageWordTemplatesView w = new() { DataContext = vm };
+        Func<TaskAwaiter> _ = vm.Initialize(appName, headers).GetAwaiter;
+
+        // Assegna il callback per il salvataggio di un nuovo template
+        vm.RequestNewTemplateDetails = _ => {
+            (string Name, string Description)? result = EditWordTemplateDetailsView.ShowDialog(w);
+            return Task.FromResult(result);
         };
+
+        // Assegna il callback per la modifica dei dettagli di un template esistente
+        vm.RequestEditTemplateDetails = template => {
+            (string Name, string Description)? result = EditWordTemplateDetailsView.ShowDialog(w, template.Name, template.Description);
+            return Task.FromResult(result);
+        };
+
         w.Show();
     }
-
 }

@@ -4,7 +4,7 @@ namespace StudioHub.Models;
 /// Rappresenta le informazioni necessarie per creare stringhe di connessione verso SQL Server. Contiene server,
 /// istanza/porta, credenziali e i nomi dei database usati dall'applicazione.
 /// </summary>
-public class DataSource {
+public class DataSourceInfo {
 
     /// <summary>
     /// Nome o indirizzo del server SQL.

@@ -12,18 +12,25 @@
 </ResourceDictionary>
 
 <!--
+    NAMESPACES
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:a="clr-namespace:StudioHub"
     xmlns:h="clr-namespace:StudioHub.Helpers"
     xmlns:v="clr-namespace:StudioHub.Views"
     xmlns:vm="clr-namespace:StudioHub.ViewModels"
+    PROPERTIES
     FontFamily="Segoe UI Variable Display, Segoe UI"
-    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
     TextOptions.TextHintingMode="Fixed"
-    d:DataContext="{d:DesignInstance Type=vm:BaseViewModel,
-    IsDesignTimeCreatable=True}"
+    WindowStartupLocation="CenterOwner"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
     ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
     SnapsToDevicePixels="True" UseLayoutRounding="True"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    d:DataContext="{d:DesignInstance Type=vm:BaseViewModel, IsDesignTimeCreatable=True}"
 -->

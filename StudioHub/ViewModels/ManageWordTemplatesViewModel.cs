@@ -138,6 +138,14 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
                 return;
             }
 
+            // Verifica se esiste già un template con lo stesso nome
+            bool nameExists = _storedTemplates.Any(t =>
+                t.Name.Equals(details.Value.Name, StringComparison.InvariantCultureIgnoreCase));
+            if (nameExists) {
+                Dialog.Show(DialogType.Error, $"Esiste già un modello con il nome '{details.Value.Name}'.");
+                return;
+            }
+
             WordTemplate newTemplate = new() {
                 Name = details.Value.Name,
                 Description = details.Value.Description,
@@ -217,6 +225,15 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         (string Name, string Description)? details = await (RequestEditTemplateDetails?.Invoke(SelectedTemplate)
                                                   ?? Task.FromResult<(string Name, string Description)?>(null));
         if (details == null) { return; }
+
+        // Verifica se esiste già un altro template con lo stesso nome
+        bool nameExists = _storedTemplates.Any(t =>
+            t.Id != SelectedTemplate.Id &&
+            t.Name.Equals(details.Value.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (nameExists) {
+            Dialog.Show(DialogType.Error, $"Esiste già un modello con il nome '{details.Value.Name}'.");
+            return;
+        }
 
         IsBusy = true;
         try {

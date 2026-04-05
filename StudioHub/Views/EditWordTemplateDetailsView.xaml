@@ -7,17 +7,17 @@
     xmlns:h="clr-namespace:StudioHub.Helpers"
     xmlns:v="clr-namespace:StudioHub.Views"
     xmlns:vm="clr-namespace:StudioHub.ViewModels"
-    Title="Dettagli Modello"
-    Height="400" Width="400"
-    FontFamily="Segoe UI Variable Display, Segoe UI"
-    TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
+    TextOptions.TextFormattingMode="Display"
     TextOptions.TextHintingMode="Fixed"
-    WindowStartupLocation="CenterOwner"
-    ShowInTaskbar="False"
-    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
+    TextOptions.TextRenderingMode="ClearType"
     SnapsToDevicePixels="True" UseLayoutRounding="True"
+    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    WindowStartupLocation="CenterOwner"
+    ShowInTaskbar="False"
+    Width="400" Height="400"
+    FontFamily="Segoe UI Variable Display, Segoe UI"
     >
 
     <Grid>
@@ -25,13 +25,16 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <ui:TitleBar
-            Grid.Row="0"
+            Margin="-15 0 0 0"
             Title="Modifica dettagli modello"
             ShowMinimize="False" ShowMaximize="False"
             CanMaximize="False"
-            />
+            >
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="{x:Null}"/>
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <Grid Grid.Row="1" Margin="25">
             <Grid.RowDefinitions>
@@ -44,11 +47,11 @@
 
             <ui:TextBlock
                 Grid.Row="0"
-                Text="Nome"
                 Margin="0 0 0 5"
+                Text="Nome"
                 FontWeight="Medium"
                 />
-            <ui:TextBox x:Name="NameBox"
+            <ui:TextBox x:Name="txtName"
                 Grid.Row="1"
                 Margin="0 0 0 20"
                 PlaceholderText="Nome"
@@ -56,15 +59,15 @@
 
             <ui:TextBlock
                 Grid.Row="2"
-                Text="Descrizione"
                 Margin="0 0 0 5"
+                Text="Descrizione"
                 FontWeight="Medium"
                 />
-            <ui:TextBox x:Name="DescriptionBox"
+            <ui:TextBox x:Name="txtDescription"
                 Grid.Row="3"
-                MinHeight="100"
                 Margin="0 0 0 20"
                 VerticalContentAlignment="Top"
+                MinHeight="100"
                 PlaceholderText="Aggiungi una descrizione dettagliata qui..." AcceptsReturn="True"
                 TextWrapping="Wrap"
                 />
@@ -74,16 +77,17 @@
                 Margin="0 10 0 0"
                 Orientation="Horizontal"
                 >
-                <ui:Button
-                    Content="Salva"
-                    Width="100"
+                <ui:Button x:Name="btnSave"
                     Margin="0 0 15 0"
+                    Width="100"
+                    IsEnabled="False"
+                    Content="Salva"
                     Appearance="Primary"
                     />
                 <ui:Button
-                    Content="Annulla"
-                    Width="100"
                     Margin="0 0 0 0"
+                    Width="100"
+                    Content="Annulla"
                     IsCancel="True"
                     />
             </StackPanel>

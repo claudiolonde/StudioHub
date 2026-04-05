@@ -26,13 +26,13 @@ public partial class ManageWordTemplatesView {
 
         // Assegna il callback per il salvataggio di un nuovo template
         vm.RequestNewTemplateDetails = _ => {
-            (string Name, string Description)? result = EditWordTemplateDetailsView.ShowDialog(w);
+            (string Name, string Description)? result = EditWordTemplateDetailsView.Open(w);
             return Task.FromResult(result);
         };
 
         // Assegna il callback per la modifica dei dettagli di un template esistente
         vm.RequestEditTemplateDetails = template => {
-            (string Name, string Description)? result = EditWordTemplateDetailsView.ShowDialog(w, template.Name, template.Description);
+            (string Name, string Description)? result = EditWordTemplateDetailsView.Open(w, template.Name, template.Description);
             return Task.FromResult(result);
         };
 

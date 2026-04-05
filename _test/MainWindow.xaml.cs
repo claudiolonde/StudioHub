@@ -3,6 +3,7 @@ using System.Windows;
 using StudioHub;
 using StudioHub.Views;
 using StudioHub.Models;
+using System.Diagnostics;
 
 namespace _test;
 
@@ -17,10 +18,6 @@ public partial class MainView {
             Application.Current.Shutdown();
             return;
         }
-    }
-    private void button_Click(object sender, RoutedEventArgs e) {
         ManageWordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
-        return;
     }
-
 }

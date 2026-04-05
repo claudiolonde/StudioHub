@@ -4,29 +4,38 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:a="clr-namespace:_test"
-    xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
-    xmlns:vm="clr-namespace:StudioHub.ViewModels;assembly=StudioHub"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="MainWindow"
-    Height="450" Width="800"
+    xmlns:a="clr-namespace:StudioHub;assembly=StudioHub"
+    xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
+    xmlns:v="clr-namespace:StudioHub.Views;assembly=StudioHub"
+    xmlns:vm="clr-namespace:StudioHub.ViewModels;assembly=StudioHub"
+    TextOptions.TextFormattingMode="Display"
+    TextOptions.TextHintingMode="Fixed"
+    TextOptions.TextRenderingMode="ClearType"
+    SnapsToDevicePixels="True" UseLayoutRounding="True"
+    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    d:DataContext="{d:DesignInstance Type=vm:ViewModelBase}"
+    d:DataContext="{d:DesignInstance Type=vm:BaseViewModel,
+                                     IsDesignTimeCreatable=True}"
     WindowStartupLocation="CenterScreen"
-    ExtendsContentIntoTitleBar="True"
-    UseLayoutRounding="True"
+    ShowInTaskbar="True"
+    ResizeMode="CanResize"
+    Width="720" Height="540"
+    FontFamily="Segoe UI Variable Display, Segoe UI"
     >
-
-    <StackPanel>
-        <ui:TitleBar x:Name="title"/>
-
-        <ui:Button
-            Content="RUN"
-            Width="100"
-            Margin="25"
-            Click="button_Click"
-            />
-
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <ui:TitleBar Margin="-15 0 0 0" Title="Titolo della finestra">
+                <ui:TitleBar.Icon>
+                    <ui:ImageIcon Source="{x:Null}"/>
+                </ui:TitleBar.Icon>
+            </ui:TitleBar>
+        </Grid>
+        <Grid Grid.Row="1"/>
+    </Grid>
 </ui:FluentWindow>

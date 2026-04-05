@@ -3,35 +3,70 @@ using System.Windows;
 namespace StudioHub.Views;
 
 /// <summary>
-/// Dialogo modale per l'inserimento o la modifica di nome e descrizione di un modello Word.
+/// Finestra di dialogo per la modifica dei dettagli di un template Word.
 /// </summary>
 public partial class EditWordTemplateDetailsView {
 
-    /// <summary>Nome confermato dall'utente.</summary>
+    /// <summary>
+    /// Ottiene il nome del template.
+    /// </summary>
     public string TemplateName { get; private set; } = string.Empty;
 
-    /// <summary>Descrizione confermata dall'utente.</summary>
+    /// <summary>
+    /// Ottiene la descrizione del template.
+    /// </summary>
     public string TemplateDescription { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Inizializza il dialogo con valori predefiniti opzionali.
+    /// Inizializza una nuova istanza della finestra di dialogo con nome e descrizione opzionali.
     /// </summary>
-    /// <param name="name">Nome iniziale del modello.</param>
-    /// <param name="description">Descrizione iniziale del modello.</param>
+    /// <param name="name">Nome iniziale del template.</param>
+    /// <param name="description">Descrizione iniziale del template.</param>
     public EditWordTemplateDetailsView(string name = "", string description = "") {
         InitializeComponent();
-        NameBox.Text = name;
-        DescriptionBox.Text = description;
+
+        TemplateName = txtName.Text = name;
+        TemplateDescription = txtDescription.Text = description;
+
+        txtName.TextChanged += txt_TextChanged;
+        txtDescription.TextChanged += txt_TextChanged;
+        btnSave.Click += btnSave_Click;
     }
 
     /// <summary>
-    /// Mostra il dialogo modale e restituisce nome e descrizione confermati, o <see langword="null"/> se annullato.
+    /// Gestisce la modifica del testo nei campi nome e descrizione, abilitando o disabilitando il pulsante Salva.
     /// </summary>
-    /// <param name="owner">Finestra proprietaria del dialogo.</param>
-    /// <param name="name">Nome iniziale (vuoto per un nuovo template).</param>
-    /// <param name="description">Descrizione iniziale (vuota per un nuovo template).</param>
-    /// <returns>Tupla con nome e descrizione, oppure <see langword="null"/> se annullato.</returns>
-    public static (string Name, string Description)? ShowDialog(Window? owner, string name = "", string description = "") {
+    /// <param name="sender">Origine dell'evento.</param>
+    /// <param name="e">Argomenti dell'evento di modifica testo.</param>
+    private void txt_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) {
+
+        btnSave.IsEnabled = canSave();
+    }
+
+    /// <summary>
+    /// Determina se è possibile salvare i dati in base allo stato corrente dei campi.
+    /// </summary>
+    /// <returns><see langword="true"/> if saving is allowed; otherwise, <see langword="false"/>.</returns>
+    private bool canSave() {
+
+        string currentName = txtName.Text.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(currentName)) {
+            return false;
+        }
+        string currentDescription = txtDescription.Text.Trim() ?? string.Empty;
+
+        return !(string.Equals(TemplateName, currentName, StringComparison.Ordinal)
+              && string.Equals(TemplateDescription, currentDescription, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Mostra la finestra di dialogo per l'editing del template e restituisce i valori inseriti se confermati.
+    /// </summary>
+    /// <param name="owner">Finestra proprietaria.</param>
+    /// <param name="name">Nome iniziale del template.</param>
+    /// <param name="description">Descrizione iniziale del template.</param>
+    /// <returns>Tuple con nome e descrizione se confermato; altrimenti <see langword="null"/>.</returns>
+    public static (string Name, string Description)? Open(Window? owner, string name = "", string description = "") {
         EditWordTemplateDetailsView dialog = new(name, description) { Owner = owner };
         return dialog.ShowDialog() == true
             ? (dialog.TemplateName, dialog.TemplateDescription)
@@ -39,24 +74,13 @@ public partial class EditWordTemplateDetailsView {
     }
 
     /// <summary>
-    /// Valida i campi e conferma il dialogo.
+    /// Gestisce il click sul pulsante Salva, aggiorna le proprietà e chiude la finestra con esito positivo.
     /// </summary>
-    private void saveButton_Click(object sender, RoutedEventArgs e) {
-        string name = NameBox.Text?.Trim() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(name)) {
-            NameBox.Focus();
-            return;
-        }
-
-        TemplateName = name;
-        TemplateDescription = DescriptionBox.Text?.Trim() ?? string.Empty;
+    /// <param name="sender">Origine dell'evento.</param>
+    /// <param name="e">Argomenti dell'evento click.</param>
+    private void btnSave_Click(object sender, RoutedEventArgs e) {
+        TemplateName = txtName.Text.Trim();
+        TemplateDescription = txtDescription.Text?.Trim() ?? string.Empty;
         DialogResult = true;
-    }
-        
-    /// <summary>
-    /// Annulla il dialogo senza salvare.
-    /// </summary>
-    private void cancelButton_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
     }
 }

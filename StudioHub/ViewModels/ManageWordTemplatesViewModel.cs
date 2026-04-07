@@ -43,9 +43,13 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     /// <summary>
     /// Imposta il contesto dell'applicazione chiamante.
     /// </summary>
-    /// <param name="targetApp">Nome dell'applicazione target.</param>
-    /// <param name="appHeaders">Intestazioni di colonna per il datasource di Word.</param>
-    internal async Task Initialize(string targetApp, string[] appHeaders) {
+    /// <param name="targetApp">
+    /// Nome dell'applicazione target.
+    /// </param>
+    /// <param name="appHeaders">
+    /// Intestazioni di colonna per il datasource di Word.
+    /// </param>
+    internal async Task InitializeAsync(string targetApp, string[] appHeaders) {
         ArgumentException.ThrowIfNullOrEmpty(targetApp);
         ArgumentNullException.ThrowIfNull(appHeaders);
         _targetApp = targetApp;
@@ -53,17 +57,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         await loadTemplatesAsync();
     }
 
-    /// <summary>
-    /// Callback per richiedere nome e descrizione di un nuovo template. Riceve il contenuto binario appena generato;
-    /// restituisce i dettagli o <c> null</c> se annullato.
-    /// </summary>
-    public Func<byte[], Task<(string Name, string Description)?>>? RequestNewTemplateDetails { get; set; }
-
-    /// <summary>
-    /// Callback per richiedere la modifica di nome e descrizione di un template esistente. Riceve il template
-    /// selezionato; restituisce i dettagli aggiornati o <see langword="null"/> se annullato.
-    /// </summary>
-    public Func<WordTemplate, Task<(string Name, string Description)?>>? RequestEditTemplateDetails { get; set; }
+    public Func<string, IEnumerable<string>, string, Task<(string Name, string Description)?>>? RequestTemplateDetails { get; set; }
 
     /// <summary>
     /// Carica i template dell'applicazione corrente dal database. Da invocare nell'evento Loaded della View.
@@ -95,13 +89,20 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
 
         if (string.IsNullOrWhiteSpace(SearchText)) {
             DisplayedTemplates = new ObservableCollection<WordTemplate>(_storedTemplates);
+
         }
         else {
-            string lowerText = SearchText.ToLowerInvariant();
-            IEnumerable<WordTemplate> filtered = _storedTemplates.Where(t => {
-                return t.Name.Contains(lowerText, StringComparison.InvariantCultureIgnoreCase) ||
-                       t.Description.Contains(lowerText, StringComparison.InvariantCultureIgnoreCase);
-            });
+            // Cache locale per evitare accessi ripetuti alla property e catturare snapshot coerente
+            string searchText = SearchText;
+            List<WordTemplate> filtered = new(_storedTemplates.Count);
+
+            for (int i = 0; i < _storedTemplates.Count; i++) {
+                WordTemplate t = _storedTemplates[i];
+                if (t.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    t.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)) {
+                    filtered.Add(t);
+                }
+            }
             DisplayedTemplates = new ObservableCollection<WordTemplate>(filtered);
         }
         updateCountText();
@@ -125,24 +126,15 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
 
         try {
             byte[] content = await _service.EditTemplateContentAsync(-1, _appHeaders, _wordCTS.Token);
-            // Contenuto vuoto, utente ha annullato in Word
             if (content.Length == 0) {
                 return;
             }
 
-            // La callback restituisce il risultato del dialogo, senza di essa non si salva nulla
-            (string Name, string Description)? details = await (RequestNewTemplateDetails?.Invoke(content)
+            IEnumerable<string> unavailableNames = _storedTemplates.Select(t => t.Name);
+            (string Name, string Description)? details = await (RequestTemplateDetails?.Invoke("", unavailableNames, "")
                                             ?? Task.FromResult<(string Name, string Description)?>(null));
-            // Utente ha annullato il dialogo dei dettagli
             if (details == null) {
-                return;
-            }
-
-            // Verifica se esiste già un template con lo stesso nome
-            bool nameExists = _storedTemplates.Any(t =>
-                t.Name.Equals(details.Value.Name, StringComparison.InvariantCultureIgnoreCase));
-            if (nameExists) {
-                Dialog.Show(DialogType.Error, $"Esiste già un modello con il nome '{details.Value.Name}'.");
+                //> Chiedere conferma all'utente
                 return;
             }
 
@@ -221,17 +213,11 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
             return;
         }
 
-        // La callback restituisce il risultato, solo se confermato si aggiorna il DB
-        (string Name, string Description)? details = await (RequestEditTemplateDetails?.Invoke(SelectedTemplate)
-                                                  ?? Task.FromResult<(string Name, string Description)?>(null));
-        if (details == null) { return; }
-
-        // Verifica se esiste già un altro template con lo stesso nome
-        bool nameExists = _storedTemplates.Any(t =>
-            t.Id != SelectedTemplate.Id &&
-            t.Name.Equals(details.Value.Name, StringComparison.InvariantCultureIgnoreCase));
-        if (nameExists) {
-            Dialog.Show(DialogType.Error, $"Esiste già un modello con il nome '{details.Value.Name}'.");
+        IEnumerable<string> unavailableNames = _storedTemplates.Where(t => t.Id != SelectedTemplate.Id).Select(t => t.Name);
+        (string Name, string Description)? details = await (RequestTemplateDetails?.Invoke(SelectedTemplate.Name, unavailableNames, SelectedTemplate.Description)
+                                            ?? Task.FromResult<(string Name, string Description)?>(null));
+        if (details == null) {
+            //> Chiedere conferma all'utente
             return;
         }
 

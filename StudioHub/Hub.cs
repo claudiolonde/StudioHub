@@ -5,8 +5,9 @@ namespace StudioHub;
 
 public static class Hub {
 
-    #region    Paths  ----------------------------------------------------------------------------------------------------
+    public const string SOLUTION_NAME = "StudioHub";
 
+    #region    Paths  ----------------------------------------------------------------------------------------------------
     //internal static string root = @"\\SERVER-18\Studio Londe\StudioHub";
     private static string root = @"D:\FILES\StudioHub";
     public static string Settings => @$"{root}\settings";
@@ -29,7 +30,9 @@ public static class Hub {
     /// <summary>
     /// Esegue il bootstrap dell'applicazione caricando le configurazioni e impostando le stringhe di connessione.
     /// </summary>
-    /// <returns>True se l'inizializzazione è completata con successo o se è già stata eseguita.</returns>
+    /// <returns>
+    /// True se l'inizializzazione è completata con successo o se è già stata eseguita.
+    /// </returns>
     public static bool Initialize() {
 
         if (_isInitialized) { return true; }

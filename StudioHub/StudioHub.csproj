@@ -5,6 +5,7 @@
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         -->
         <TargetFramework>net10.0-windows</TargetFramework>
+        <LangVersion>14.0</LangVersion>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <ImplicitUsings>enable</ImplicitUsings>

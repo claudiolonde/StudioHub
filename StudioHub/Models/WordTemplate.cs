@@ -41,9 +41,8 @@ public record WordTemplate {
     /// Costruttore con parametri completi. Valida i parametri stringa e array prima dell'assegnazione.
     /// </summary>
     public WordTemplate(int id, string name, string description, string targetApp, DateTime created, DateTime modified, bool locked) {
-        ArgumentException.ThrowIfNullOrEmpty(name);
-        ArgumentException.ThrowIfNullOrEmpty(description);
-        ArgumentException.ThrowIfNullOrEmpty(targetApp);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetApp);
 
         Id = id;
         Name = name;

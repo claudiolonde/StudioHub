@@ -15,11 +15,10 @@ namespace StudioHub.Services;
 /// </summary>
 public class ManageWordTemplatesService {
 
-    private const string DOC_VARIABLE = "StudioHub";
     private const string WORD_FILE_EXT = ".docx";
-    private const string HEADERS_TSV = "headers.tsv";
-    private const string DATASOURCE_TSV = "datasource.tsv";
-    private const string SCHEMA_CONTENT = $"[{HEADERS_TSV}]\nFormat=TabDelimited\nColNameHeader=True\nMaxScanRows=0\nCharacterSet=UTF8";
+    private const string HEADERS_FILENAME = "headers.tsv";
+    private const string DATASOURCE_FILENAME = "datasource.tsv";
+    private const string SCHEMA_CONTENT = $"[{HEADERS_FILENAME}]\nFormat=TabDelimited\nColNameHeader=True\nMaxScanRows=0\nCharacterSet=UTF8";
 
     private string _tempGuid = string.Empty;
     private string _tempFolder = string.Empty;
@@ -44,8 +43,12 @@ public class ManageWordTemplatesService {
     /// <summary>
     /// Verifica se un template è attualmente bloccato.
     /// </summary>
-    /// <param name="id">Id del template.</param>
-    /// <returns><see langword="true"/> se il template è bloccato, altrimenti <see langword="false"/>.</returns>
+    /// <param name="id">
+    /// Id del template.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> se il template è bloccato, altrimenti <see langword="false"/>.
+    /// </returns>
     public static async Task<bool> IsTemplateLockedAsync(int id) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
         bool isLocked = await connection.ExecuteScalarAsync<bool>(@"
@@ -60,8 +63,12 @@ WHERE  Id = @Id",
     /// <summary>
     /// Imposta lo stato di lock di un template.
     /// </summary>
-    /// <param name="id">Id del template.</param>
-    /// <param name="locked">Valore di lock da impostare.</param>
+    /// <param name="id">
+    /// Id del template.
+    /// </param>
+    /// <param name="locked">
+    /// Valore di lock da impostare.
+    /// </param>
     public static async Task SetTemplateLockAsync(int id, bool locked) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
         await connection.ExecuteNonQueryAsync(@"
@@ -75,14 +82,18 @@ WHERE  Id = @Id",
     /// <summary>
     /// Crea una cartella temporanea e i file necessari per la modifica del template.
     /// </summary>
-    /// <param name="headers">Intestazioni per il datasource del mail merge.</param>
-    /// <returns>Task di completamento.</returns>
+    /// <param name="headers">
+    /// Intestazioni per il datasource del mail merge.
+    /// </param>
+    /// <returns>
+    /// Task di completamento.
+    /// </returns>
     private Task createTempFolderAsync(string[] headers) {
 
         Directory.CreateDirectory(_tempFolder);
 
         string tsvContent = $"{string.Join("\t", headers)}\r\n{new string('\t', headers.Length - 1)}";
-        Task tsvTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, HEADERS_TSV), tsvContent);
+        Task tsvTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, HEADERS_FILENAME), tsvContent);
         Task iniTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, "schema.ini"), SCHEMA_CONTENT);
 
         return Task.WhenAll(tsvTask, iniTask);
@@ -91,10 +102,18 @@ WHERE  Id = @Id",
     /// <summary>
     /// Permette la modifica del contenuto di un template Word tramite Word interattivo.
     /// </summary>
-    /// <param name="id">Id del template, -1 per nuovo.</param>
-    /// <param name="headers">Intestazioni per il mail merge.</param>
-    /// <param name="ct">Token di cancellazione.</param>
-    /// <returns>Contenuto del file Word modificato come array di byte.</returns>
+    /// <param name="id">
+    /// Id del template, -1 per nuovo.
+    /// </param>
+    /// <param name="headers">
+    /// Intestazioni per il mail merge.
+    /// </param>
+    /// <param name="ct">
+    /// Token di cancellazione.
+    /// </param>
+    /// <returns>
+    /// Contenuto del file Word modificato come array di byte.
+    /// </returns>
     public async Task<byte[]> EditTemplateContentAsync(int id, string[] headers, CancellationToken ct) {
 
         _syncContext = SynchronizationContext.Current;
@@ -103,7 +122,7 @@ WHERE  Id = @Id",
         _isShuttingDown = false;
 
         _tempGuid = Guid.NewGuid().ToString();
-        _tempFolder = Path.Combine(Path.GetTempPath(), "StudioHub", _tempGuid);
+        _tempFolder = Path.Combine(Path.GetTempPath(), SOLUTION_NAME, _tempGuid);
 
         await createTempFolderAsync(headers);
 
@@ -154,9 +173,15 @@ WHERE  Id = @Id",
     /// <summary>
     /// Attende che il file non sia più bloccato da altri processi.
     /// </summary>
-    /// <param name="filePath">Percorso del file.</param>
-    /// <param name="timeoutMs">Timeout in millisecondi.</param>
-    /// <returns><see langword="true"/> se il file è sbloccato, altrimenti <see langword="false"/>.</returns>
+    /// <param name="filePath">
+    /// Percorso del file.
+    /// </param>
+    /// <param name="timeoutMs">
+    /// Timeout in millisecondi.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> se il file è sbloccato, altrimenti <see langword="false"/>.
+    /// </returns>
     private static async Task<bool> waitFileUnlockingAsync(string filePath, int timeoutMs = 5000) {
 
         long deadline = Environment.TickCount64 + timeoutMs;
@@ -175,7 +200,9 @@ WHERE  Id = @Id",
     /// <summary>
     /// Esegue un'azione sul thread STA di Word, se disponibile.
     /// </summary>
-    /// <param name="action">Azione da eseguire.</param>
+    /// <param name="action">
+    /// Azione da eseguire.
+    /// </param>
     private void invokeOnWordSTAThread(Action action) {
         if (_wordDispatcher != null) {
             try {
@@ -218,7 +245,7 @@ WHERE  Id = @Id",
             try {
                 removeWordEventHandlers();
                 _wordDoc.MailMerge.MainDocumentType = Word.WdMailMergeMainDocType.wdNotAMergeDocument;
-                _wordDoc.Variables[DOC_VARIABLE].Delete();
+                _wordDoc.Variables[SOLUTION_NAME].Delete();
                 _wordDoc.Save();
                 _wordDoc.Close();
             }
@@ -256,7 +283,9 @@ WHERE  Id = @Id",
     /// <summary>
     /// Inizializza l'applicazione Word e apre o crea il documento specificato.
     /// </summary>
-    /// <param name="filename">Percorso del file Word.</param>
+    /// <param name="filename">
+    /// Percorso del file Word.
+    /// </param>
     private void initializeWordApp(string filename) {
 
         _wordApp = new Word.Application { Visible = false };
@@ -268,8 +297,8 @@ WHERE  Id = @Id",
             _wordDoc.SaveAs2(filename);
         }
 
-        _wordDoc.Variables.Add(DOC_VARIABLE, _tempGuid);
-        _wordDoc.MailMerge.OpenDataSource(Path.Combine(_tempFolder, HEADERS_TSV));
+        _wordDoc.Variables.Add(SOLUTION_NAME, _tempGuid);
+        _wordDoc.MailMerge.OpenDataSource(Path.Combine(_tempFolder, HEADERS_FILENAME));
         _wordDoc.Save();
 
         _wordApp.DocumentBeforeSave += wordApp_DocumentBeforeSave;
@@ -282,14 +311,16 @@ WHERE  Id = @Id",
     /// <summary>
     /// Verifica la presenza e il valore della variabile di controllo nel documento Word.
     /// </summary>
-    /// <param name="wdoc">Documento Word da controllare.</param>
+    /// <param name="wdoc">
+    /// Documento Word da controllare.
+    /// </param>
     /// <returns>
     /// <see langword="true"/> se la variabile è presente e valida, altrimenti <see langword="false"/>.
     /// </returns>
     private bool checkVariable(Word.Document wdoc) {
 
         try {
-            Word.Variable variable = wdoc.Variables[DOC_VARIABLE];
+            Word.Variable variable = wdoc.Variables[SOLUTION_NAME];
             if (variable != null && variable.Value == _tempGuid) {
                 return true;
             }
@@ -301,9 +332,15 @@ WHERE  Id = @Id",
     /// <summary>
     /// Gestisce l'evento di salvataggio del documento Word.
     /// </summary>
-    /// <param name="wdoc">Documento Word.</param>
-    /// <param name="SaveAsUI">Indica se è stato richiesto un "Salva con nome".</param>
-    /// <param name="Cancel">Imposta <see langword="true"/> per annullare il salvataggio.</param>
+    /// <param name="wdoc">
+    /// Documento Word.
+    /// </param>
+    /// <param name="SaveAsUI">
+    /// Indica se è stato richiesto un "Salva con nome".
+    /// </param>
+    /// <param name="Cancel">
+    /// Imposta <see langword="true"/> per annullare il salvataggio.
+    /// </param>
     private void wordApp_DocumentBeforeSave(Word.Document wdoc, ref bool SaveAsUI, ref bool Cancel) {
 
         if (_isShuttingDown) {
@@ -320,8 +357,12 @@ WHERE  Id = @Id",
     /// <summary>
     /// Gestisce l'evento di chiusura del documento Word.
     /// </summary>
-    /// <param name="wdoc">Documento Word.</param>
-    /// <param name="Cancel">Imposta <see langword="true"/> per annullare la chiusura.</param>
+    /// <param name="wdoc">
+    /// Documento Word.
+    /// </param>
+    /// <param name="Cancel">
+    /// Imposta <see langword="true"/> per annullare la chiusura.
+    /// </param>
     private void wordApp_DocumentBeforeClose(Word.Document wdoc, ref bool Cancel) {
 
         if (_isCanceledByUser || _isShuttingDown) {
@@ -378,9 +419,15 @@ WHERE  Id = @Id",
     /// <summary>
     /// Avvia un thread STA per l'interazione con Word e prepara l'ambiente.
     /// </summary>
-    /// <param name="filename">Percorso del file Word.</param>
-    /// <param name="ct">Token di cancellazione.</param>
-    /// <returns>Task di completamento.</returns>
+    /// <param name="filename">
+    /// Percorso del file Word.
+    /// </param>
+    /// <param name="ct">
+    /// Token di cancellazione.
+    /// </param>
+    /// <returns>
+    /// Task di completamento.
+    /// </returns>
     private Task startWordSTAThreadAndSetupAsync(string filename, CancellationToken ct) {
 
         _wordSTAReadyTCS = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -439,7 +486,9 @@ FROM   Hub.WordTemplates";
     /// <summary>
     /// Restituisce la lista di tutti i template Word, escludendo il contenuto binario.
     /// </summary>
-    /// <returns>Lista di <see cref="WordTemplate"/> senza il campo <see cref="WordTemplate.Content"/>.</returns>
+    /// <returns>
+    /// Lista di <see cref="WordTemplate"/> senza il campo <see cref="WordTemplate.Content"/>.
+    /// </returns>
     public static async Task<List<WordTemplate>> GetTemplatesAsync() {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
         IEnumerable<WordTemplate> templates = await connection.ExecuteQueryAsync<WordTemplate>(SUMMARY_SQL);
@@ -449,8 +498,12 @@ FROM   Hub.WordTemplates";
     /// <summary>
     /// Restituisce la lista dei template Word filtrati per applicazione target, escludendo il contenuto binario.
     /// </summary>
-    /// <param name="targetApp">Nome dell'applicazione target.</param>
-    /// <returns>Lista di <see cref="WordTemplate"/> senza il campo <see cref="WordTemplate.Content"/>.</returns>
+    /// <param name="targetApp">
+    /// Nome dell'applicazione target.
+    /// </param>
+    /// <returns>
+    /// Lista di <see cref="WordTemplate"/> senza il campo <see cref="WordTemplate.Content"/>.
+    /// </returns>
     public static async Task<List<WordTemplate>> GetTemplatesAsync(string targetApp) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
         IEnumerable<WordTemplate> templates = await connection.ExecuteQueryAsync<WordTemplate>(
@@ -463,8 +516,12 @@ FROM   Hub.WordTemplates";
     /// <summary>
     /// Salva un template Word nel database. Se l'Id è uguale a -1, viene creato un nuovo record.
     /// </summary>
-    /// <param name="template">Template da salvare.</param>
-    /// <returns>Template salvato, con Id aggiornato se nuovo.</returns>
+    /// <param name="template">
+    /// Template da salvare.
+    /// </param>
+    /// <returns>
+    /// Template salvato, con Id aggiornato se nuovo.
+    /// </returns>
     public static async Task<WordTemplate> SaveTemplateAsync(WordTemplate template) {
 
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
@@ -481,7 +538,9 @@ FROM   Hub.WordTemplates";
     /// <summary>
     /// Elimina un template Word dal database.
     /// </summary>
-    /// <param name="id">Id del template da eliminare.</param>
+    /// <param name="id">
+    /// Id del template da eliminare.
+    /// </param>
     public static async Task DeleteTemplateAsync(int id) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
         await connection.DeleteAsync<WordTemplate>(id);
@@ -490,8 +549,12 @@ FROM   Hub.WordTemplates";
     /// <summary>
     /// Duplica un template Word esistente con un nuovo nome.
     /// </summary>
-    /// <param name="id">Id del template da duplicare.</param>
-    /// <param name="name">Nome del nuovo template.</param>
+    /// <param name="id">
+    /// Id del template da duplicare.
+    /// </param>
+    /// <param name="name">
+    /// Nome del nuovo template.
+    /// </param>
     public static async Task DuplicateTemplateAsync(int id, string name) {
 
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
@@ -515,9 +578,15 @@ FROM   Hub.WordTemplates";
     /// <summary>
     /// Aggiorna i dettagli (nome e descrizione) di un template Word.
     /// </summary>
-    /// <param name="id">Id del template.</param>
-    /// <param name="name">Nuovo nome.</param>
-    /// <param name="description">Nuova descrizione.</param>
+    /// <param name="id">
+    /// Id del template.
+    /// </param>
+    /// <param name="name">
+    /// Nuovo nome.
+    /// </param>
+    /// <param name="description">
+    /// Nuova descrizione.
+    /// </param>
     public static async Task UpdateTemplateDetailsAsync(int id, string name, string description) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
         await connection.ExecuteNonQueryAsync(@"

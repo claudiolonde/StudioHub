@@ -8,7 +8,6 @@ namespace StudioHub.ViewModels;
 public partial class ManageWordTemplatesViewModel : ObservableObject {
 
     private readonly ManageWordTemplatesService _service;
-    private CancellationTokenSource? _wordCTS;
 
     private List<WordTemplate> _storedTemplates = [];
     [ObservableProperty]
@@ -122,10 +121,9 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     private async Task newTemplateAsync() {
 
         IsBusy = true;
-        _wordCTS = new CancellationTokenSource();
 
         try {
-            byte[] content = await _service.EditTemplateContentAsync(-1, _appHeaders, _wordCTS.Token);
+            byte[] content = await _service.EditTemplateContentAsync(-1, _appHeaders);
             if (content.Length == 0) {
                 return;
             }
@@ -148,13 +146,10 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
             await ManageWordTemplatesService.SaveTemplateAsync(newTemplate);
             await loadTemplatesAsync();
         }
-        catch (OperationCanceledException) { }
         catch (Exception ex) {
             Dialog.Show(DialogType.Error, $"Errore in Microsoft Word: {ex.Message}");
         }
         finally {
-            _wordCTS?.Dispose();
-            _wordCTS = null;
             IsBusy = false;
         }
     }
@@ -175,10 +170,9 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         await ManageWordTemplatesService.SetTemplateLockAsync(id, true);
 
         IsBusy = true;
-        _wordCTS = new CancellationTokenSource();
 
         try {
-            byte[] content = await _service.EditTemplateContentAsync(id, _appHeaders, _wordCTS.Token);
+            byte[] content = await _service.EditTemplateContentAsync(id, _appHeaders);
             if (content.Length == 0) { return; }
 
             SelectedTemplate = SelectedTemplate with {
@@ -189,14 +183,11 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
             await ManageWordTemplatesService.SaveTemplateAsync(SelectedTemplate);
             await loadTemplatesAsync();
         }
-        catch (OperationCanceledException) { }
         catch (Exception ex) {
             Dialog.Show(DialogType.Error, $"Errore in Microsoft Word: {ex.Message}");
         }
         finally {
             await ManageWordTemplatesService.SetTemplateLockAsync(id, false);
-            _wordCTS?.Dispose();
-            _wordCTS = null;
             IsBusy = false;
         }
     }
@@ -290,15 +281,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     /// <summary>
-    /// Annulla l'operazione Word in corso.
-    /// </summary>
-    [RelayCommand]
-    private void cancelWordOperation() {
-        _wordCTS?.Cancel();
-    }
-
-    /// <summary>
-    /// Restituisce <see langword="true"/> se è selezionato un template.
+    /// Restituisce <c>true</c> se è selezionato un template.
     /// </summary>
     private bool canExecuteIfSelected() {
         return SelectedTemplate != null;

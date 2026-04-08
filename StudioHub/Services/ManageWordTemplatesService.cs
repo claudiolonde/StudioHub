@@ -25,7 +25,6 @@ public class ManageWordTemplatesService {
 
     private TaskCompletionSource? _tcs;
     private SynchronizationContext? _syncContext;
-    private volatile bool _isCanceledByUser;
     private volatile bool _isShuttingDown;
 
     private Word.Application? _wordApp;
@@ -108,17 +107,13 @@ WHERE  Id = @Id",
     /// <param name="headers">
     /// Intestazioni per il mail merge.
     /// </param>
-    /// <param name="ct">
-    /// Token di cancellazione.
-    /// </param>
     /// <returns>
     /// Contenuto del file Word modificato come array di byte.
     /// </returns>
-    public async Task<byte[]> EditTemplateContentAsync(int id, string[] headers, CancellationToken ct) {
+    public async Task<byte[]> EditTemplateContentAsync(int id, string[] headers) {
 
         _syncContext = SynchronizationContext.Current;
         _tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        _isCanceledByUser = false;
         _isShuttingDown = false;
 
         _tempGuid = Guid.NewGuid().ToString();
@@ -132,36 +127,26 @@ WHERE  Id = @Id",
         }
         else {
             using SqlConnection connection = new(DataSource.StudioHubConnectionString);
-            WordTemplate? template = (await connection.QueryAsync<WordTemplate>(t => t.Id == id, cancellationToken: ct)).FirstOrDefault();
+            WordTemplate? template = (await connection.QueryAsync<WordTemplate>(t => t.Id == id)).FirstOrDefault();
 
             filename = Path.Combine(_tempFolder, (template is null ? "Modello" : template.Name) + WORD_FILE_EXT);
             if (template != null && template.Content.Length > 0) {
-                await File.WriteAllBytesAsync(filename, template.Content, ct);
+                await File.WriteAllBytesAsync(filename, template.Content);
             }
         }
 
-        using CancellationTokenRegistration ctr = ct.Register(() => {
-            _isCanceledByUser = true;
-            forceCloseWord();
-            _tcs.TrySetCanceled();
-        });
-
         try {
-            await startWordSTAThreadAndSetupAsync(filename, ct).ConfigureAwait(false);
+            await startWordSTAThreadAndSetupAsync(filename).ConfigureAwait(false);
             await _tcs.Task;
 
-            if (!_isCanceledByUser) {
-                cleanSaveCloseDocument();
+            cleanSaveCloseDocument();
 
-                bool isUnlocked = await waitFileUnlockingAsync(filename);
-                if (!isUnlocked) {
-                    throw new IOException("Impossibile accedere al file salvato. Il file risulta ancora in uso dal sistema dopo il timeout.");
-                }
-
-                byte[] resultBytes = await File.ReadAllBytesAsync(filename, ct);
-                return resultBytes;
+            bool isUnlocked = await waitFileUnlockingAsync(filename);
+            if (!isUnlocked) {
+                throw new IOException("Impossibile accedere al file salvato. Il file risulta ancora in uso dal sistema dopo il timeout.");
             }
-            return [];
+
+            return await File.ReadAllBytesAsync(filename);
         }
         finally {
             releaseCOMObjects();
@@ -365,7 +350,7 @@ WHERE  Id = @Id",
     /// </param>
     private void wordApp_DocumentBeforeClose(Word.Document wdoc, ref bool Cancel) {
 
-        if (_isCanceledByUser || _isShuttingDown) {
+        if (_isShuttingDown) {
             return;
         }
         try {
@@ -422,13 +407,10 @@ WHERE  Id = @Id",
     /// <param name="filename">
     /// Percorso del file Word.
     /// </param>
-    /// <param name="ct">
-    /// Token di cancellazione.
-    /// </param>
     /// <returns>
     /// Task di completamento.
     /// </returns>
-    private Task startWordSTAThreadAndSetupAsync(string filename, CancellationToken ct) {
+    private Task startWordSTAThreadAndSetupAsync(string filename) {
 
         _wordSTAReadyTCS = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         _wordSTAThread = new Thread(() => {
@@ -446,10 +428,6 @@ WHERE  Id = @Id",
         _wordSTAThread.SetApartmentState(ApartmentState.STA);
         _wordSTAThread.IsBackground = true;
         _wordSTAThread.Start();
-
-        if (ct.CanBeCanceled) {
-            ct.Register(() => _wordSTAReadyTCS.TrySetCanceled());
-        }
 
         return _wordSTAReadyTCS.Task;
     }

@@ -15,7 +15,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     [ObservableProperty]
     private string _searchText = string.Empty;
     [ObservableProperty]
-    private string _itemsCountText = "0 su 0 elementi";
+    private string _itemsCountText = "Visualizzati 0 su 0 elementi";
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(deleteCommand))]
@@ -111,7 +111,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     /// Aggiorna il testo del contatore degli elementi.
     /// </summary>
     private void updateCountText() {
-        ItemsCountText = $"{DisplayedTemplates.Count} su {_storedTemplates.Count} elementi";
+        ItemsCountText = $"Visualizzati {DisplayedTemplates.Count} su {_storedTemplates.Count} elementi";
     }
 
     /// <summary>

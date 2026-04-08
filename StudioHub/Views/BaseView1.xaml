@@ -4,25 +4,24 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:a="clr-namespace:StudioHub;assembly=StudioHub"
     xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
-    xmlns:v="clr-namespace:StudioHub.Views;assembly=StudioHub"
     xmlns:vm="clr-namespace:StudioHub.ViewModels;assembly=StudioHub"
-    TextOptions.TextFormattingMode="Display"
-    TextOptions.TextHintingMode="Fixed"
-    TextOptions.TextRenderingMode="ClearType"
-    SnapsToDevicePixels="True" UseLayoutRounding="True"
-    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
-    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    d:DataContext="{d:DesignInstance Type=vm:ManageWordTemplatesViewModel,
-                                     IsDesignTimeCreatable=True}"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:v="clr-namespace:StudioHub.Views;assembly=StudioHub"
     WindowStartupLocation="CenterScreen"
     ShowInTaskbar="True"
     ResizeMode="CanResize"
-    Width="720" Height="540"
+    Height="540" Width="720"
     FontFamily="Segoe UI Variable Display, Segoe UI"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    TextOptions.TextFormattingMode="Display" TextOptions.TextHintingMode="Fixed"
+    TextOptions.TextRenderingMode="ClearType" SnapsToDevicePixels="True"
+    UseLayoutRounding="True" ExtendsContentIntoTitleBar="True"
+    WindowBackdropType="Mica"
+    d:DataContext="{d:DesignInstance Type=vm:ManageWordTemplatesViewModel,
+                                     IsDesignTimeCreatable=True}"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -30,23 +29,109 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid>
-            <ui:TitleBar Margin="-15 0 0 0" Title="Titolo della finestra">
+            <ui:TitleBar Title="Gestione modelli di Word" Margin="-15 0 0 0">
                 <ui:TitleBar.Icon>
                     <ui:ImageIcon Source="{x:Null}"/>
                 </ui:TitleBar.Icon>
             </ui:TitleBar>
         </Grid>
-        <Grid Grid.Row="1" Cursor="">
+
+        <Grid
+            Grid.Row="1"
+            Margin="25"
+            Cursor=""
+            >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
+
+            <!--  search text  -->
+            <ui:TextBox
+                Grid.Column="0" Grid.Row="0"
+                Icon="{ui:SymbolIcon Symbol=Search16}"
+                Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                Margin="0 0 15 0"
+                PlaceholderText="Cerca..."
+                />
+
+            <!--  Nuovo modello  -->
+            <!-- Appearance="Primary"   -->
+            <ui:Button
+                Grid.Column="1" Grid.Row="0"
+                Icon="{ui:SymbolIcon Symbol=Add16}"
+                Content="Nuovo Modello"
+                HorizontalAlignment="Stretch"
+                
+                Command="{Binding newTemplateCommand}"
+                />
+
+            <!--  templates list  -->
+            <ListBox
+                Grid.Column="0" Grid.Row="1"
+                Margin="0 10 15 10"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding DisplayedTemplates, Mode=OneWay}"
+                SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                VirtualizingPanel.ScrollUnit="Pixel"
+                />
+
+            <StackPanel
+                Grid.Column="1" Grid.Row="1"
+                Margin="0 10"
+                >
+                <ui:HyperlinkButton Content="Modifica Dettagli..." Command="{Binding editDetailsCommand}"/>
+                <ui:HyperlinkButton Content="Modifica Documento..." Command="{Binding editContentCommand}"/>
+                <ui:HyperlinkButton Content="Duplica..." Command="{Binding duplicateCommand}"/>
+                <ui:HyperlinkButton Content="Elimina..." Command="{Binding deleteCommand}"/>
+
+                <ui:TextBlock
+                    Text="Creato il"
+                    Margin="10 10 0 0"
+                    FontWeight="Medium"
+                    />
+                <ui:TextBlock Text="{Binding SelectedTemplate.Created, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Margin="10 0 0 0"/>
+
+                <ui:TextBlock
+                    Text="Modificato il"
+                    Margin="10 10 0 0"
+                    FontWeight="Medium"
+                    />
+                <ui:TextBlock Text="{Binding SelectedTemplate.Modified, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Margin="10 0 0 0"/>
+
+                <ui:TextBlock
+                    Text="Descrizione"
+                    Margin="10 10 0 0"
+                    FontWeight="Medium"
+                    />
+                <ui:TextBlock
+                    Text="{Binding SelectedTemplate.Description, Mode=OneWay}"
+                    MinWidth="240"
+                    MaxWidth="240"
+                    Margin="10 0"
+                    HorizontalAlignment="Left"
+                    TextWrapping="WrapWithOverflow"
+                    />
+            </StackPanel>
+
+            <ui:TextBlock
+                Grid.Column="0" Grid.Row="2"
+                Text="{Binding ItemsCountText}"
+                Margin="0 0 15 0"
+                VerticalAlignment="Center"
+                />
+            <ui:Button
+                Grid.Column="1" Grid.Row="2"
+                Content="Chiudi"
+                HorizontalAlignment="Stretch"
+                />
         </Grid>
     </Grid>
 </ui:FluentWindow>

@@ -18,6 +18,7 @@ public partial class MainView {
             Application.Current.Shutdown();
             return;
         }
-        ManageWordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
+        StudioHub.Views.MainView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
+        //ManageWordTemplatesView.Open(App.Name, ["Nome", "Cognome", "Indirizzo"]);
     }
 }

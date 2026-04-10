@@ -4,23 +4,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:a="clr-namespace:StudioHub;assembly=StudioHub"
     xmlns:h="clr-namespace:StudioHub.Helpers;assembly=StudioHub"
     xmlns:v="clr-namespace:StudioHub.Views;assembly=StudioHub"
     xmlns:vm="clr-namespace:StudioHub.ViewModels;assembly=StudioHub"
-    TextOptions.TextFormattingMode="Display"
-    TextOptions.TextHintingMode="Fixed"
-    TextOptions.TextRenderingMode="ClearType"
-    SnapsToDevicePixels="True" UseLayoutRounding="True"
-    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    WindowBackdropType="Mica" WindowCornerPreference="Round"
+    ExtendsContentIntoTitleBar="True"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
+    UseLayoutRounding="True"
     d:DataContext="{d:DesignInstance Type=vm:BaseViewModel,
                                      IsDesignTimeCreatable=True}"
     WindowStartupLocation="CenterScreen"
     ShowInTaskbar="True"
-    ResizeMode="CanResize"
+    ResizeMode="CanResize" SizeToContent="Manual"
     Width="720" Height="540"
     FontFamily="Segoe UI Variable Display, Segoe UI"
     >
@@ -30,11 +29,20 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid>
-            <ui:TitleBar Margin="-15 0 0 0" Title="Titolo della finestra">
+            <ui:TitleBar
+                Grid.Row="0"
+                Icon="Auto" Title="Titolo della finestra"
+                >
+                <!--
                 <ui:TitleBar.Icon>
                     <ui:ImageIcon Source="{x:Null}"/>
                 </ui:TitleBar.Icon>
+                <ui:TitleBar.TrailingContent>
+                </ui:TitleBar.TrailingContent>
+                -->
             </ui:TitleBar>
+            <!--<ui:TitleBar Margin="-15 0 0 0" Title="Titolo della finestra">
+            </ui:TitleBar>-->
         </Grid>
         <Grid Grid.Row="1"/>
     </Grid>

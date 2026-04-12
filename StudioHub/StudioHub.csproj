@@ -12,18 +12,7 @@
         <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     </PropertyGroup>
 
-    <ItemGroup>
-        <Page Update="Themes\_wpf-ui.xaml">
-            <ContainsDesignTimeResources>True</ContainsDesignTimeResources>
-        </Page>
-    </ItemGroup>
 
-    <ItemGroup>
-        <None Remove="Assets\StudioHub.ico" />
-        <Resource Include="Assets\StudioHub.ico">
-            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-        </Resource>
-    </ItemGroup>
 
     <ItemGroup>
         <COMReference Include="Microsoft.Office.Interop.Word">
@@ -42,6 +31,10 @@
         <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
         <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
         <PackageReference Include="WPF-UI" Version="4.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Themes\" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace StudioHub.Models;
+namespace Studio.Models;
 
 /// <summary>
 /// Rappresenta un template Word modificabile utilizzato dall'app.

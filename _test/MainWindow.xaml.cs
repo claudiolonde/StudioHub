@@ -1,8 +1,8 @@
 using System.Windows;
-using StudioHub;
-using StudioHub.Views;
+using Studio;
+using Studio.Views;
 
-namespace _test;
+namespace Meeting;
 
 public partial class MainWindow {
 

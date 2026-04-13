@@ -3,7 +3,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace StudioHub.ViewModels;
+namespace Studio.ViewModels;
 
 public partial class ManageWordTemplatesViewModel : ObservableObject {
 

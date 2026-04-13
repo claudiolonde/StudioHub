@@ -1,4 +1,4 @@
-namespace StudioHub.Models;
+namespace Studio.Models;
 
 /// <summary>
 /// Rappresenta le informazioni necessarie per creare stringhe di connessione verso SQL Server. Contiene server,

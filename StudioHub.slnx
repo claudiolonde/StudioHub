@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="StudioHub/StudioHub.csproj" />
-  <Project Path="_test/_test.csproj" />
+  <Project Path="StudioHub/Studio.csproj" />
+  <Project Path="_test/Meeting.csproj" />
 </Solution>

@@ -1,7 +1,7 @@
 using RepoDb;
-using StudioHub.Models;
+using Studio.Models;
 
-namespace StudioHub;
+namespace Studio;
 
 public static class Hub {
 

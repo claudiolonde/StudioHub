@@ -1,5 +1,5 @@
-global using StudioHub.Helpers;
-global using StudioHub.Models;
-global using StudioHub.Services;
-global using StudioHub.Views;
-global using StudioHub.ViewModels;
+global using Studio.Helpers;
+global using Studio.Models;
+global using Studio.Services;
+global using Studio.Views;
+global using Studio.ViewModels;

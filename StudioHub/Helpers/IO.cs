@@ -1,8 +1,6 @@
-using System.IO;
-using System.Text.Json;
 using Microsoft.Win32;
-using StudioHub.Models;
-namespace StudioHub.Helpers;
+
+namespace Studio.Helpers;
 
 internal class IO {
 

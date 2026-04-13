@@ -4,7 +4,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 
 #pragma warning disable IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
-namespace StudioHub.Helpers;
+namespace Studio.Helpers;
 #pragma warning restore IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
 
 /// <summary>

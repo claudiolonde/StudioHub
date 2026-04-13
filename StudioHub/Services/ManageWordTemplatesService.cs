@@ -4,10 +4,10 @@ using System.Windows.Threading;
 using Microsoft.Data.SqlClient;
 using RepoDb;
 using RepoDb.Extensions;
-using static StudioHub.Hub;
+using static Studio.Hub;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace StudioHub.Services;
+namespace Studio.Services;
 
 /// <summary>
 /// Servizio per la gestione dei template Word, inclusa modifica, salvataggio, duplicazione e lock. Gestisce

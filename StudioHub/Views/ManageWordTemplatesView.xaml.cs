@@ -1,12 +1,12 @@
 using System.Data.Common;
 using System.Diagnostics;
 using System.Windows;
-using StudioHub;
-using StudioHub.Models;
-using StudioHub.Views;
+using Studio;
+using Studio.Models;
+using Studio.Views;
 using Wpf.Ui.Appearance;
 
-namespace StudioHub.Views;
+namespace Studio.Views;
 /// <summary>
 /// Interaction logic for BaseView1.xaml
 /// </summary>

@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace StudioHub.Views;
+namespace Studio.Views;
 
 /// <summary>
 /// Finestra di dialogo per la modifica dei dettagli di un modello Word.

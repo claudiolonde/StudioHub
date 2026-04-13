@@ -1,5 +1,5 @@
 using System.Windows;
-namespace _test;
+namespace Meeting;
 
 public partial class App : Application {
     public static string Name => "Meeting";

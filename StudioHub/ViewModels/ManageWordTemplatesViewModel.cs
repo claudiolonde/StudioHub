@@ -15,7 +15,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     [ObservableProperty]
     private string _searchText = string.Empty;
     [ObservableProperty]
-    private string _itemsCountText = "Visualizzati 0 su 0 elementi";
+    private string _infoBarText = "Visualizzati 0 su 0 elementi";
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(deleteCommand))]
@@ -77,25 +77,24 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         }
     }
 
-    partial void OnSearchTextChanged(string value) {
-        applyFilter();
-    }
+    partial void OnSearchTextChanged(string value) => applyFilter();
 
     /// <summary>
     /// Filtra i template visualizzati in base al testo di ricerca corrente.
     /// </summary>
     private void applyFilter() {
+#pragma warning disable IDE0028 // Semplifica l'inizializzazione della raccolta
 
         if (string.IsNullOrWhiteSpace(SearchText)) {
             DisplayedTemplates = new ObservableCollection<WordTemplate>(_storedTemplates);
 
         }
         else {
-            // Cache locale per evitare accessi ripetuti alla property e catturare snapshot coerente
             string searchText = SearchText;
-            List<WordTemplate> filtered = new(_storedTemplates.Count);
+            int count = _storedTemplates.Count;
+            List<WordTemplate> filtered = new(count);
 
-            for (int i = 0; i < _storedTemplates.Count; i++) {
+            for (int i = 0; i < count; i++) {
                 WordTemplate t = _storedTemplates[i];
                 if (t.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                     t.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)) {
@@ -104,14 +103,15 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
             }
             DisplayedTemplates = new ObservableCollection<WordTemplate>(filtered);
         }
-        updateCountText();
+        updateInfoBar();
+#pragma warning restore IDE0028 // Semplifica l'inizializzazione della raccolta
     }
 
     /// <summary>
-    /// Aggiorna il testo del contatore degli elementi.
+    /// Aggiorna il testo dell'infobar.
     /// </summary>
-    private void updateCountText() {
-        ItemsCountText = $"Visualizzati {DisplayedTemplates.Count} su {_storedTemplates.Count} elementi";
+    private void updateInfoBar() {
+        InfoBarText = $"Visualizzati {DisplayedTemplates.Count} su {_storedTemplates.Count} elementi";
     }
 
     /// <summary>
@@ -124,17 +124,12 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
 
         try {
             byte[] content = await _service.EditTemplateContentAsync(-1, _appHeaders);
-            if (content.Length == 0) {
-                return;
-            }
+            if (content.Length == 0) { return; }
 
             IEnumerable<string> unavailableNames = _storedTemplates.Select(t => t.Name);
             (string Name, string Description)? details = await (RequestTemplateDetails?.Invoke("", unavailableNames, "")
                                             ?? Task.FromResult<(string Name, string Description)?>(null));
-            if (details == null) {
-                //> Chiedere conferma all'utente
-                return;
-            }
+            if (details == null) { return; }
 
             WordTemplate newTemplate = new() {
                 Name = details.Value.Name,
@@ -155,13 +150,46 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     /// <summary>
+    /// Apre il dialogo per modificare nome e descrizione del template selezionato e persiste le modifiche.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(canExecuteIfSelected))]
+    private async Task editDetailsAsync() {
+
+        if (SelectedTemplate == null) { return; }
+        if (await ManageWordTemplatesService.IsTemplateLockedAsync(SelectedTemplate.Id)) {
+            Dialog.Show(DialogType.Error, "Il modello è attualmente in uso da un altro utente.");
+            return;
+        }
+
+        IEnumerable<string> unavailableNames = _storedTemplates.Where(t => t.Id != SelectedTemplate.Id).Select(t => t.Name);
+        (string Name, string Description)? details = await (RequestTemplateDetails?.Invoke(SelectedTemplate.Name, unavailableNames, SelectedTemplate.Description)
+                                            ?? Task.FromResult<(string Name, string Description)?>(null));
+        if (details == null) {
+            return;
+        }
+
+        IsBusy = true;
+        try {
+            await ManageWordTemplatesService.SetTemplateLockAsync(SelectedTemplate.Id, true);
+            await ManageWordTemplatesService.UpdateTemplateDetailsAsync(SelectedTemplate.Id, details.Value.Name, details.Value.Description);
+            await loadTemplatesAsync();
+        }
+        catch (Exception ex) {
+            Dialog.Show(DialogType.Error, $"Errore durante la modifica dei dettagli: {ex.Message}");
+        }
+        finally {
+            IsBusy = false;
+        }
+    }
+
+    /// <summary>
     /// Apre Word per modificare il contenuto del template selezionato e salva le modifiche nel DB.
     /// </summary>
     [RelayCommand(CanExecute = nameof(canExecuteIfSelected))]
     private async Task editContentAsync() {
 
         if (SelectedTemplate == null) { return; }
-        if (SelectedTemplate.Locked) {
+        if (await ManageWordTemplatesService.IsTemplateLockedAsync(SelectedTemplate.Id)) {
             Dialog.Show(DialogType.Error, "Il modello è attualmente in uso da un altro utente.");
             return;
         }
@@ -172,6 +200,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
         IsBusy = true;
 
         try {
+            await ManageWordTemplatesService.SetTemplateLockAsync(SelectedTemplate.Id, true);
             byte[] content = await _service.EditTemplateContentAsync(id, _appHeaders);
             if (content.Length == 0) { return; }
 
@@ -193,39 +222,6 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     /// <summary>
-    /// Apre il dialogo per modificare nome e descrizione del template selezionato e persiste le modifiche.
-    /// </summary>
-    [RelayCommand(CanExecute = nameof(canExecuteIfSelected))]
-    private async Task editDetailsAsync() {
-
-        if (SelectedTemplate == null) { return; }
-        if (SelectedTemplate.Locked) {
-            Dialog.Show(DialogType.Error, "Il modello è attualmente in uso da un altro utente.");
-            return;
-        }
-
-        IEnumerable<string> unavailableNames = _storedTemplates.Where(t => t.Id != SelectedTemplate.Id).Select(t => t.Name);
-        (string Name, string Description)? details = await (RequestTemplateDetails?.Invoke(SelectedTemplate.Name, unavailableNames, SelectedTemplate.Description)
-                                            ?? Task.FromResult<(string Name, string Description)?>(null));
-        if (details == null) {
-            //> Chiedere conferma all'utente
-            return;
-        }
-
-        IsBusy = true;
-        try {
-            await ManageWordTemplatesService.UpdateTemplateDetailsAsync(SelectedTemplate.Id, details.Value.Name, details.Value.Description);
-            await loadTemplatesAsync();
-        }
-        catch (Exception ex) {
-            Dialog.Show(DialogType.Error, $"Errore durante la modifica dei dettagli: {ex.Message}");
-        }
-        finally {
-            IsBusy = false;
-        }
-    }
-
-    /// <summary>
     /// Duplica il template selezionato con nome univoco basato sulla data corrente.
     /// </summary>
     [RelayCommand(CanExecute = nameof(canExecuteIfSelected))]
@@ -235,8 +231,8 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
 
         IsBusy = true;
         try {
-            string copyName = $"{SelectedTemplate.Name}_{DateTime.Now:yyyyMMdd_HHmmss}";
-            await ManageWordTemplatesService.DuplicateTemplateAsync(SelectedTemplate.Id, copyName);
+            string name = $"{SelectedTemplate.Name}_{DateTime.Now:yyyyMMdd_HHmmss}";
+            await ManageWordTemplatesService.DuplicateTemplateAsync(SelectedTemplate.Id, name);
             await loadTemplatesAsync();
         }
         catch (Exception ex) {
@@ -254,7 +250,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     private async Task deleteAsync() {
 
         if (SelectedTemplate == null) { return; }
-        if (SelectedTemplate.Locked) {
+        if (await ManageWordTemplatesService.IsTemplateLockedAsync(SelectedTemplate.Id)) {
             Dialog.Show(DialogType.Error, "Il modello è attualmente in uso da un altro utente.");
             return;
         }
@@ -281,7 +277,7 @@ public partial class ManageWordTemplatesViewModel : ObservableObject {
     }
 
     /// <summary>
-    /// Restituisce <c>true</c> se è selezionato un template.
+    /// Restituisce <c> true</c> se è selezionato un template.
     /// </summary>
     private bool canExecuteIfSelected() {
         return SelectedTemplate != null;

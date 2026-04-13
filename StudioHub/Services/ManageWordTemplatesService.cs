@@ -79,26 +79,6 @@ WHERE  Id = @Id",
     }
 
     /// <summary>
-    /// Crea una cartella temporanea e i file necessari per la modifica del template.
-    /// </summary>
-    /// <param name="headers">
-    /// Intestazioni per il datasource del mail merge.
-    /// </param>
-    /// <returns>
-    /// Task di completamento.
-    /// </returns>
-    private Task createTempFolderAsync(string[] headers) {
-
-        Directory.CreateDirectory(_tempFolder);
-
-        string tsvContent = $"{string.Join("\t", headers)}\r\n{new string('\t', headers.Length - 1)}";
-        Task tsvTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, HEADERS_FILENAME), tsvContent);
-        Task iniTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, "schema.ini"), SCHEMA_CONTENT);
-
-        return Task.WhenAll(tsvTask, iniTask);
-    }
-
-    /// <summary>
     /// Permette la modifica del contenuto di un template Word tramite Word interattivo.
     /// </summary>
     /// <param name="id">
@@ -119,7 +99,7 @@ WHERE  Id = @Id",
         _tempGuid = Guid.NewGuid().ToString();
         _tempFolder = Path.Combine(Path.GetTempPath(), SOLUTION_NAME, _tempGuid);
 
-        await createTempFolderAsync(headers);
+        await createTempFolderAsync(id, headers);
 
         string filename;
         if (id == -1) {
@@ -129,10 +109,9 @@ WHERE  Id = @Id",
             using SqlConnection connection = new(DataSource.StudioHubConnectionString);
             WordTemplate? template = (await connection.QueryAsync<WordTemplate>(t => t.Id == id)).FirstOrDefault();
 
-            filename = Path.Combine(_tempFolder, (template is null ? "Modello" : template.Name) + WORD_FILE_EXT);
+            filename = Path.Combine(_tempFolder, (template is null ? "Modello senza nome" : template.Name) + WORD_FILE_EXT);
             if (template != null && template.Content.Length > 0) {
                 await File.WriteAllBytesAsync(filename, template.Content);
-                await File.WriteAllTextAsync(Path.Combine(_tempFolder, "template_id"), template.Id.ToString());
             }
         }
 
@@ -143,17 +122,36 @@ WHERE  Id = @Id",
             cleanSaveCloseDocument();
 
             bool isUnlocked = await waitFileUnlockingAsync(filename);
-            if (!isUnlocked) {
-                throw new IOException("Impossibile accedere al file salvato. Il file risulta ancora in uso dal sistema dopo il timeout.");
-            }
-
-            return await File.ReadAllBytesAsync(filename);
+            return !isUnlocked
+                ? throw new IOException("Impossibile accedere al file salvato. Il file risulta ancora in uso dal sistema dopo il timeout.")
+                : await File.ReadAllBytesAsync(filename);
         }
         finally {
             releaseCOMObjects();
             deleteTempFolder();
             shutdownWordSTAThread();
         }
+    }
+
+    /// <summary>
+    /// Crea una cartella temporanea e i file necessari per la modifica del template.
+    /// </summary>
+    /// <param name="headers">
+    /// Intestazioni per il datasource del mail merge.
+    /// </param>
+    /// <returns>
+    /// Task di completamento.
+    /// </returns>
+    private Task createTempFolderAsync(int id, string[] headers) {
+
+        Directory.CreateDirectory(_tempFolder);
+
+        string tsvContent = $"{string.Join("\t", headers)}\r\n{new string('\t', headers.Length - 1)}";
+        Task tsvTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, HEADERS_FILENAME), tsvContent);
+        Task iniTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, "schema.ini"), SCHEMA_CONTENT);
+        Task txtTask = File.WriteAllTextAsync(Path.Combine(_tempFolder, "locked_id.txt"), id.ToString());
+
+        return Task.WhenAll(tsvTask, iniTask, txtTask);
     }
 
     /// <summary>
@@ -458,8 +456,7 @@ SELECT Id,
        Description,
        TargetApp,
        Created,
-       Modified,
-       Locked
+       Modified
 FROM   Hub.WordTemplates";
 
     /// <summary>
@@ -515,14 +512,27 @@ FROM   Hub.WordTemplates";
     }
 
     /// <summary>
-    /// Elimina un template Word dal database.
+    /// Aggiorna i dettagli (nome e descrizione) di un template Word.
     /// </summary>
     /// <param name="id">
-    /// Id del template da eliminare.
+    /// Id del template.
     /// </param>
-    public static async Task DeleteTemplateAsync(int id) {
+    /// <param name="name">
+    /// Nuovo nome.
+    /// </param>
+    /// <param name="description">
+    /// Nuova descrizione.
+    /// </param>
+    public static async Task UpdateTemplateDetailsAsync(int id, string name, string description) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
-        await connection.DeleteAsync<WordTemplate>(id);
+        await connection.ExecuteNonQueryAsync(@"
+UPDATE Hub.WordTemplates
+SET    Name = @Name,
+       Description = @Desc,
+       Modified = @Mod
+WHERE  Id = @Id",
+            new { Name = name, Desc = description, Mod = DateTime.UtcNow, Id = id }
+        );
     }
 
     /// <summary>
@@ -547,34 +557,20 @@ FROM   Hub.WordTemplates";
             Id = -1,
             Name = name,
             Created = now,
-            Modified = now,
-            Locked = false
+            Modified = now
         };
 
         await SaveTemplateAsync(clone);
     }
 
     /// <summary>
-    /// Aggiorna i dettagli (nome e descrizione) di un template Word.
+    /// Elimina un template Word dal database.
     /// </summary>
     /// <param name="id">
-    /// Id del template.
+    /// Id del template da eliminare.
     /// </param>
-    /// <param name="name">
-    /// Nuovo nome.
-    /// </param>
-    /// <param name="description">
-    /// Nuova descrizione.
-    /// </param>
-    public static async Task UpdateTemplateDetailsAsync(int id, string name, string description) {
+    public static async Task DeleteTemplateAsync(int id) {
         using SqlConnection connection = new(DataSource.StudioHubConnectionString);
-        await connection.ExecuteNonQueryAsync(@"
-UPDATE Hub.WordTemplates
-SET    Name = @Name,
-       Description = @Desc,
-       Modified = @Mod
-WHERE  Id = @Id",
-            new { Name = name, Desc = description, Mod = DateTime.UtcNow, Id = id }
-        );
+        await connection.DeleteAsync<WordTemplate>(id);
     }
 }

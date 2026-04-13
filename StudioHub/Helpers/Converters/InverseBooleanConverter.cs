@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Markup;
 
 #pragma warning disable IDE0130 // La parola chiave namespace non corrisponde alla struttura di cartelle
 namespace StudioHub.Helpers;
@@ -14,7 +15,7 @@ namespace StudioHub.Helpers;
 /// <paramref name="value"/> è <see langword="null"/> o non è di tipo <see cref="System.Boolean"/>, il converter
 /// restituisce <see langword="false"/>.
 /// </remarks>
-public class InverseBooleanConverter : IValueConverter {
+public class InverseBooleanConverter : MarkupExtension, IValueConverter {
 
     /// <summary>
     /// Converte un valore booleano invertendone il valore per il binding WPF.
@@ -50,5 +51,9 @@ public class InverseBooleanConverter : IValueConverter {
     /// </returns>
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
         return value is bool booleanValue && !booleanValue;
+    }
+
+    public override object ProvideValue(IServiceProvider serviceProvider) {
+        return this;
     }
 }

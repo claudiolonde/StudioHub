@@ -132,6 +132,7 @@ WHERE  Id = @Id",
             filename = Path.Combine(_tempFolder, (template is null ? "Modello" : template.Name) + WORD_FILE_EXT);
             if (template != null && template.Content.Length > 0) {
                 await File.WriteAllBytesAsync(filename, template.Content);
+                await File.WriteAllTextAsync(Path.Combine(_tempFolder, "template_id"), template.Id.ToString());
             }
         }
 

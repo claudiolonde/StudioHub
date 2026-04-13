@@ -12,6 +12,13 @@
         <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Remove="Themes\**" />
+      <EmbeddedResource Remove="Themes\**" />
+      <None Remove="Themes\**" />
+      <Page Remove="Themes\**" />
+    </ItemGroup>
+
 
 
     <ItemGroup>
@@ -31,10 +38,6 @@
         <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
         <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
         <PackageReference Include="WPF-UI" Version="4.2.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Themes\" />
     </ItemGroup>
 
 </Project>

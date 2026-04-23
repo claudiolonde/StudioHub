@@ -17,23 +17,15 @@
     ResizeMode="CanResize" SizeToContent="Manual"
     Width="720" Height="540"
     >
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="39*"/>
-            <ColumnDefinition Width="682*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto *">
+
         <ui:TitleBar
             Grid.ColumnSpan="2"
-            Margin="-16 0 0 0"
             VerticalAlignment="Center"
             Title="Titolo della finestra"
             >
             <ui:TitleBar.Icon>
-                <ui:ImageIcon Source="{x:Null}"/>
+                <ui:ImageIcon Margin="0 -4 -8 0" Source="/Studio;component/Assets/Icons/StudioHubIcon-50.png"/>
             </ui:TitleBar.Icon>
         </ui:TitleBar>
         <Grid

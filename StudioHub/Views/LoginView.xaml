@@ -1,0 +1,88 @@
+<ui:FluentWindow x:Class="Studio.Views.UserLoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    mc:Ignorable="d"
+    xmlns:a="clr-namespace:Studio"
+    xmlns:h="clr-namespace:Studio.Helpers"
+    xmlns:v="clr-namespace:Studio.Views"
+    xmlns:vm="clr-namespace:Studio.ViewModels"
+    ExtendsContentIntoTitleBar="True" WindowBackdropType="Mica"
+    d:DataContext="{d:DesignInstance Type=vm:ManageWordTemplatesViewModel, IsDesignTimeCreatable=True}"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen" WindowState="Normal"
+    ShowInTaskbar="False" WindowStyle="None"
+    ResizeMode="NoResize" SizeToContent="Manual"
+    Width="520" Height="400"
+    >
+    <Grid RowDefinitions="Auto *">
+        <ui:TitleBar
+            VerticalAlignment="Center"
+            Title="Accedi a StudioHub"
+            CanMaximize="False" ShowMaximize="False"
+            ShowMinimize="False"
+            >
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Margin="0 -4 -8 0" Source="/Studio;component/Assets/Icons/UserLoginIcon.png"/>
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+        <Grid
+            Grid.Row="1"
+            Margin="24 16 24 24"
+            RowDefinitions="Auto Auto Auto Auto"
+            >
+            <StackPanel Grid.Row="0">
+                <Border
+                    Padding="2"
+                    HorizontalAlignment="Center"
+                    BorderBrush="Goldenrod" BorderThickness="2"
+                    CornerRadius="8"
+                    >
+                    <ui:Image Width="50" Source="/Studio;component/Assets/Icons/StudioHubIcon-50.png"/>
+                </Border>
+                <ui:TextBlock
+                    HorizontalAlignment="Center"
+                    Text="StudioHub"
+                    FontSize="28" FontWeight="Medium"
+                    />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Width="360">
+                <ui:TextBlock
+                    Margin="0 16 0 4"
+                    Text="Nome utente"
+                    FontWeight="Medium"
+                    />
+                <ui:TextBox Icon="" PlaceholderText="inserisci il tuo nome utente"/>
+                <ui:TextBlock
+                    Margin="0 16 0 4"
+                    Text="Password"
+                    FontWeight="Medium"
+                    />
+                <ui:PasswordBox PlaceholderText="inserisci la tua password"/>
+                <ui:HyperlinkButton
+                    HorizontalAlignment="Right"
+                    Content="Password dimenticata?"
+                    Foreground="{DynamicResource SystemAccentColorBrush}"
+                    />
+            </StackPanel>
+            <StackPanel
+                Grid.Row="2"
+                Margin="0 16 0 0"
+                Width="360"
+                >
+                <ui:Button
+                    HorizontalAlignment="Stretch"
+                    Content="Accedi"
+                    Appearance="Primary"
+                    />
+                <ui:HyperlinkButton
+                    HorizontalAlignment="Right"
+                    Content="Registrati"
+                    Foreground="{DynamicResource SystemAccentColorBrush}"
+                    />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

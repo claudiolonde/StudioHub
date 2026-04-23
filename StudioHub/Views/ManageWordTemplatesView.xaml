@@ -41,8 +41,7 @@
                 HorizontalAlignment="Left"
                 HorizontalContentAlignment="Left"
                 Width="172"
-                Content="Nuovo Modello"
-                Icon="{ui:SymbolIcon Symbol=DocumentAdd20}"
+                Content="Nuovo Modello" Icon="{ui:SymbolIcon Symbol=DocumentAdd20}"
                 Appearance="Primary" ToolTip="Avvia Microsoft Word per la creazione di un nuovo modello."
                 Command="{Binding newTemplateCommand}"
                 />
@@ -51,8 +50,7 @@
             <ui:TextBox
                 Grid.Column="0" Grid.Row="0"
                 Margin="0 0 16 0"
-                Icon="{ui:SymbolIcon Symbol=Search12}"
-                Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                Icon="{ui:SymbolIcon Symbol=Search12}" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                 PlaceholderText="Cerca..." ToolTip="Digitare il testo da usare per filtrare i modelli in base a Nome e Descrizione."
                 />
 
@@ -60,11 +58,9 @@
             <ListBox
                 Grid.Column="0" Grid.Row="1"
                 Margin="0 8 16 8"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding DisplayedTemplates, Mode=OneWay}"
-                SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.ScrollUnit="Pixel"
+                DisplayMemberPath="Name" ItemsSource="{Binding DisplayedTemplates, Mode=OneWay}"
+                SelectedItem="{Binding SelectedTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel"
                 />
 
             <Grid
@@ -77,29 +73,21 @@
                 <!--  azioni di modifica  -->
                 <StackPanel Grid.Row="0">
                     <ui:HyperlinkButton
-                        Content="Modifica dettagli..."
-                        Icon="{ui:SymbolIcon Symbol=TextDescription24}"
-                        ToolTip="Apre una finestra per la modifica del Nome e della Descrizione del modello."
-                        Command="{Binding editDetailsCommand}"
+                        Content="Modifica dettagli..." Icon="{ui:SymbolIcon Symbol=TextDescription24}"
+                        ToolTip="Apre una finestra per la modifica del Nome e della Descrizione del modello." Command="{Binding editDetailsCommand}"
                         />
                     <ui:HyperlinkButton
-                        Content="Modifica documento..."
-                        Icon="{ui:SymbolIcon Symbol=Edit16}"
+                        Content="Modifica documento..." Icon="{ui:SymbolIcon Symbol=Edit16}"
                         FontSize="14"
-                        ToolTip="Avvia Microsoft Word per modificare il contenuto documento."
-                        Command="{Binding editContentCommand}"
+                        ToolTip="Avvia Microsoft Word per modificare il contenuto documento." Command="{Binding editContentCommand}"
                         />
                     <ui:HyperlinkButton
-                        Content="Duplica..."
-                        Icon="{ui:SymbolIcon Symbol=Copy16}"
-                        ToolTip="Duplica il modello aggiungendo una marca temporale al nome della copia."
-                        Command="{Binding duplicateCommand}"
+                        Content="Duplica..." Icon="{ui:SymbolIcon Symbol=Copy16}"
+                        ToolTip="Duplica il modello aggiungendo una marca temporale al nome della copia." Command="{Binding duplicateCommand}"
                         />
                     <ui:HyperlinkButton
-                        Content="Elimina..."
-                        Icon="{ui:SymbolIcon Symbol=Delete16}"
-                        ToolTip="Chiede conferma ed eventualmente elimina il modello selezionato."
-                        Command="{Binding deleteCommand}"
+                        Content="Elimina..." Icon="{ui:SymbolIcon Symbol=Delete16}"
+                        ToolTip="Chiede conferma ed eventualmente elimina il modello selezionato." Command="{Binding deleteCommand}"
                         />
 
                     <ui:TextBlock

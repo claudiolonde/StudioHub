@@ -19,6 +19,12 @@
       <Page Remove="Themes\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Assets\Icons\StudioHubIcon-100.png" />
+      <None Remove="Assets\Icons\StudioHubIcon-50.png" />
+      <None Remove="Assets\Icons\UserLoginIcon.png" />
+    </ItemGroup>
+
 
 
     <ItemGroup>
@@ -38,6 +44,12 @@
         <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
         <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
         <PackageReference Include="WPF-UI" Version="4.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Assets\Icons\StudioHubIcon-100.png" />
+      <Resource Include="Assets\Icons\StudioHubIcon-50.png" />
+      <Resource Include="Assets\Icons\UserLoginIcon.png" />
     </ItemGroup>
 
 </Project>

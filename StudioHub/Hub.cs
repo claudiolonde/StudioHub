@@ -1,5 +1,6 @@
 using RepoDb;
 using Studio.Models;
+using Studio.Models.TaskPlanner;
 
 namespace Studio;
 
@@ -60,6 +61,11 @@ public static class Hub {
     private static void mapEntities() {
         FluentMapper.Entity<WordTemplate>()
             .Table("Hub.WordTemplates")
+            .Primary(x => x.Id)
+            .Identity(x => x.Id);
+
+        FluentMapper.Entity<Supplier>()
+            .Table("TaskPlanner.Suppliers")
             .Primary(x => x.Id)
             .Identity(x => x.Id);
     }
